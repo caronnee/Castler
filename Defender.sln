@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CracDesChevaliers", "CracDesChevaliers.vcxproj", "{1D8BDB5A-8D5F-4991-9D59-C9B9EDC052F3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DF0C0255-50B0-462D-80F2-FBF45DEEDD91} = {DF0C0255-50B0-462D-80F2-FBF45DEEDD91}
+		{8954F801-10F0-4C71-9E24-E7F81407AED2} = {8954F801-10F0-4C71-9E24-E7F81407AED2}
+		{89CA8012-22A0-403C-9FAB-6E822FD98AA4} = {89CA8012-22A0-403C-9FAB-6E822FD98AA4}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D8BDB5A-8D5F-4991-9D59-C9B9EDC052F3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D8BDB5A-8D5F-4991-9D59-C9B9EDC052F3}.Debug|Win32.Build.0 = Debug|Win32
+		{1D8BDB5A-8D5F-4991-9D59-C9B9EDC052F3}.Release|Win32.ActiveCfg = Release|Win32
+		{1D8BDB5A-8D5F-4991-9D59-C9B9EDC052F3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

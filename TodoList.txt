@@ -1,0 +1,3 @@
+- show help
+- process multiple images
+- create a structure
