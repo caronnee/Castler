@@ -1,38 +1,27 @@
 #version 120
 
 // Interpolated values from the vertex shaders
-varying vec2 UV;
 varying vec3 Position_worldspace;
 varying vec3 Normal_cameraspace;
 varying vec3 EyeDirection_cameraspace;
 varying vec3 LightDirection_cameraspace;
 
-// Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
 uniform vec3 ambient;
-uniform vec3 specular;
-uniform vec3 diffuseMask;
 uniform float LightPower;
 
 void main(){
 
 	// Light emission properties
-	// You probably want to put them as uniforms
 	vec3 LightColor = vec3(1,1,1);
 	
-	// Material properties
-	vec3 TextureColor = texture2D( myTextureSampler, UV ).rgb;
-	vec3 MaterialDiffuseColor = diffuseMask * TextureColor;
-	vec3 MaterialAmbientColor = ambient * TextureColor;
-	vec3 MaterialSpecularColor = specular;
-
 	// Distance to the light
 	float distance = length( LightPosition_worldspace - Position_worldspace );
 
 	// Normal of the computed fragment, in camera space
 	vec3 n = normalize( Normal_cameraspace );
+
 	// Direction of the light (from the fragment to the light)
 	vec3 l = normalize( LightDirection_cameraspace );
 	// Cosine of the angle between the normal and the light direction, 
@@ -52,12 +41,5 @@ void main(){
 	//  - Looking elsewhere -> < 1
 	float cosAlpha = clamp( dot( E,R ), 0,1 );
 	
-	gl_FragColor.rgb = 
-		// Ambient : simulates indirect lighting
-		MaterialAmbientColor +
-		// Diffuse : "color" of the object
-		MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
-		// Specular : reflective highlight, like a mirror
-		MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
-
+	gl_FragColor.rgb = vec3(1,1,1);
 }

@@ -46,13 +46,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\Bin\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Bin\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bin\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Bin\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
@@ -61,7 +61,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\external\AntTweakBar-1.16\include;$(ProjectDir)\external\glfw-3.0.3\include\GLFW;$(ProjectDir)\external\glm-0.9.4.0;$(ProjectDir)\external\glew-1.9.0\include;$(ProjectDir)\external\assimp-3.0.1270\include;$(ProjectDir)\external\bullet-2.81-rev2613\src;$(ProjectDir)\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\external\AntTweakBar-1.16\include;$(ProjectDir)\external\glfw-3.0.3\include\GLFW;$(ProjectDir)\external\glm-0.9.4.0;$(ProjectDir)\external\glew-1.9.0\include;$(ProjectDir)\external\assimp-3.0.1270\include;$(ProjectDir)\external\bullet-2.81-rev2613\src;$(ProjectDir)\.;$(ProjectDir)\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -282,17 +282,19 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="external\source\tiny_obj_loader.h" />
     <ClInclude Include="source\shader.hpp" />
     <ClInclude Include="source\controls.hpp" />
     <ClInclude Include="source\texture.hpp" />
     <ClInclude Include="source\objloader.hpp" />
+    <ClCompile Include="external\source\tiny_obj_loader.cc" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\shader.cpp" />
     <ClCompile Include="source\controls.cpp" />
     <ClCompile Include="source\texture.cpp" />
     <ClCompile Include="source\objloader.cpp" />
-    <None Include="source\StandardShading.vertexshader" />
-    <None Include="source\StandardShading.fragmentshader" />
+    <None Include="shaders\StandardShading.fragmentshader" />
+    <None Include="shaders\StandardShading.vertexshader" />
     <None Include="TodoList.txt" />
   </ItemGroup>
   <ItemGroup>

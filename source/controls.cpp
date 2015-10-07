@@ -1,6 +1,6 @@
 // Include GLFW
 #include <glfw3.h>
-extern GLFWwindow* window; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
+extern GLFWwindow* GWindow; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -157,12 +157,12 @@ float HandlePressed()
 
   for ( int i =0; i < Keys; i++)
   {
-    if( (glfwGetKey(window, keys[i].key ) == GLFW_PRESS) && !keys[i].isPressed )
+    if( (glfwGetKey(GWindow, keys[i].key ) == GLFW_PRESS) && !keys[i].isPressed )
     {
       keys[i].isPressed = true;
       keys[i].enabled = !keys[i].enabled;
     }
-    if( (glfwGetKey(window, keys[i].key ) == GLFW_RELEASE) )
+    if( (glfwGetKey(GWindow, keys[i].key ) == GLFW_RELEASE) )
     {
       keys[i].isPressed = false;
     }
@@ -193,7 +193,7 @@ float HandlePressed()
 
   // Get mouse position
   double xpos, ypos;
-  glfwGetCursorPos(window, &xpos, &ypos);
+  glfwGetCursorPos(GWindow, &xpos, &ypos);
 
   // Compute time difference between current and last frame
   double currentTime = glfwGetTime();
@@ -323,10 +323,10 @@ void computeMatricesFromInputs(){
   // handle not dependent on time
   
 
-  if (glfwGetKey( window, GLFW_KEY_SPACE ) == GLFW_PRESS)
+  if (glfwGetKey( GWindow, GLFW_KEY_SPACE ) == GLFW_PRESS)
   {
     // Reset mouse position for next frame
-    glfwSetCursorPos(window, WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+    glfwSetCursorPos(GWindow, WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
     lastPos = glm::vec2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
   }
 
@@ -335,37 +335,37 @@ void computeMatricesFromInputs(){
   //  __debugbreak();
   //d = direction;
   // Move forward
-  if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
+  if (glfwGetKey( GWindow, GLFW_KEY_UP ) == GLFW_PRESS){
     if (IsEnabled(Key_L))
       lightPos += GetLightDir()* deltaTime * speed;
     else
       position += direction * deltaTime * speed;
   }
   // Move backward
-  if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
+  if (glfwGetKey( GWindow, GLFW_KEY_DOWN ) == GLFW_PRESS){
     if (IsEnabled(Key_L))
       lightPos -= GetLightDir()* deltaTime * speed;
     else
       position -= direction * deltaTime * speed;
   }
   // Strafe right
-  if (glfwGetKey( window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
+  if (glfwGetKey( GWindow, GLFW_KEY_RIGHT ) == GLFW_PRESS){
     if (IsEnabled(Key_L))
       lightPos += GetLightStrafe() * deltaTime * speed;
     else
       position += right * deltaTime * speed;
   }
   // Strafe left
-  if (glfwGetKey( window, GLFW_KEY_LEFT ) == GLFW_PRESS){
+  if (glfwGetKey( GWindow, GLFW_KEY_LEFT ) == GLFW_PRESS){
     if (IsEnabled(Key_L))
       lightPos -= GetLightStrafe() * deltaTime * speed;
     else
       position -= right * deltaTime * speed;
   }
 
-  if (glfwGetKey( window, GLFW_KEY_KP_ADD ) == GLFW_PRESS)
+  if (glfwGetKey( GWindow, GLFW_KEY_KP_ADD ) == GLFW_PRESS)
     power++;
-  if (glfwGetKey( window, GLFW_KEY_KP_SUBTRACT ) == GLFW_PRESS)
+  if (glfwGetKey( GWindow, GLFW_KEY_KP_SUBTRACT ) == GLFW_PRESS)
     power--;
   if ( power < 0 )
     power = 0;

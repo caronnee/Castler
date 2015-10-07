@@ -20,7 +20,6 @@
 bool loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
-	std::vector<glm::vec2> & out_uvs,
 	std::vector<glm::vec3> & out_normals
 ){
 	printf("Loading OBJ file %s...\n", path);
@@ -34,7 +33,6 @@ bool loadOBJ(
 	FILE * file = fopen(path, "r");
 	if( file == NULL ){
 		printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
-		getchar();
 		return false;
 	}
 
@@ -101,7 +99,6 @@ bool loadOBJ(
 		
 		// Put the attributes in buffers
 		out_vertices.push_back(vertex);
-		out_uvs     .push_back(uv);
 		out_normals .push_back(normal);
 	
 	}

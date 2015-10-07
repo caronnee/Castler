@@ -1,3 +1,4 @@
+- make Gengine class ;) for rendering content
 - show help
 - process multiple images
 - create a structure

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\shader.cpp" />
+    <ClCompile Include="source\controls.cpp" />
+    <ClCompile Include="source\texture.cpp" />
+    <ClCompile Include="source\objloader.cpp" />
+    <ClCompile Include="external\source\tiny_obj_loader.cc">
+      <Filter>Extern</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\shader.hpp" />
+    <ClInclude Include="source\controls.hpp" />
+    <ClInclude Include="source\texture.hpp" />
+    <ClInclude Include="source\objloader.hpp" />
+    <ClInclude Include="external\source\tiny_obj_loader.h">
+      <Filter>Extern</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TodoList.txt" />
+    <None Include="shaders\StandardShading.fragmentshader" />
+    <None Include="shaders\StandardShading.vertexshader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Extern">
+      <UniqueIdentifier>{dba48729-3bd4-4aa3-8857-421c91cc905a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
