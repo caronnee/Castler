@@ -5,12 +5,9 @@
     <ClCompile Include="source\shader.cpp" />
     <ClCompile Include="source\controls.cpp" />
     <ClCompile Include="source\texture.cpp" />
-    <ClCompile Include="source\objloader.cpp" />
     <ClCompile Include="external\source\tiny_obj_loader.cc">
       <Filter>Extern</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="source\shader.hpp" />
     <ClInclude Include="source\controls.hpp" />
     <ClInclude Include="source\texture.hpp" />
@@ -18,15 +15,23 @@
     <ClInclude Include="external\source\tiny_obj_loader.h">
       <Filter>Extern</Filter>
     </ClInclude>
+    <ClCompile Include="source\objloader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
-    <None Include="shaders\StandardShading.fragmentshader" />
-    <None Include="shaders\StandardShading.vertexshader" />
+    <None Include="shaders\StandardShading.fragmentshader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\StandardShading.vertexshader">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Extern">
       <UniqueIdentifier>{dba48729-3bd4-4aa3-8857-421c91cc905a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{7793c53c-da7a-4122-bee0-5c5e950ec62d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
