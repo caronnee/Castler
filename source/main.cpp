@@ -110,7 +110,7 @@ class Model
   std::vector<glm::vec3> _vertices;
   std::vector<glm::vec3> _normals;
   glm::vec4 _centerMin, _centerMax,_center;
-  std::vector<int> _indices;
+  std::vector<short> _indices;
 
 public:
   void Load(const char * name)
@@ -191,6 +191,18 @@ public:
   {
     return &_normals[0];
   }
+
+  int NIndices() const
+  {
+    return _indices.size();
+  }
+
+  short * Indices()
+  {
+    return &_indices[0];
+  }
+
+
 };
 
 class Engine
@@ -198,13 +210,16 @@ class Engine
   glm::vec4 camPos, camDir;
   GLuint programID;
   GLuint vertexbuffer;
+  GLuint indicesbuffer;
 
   GLuint MatrixID;
 
   // Get a handle for our buffers
   GLuint vertexPosition_modelspaceID;
+  GLuint model_indices;
 
   int _nvertices;
+  int _indices_size;
 public:
   void SwitchToModel(Model & model)
   {
@@ -212,14 +227,17 @@ public:
     camDir = glm::vec4(0,0,1,0);
     camDir = glm::normalize(camDir);
     camPos -= camDir *5;
-    SetCameraPosition( glm::vec3(camPos.x,camPos.y,camPos.z), glm::vec3(camDir.x,camDir.y,camDir.z) );
 
+    SetCameraPosition( glm::vec3(camPos.x,camPos.y,camPos.z), glm::vec3(camDir.x,camDir.y,camDir.z) );
     SetCenter(model.Center());
 
     // Load it into a VBO
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, model.NVertices() * sizeof(glm::vec3), model.Vertices(), GL_STATIC_DRAW);
     _nvertices = model.NVertices();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model_indices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.NIndices() * sizeof(unsigned short), model.Indices() , GL_STATIC_DRAW);
+    _indices_size = model.NIndices();
   }
 
   void Draw()
@@ -252,8 +270,16 @@ public:
       );
 
     // Draw the triangles !
-    glDrawArrays(GL_TRIANGLES, 0, _nvertices );
+    // Index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model_indices);
 
+    // Draw the triangles !
+    glDrawElements(
+      GL_TRIANGLES,      // mode
+      _indices_size,    // count
+      GL_UNSIGNED_SHORT,   // type
+      (void*)0           // element array buffer offset
+      );
     glDisableVertexAttribArray(vertexPosition_modelspaceID);
 
   }
@@ -271,12 +297,14 @@ public:
     // Get a handle for our buffers
     vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
 
+    glGenBuffers(1,&model_indices);
     glGenBuffers(1,&vertexbuffer);
   }
 
   void ShutDown()
   {
     // Cleanup VBO and shader
+    glDeleteBuffers(1, &model_indices);
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteProgram(programID);
   }
