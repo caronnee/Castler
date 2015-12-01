@@ -25,11 +25,6 @@ Creator::~Creator()
 
 }
 
-void Creator::setCurrentGlWidget()
-{
-  currentGlWidget = qobject_cast<Renderer *>(sender());
-}
-
 void Creator::rotateOneStep()
 {
     currentGlWidget->rotateBy(+2 * 16, +2 * 16, -1 * 16);

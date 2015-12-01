@@ -15,11 +15,10 @@ public:
     ~Creator();
 
 private slots:
-    void setCurrentGlWidget();
     void rotateOneStep();
 
 private:
-    Ui::CreatorClass ui;
+    Ui::CreatorContent ui;
     Renderer *currentGlWidget;
 };
 

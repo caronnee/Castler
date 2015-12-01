@@ -119,7 +119,7 @@ void Renderer::initializeGL()
     "varying mediump vec4 texc;\n"
     "void main(void)\n"
     "{\n"
-    "    gl_FragColor = texture2D(texture, texc.st);\n"
+    "    gl_FragColor = color(1,1,1,1);\n"
     "}\n";
   fshader->compileSourceCode(fsrc);
 
