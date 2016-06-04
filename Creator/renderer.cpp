@@ -64,16 +64,6 @@ Renderer::~Renderer()
   doneCurrent();
 }
 
-QSize Renderer::minimumSizeHint() const
-{
-  return QSize(50, 50);
-}
-
-QSize Renderer::sizeHint() const
-{
-  return QSize(200, 200);
-}
-
 void Renderer::rotateBy(int xAngle, int yAngle, int zAngle)
 {
   xRot += xAngle;
@@ -156,11 +146,6 @@ void Renderer::paintGL()
     //textures[i]->bind();
     glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
   }
-}
-void Renderer::resizeGL(int width, int height)
-{
-  int side = qMin(width, height);
-  glViewport((width - side) / 2, (height - side) / 2, side, side);
 }
 
 void Renderer::mousePressEvent(QMouseEvent *event)

@@ -36,6 +36,9 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{2fbf9788-5cc7-41de-bfc2-340d2bc619ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{b1db6d3a-f727-4eb2-aca6-0a840138e9d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -62,6 +65,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_renderer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.h">
@@ -82,6 +88,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

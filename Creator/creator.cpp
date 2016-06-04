@@ -7,17 +7,13 @@ Creator::Creator(QWidget *parent)
 {
     ui.setupUi(this);
 
-    QGridLayout *mainLayout = new QGridLayout;
-
-    setLayout(mainLayout);
-    currentGlWidget = new Renderer;
+/// connecters
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
     timer->start(20);
-    mainLayout->addWidget(currentGlWidget, 0, 0);
 
-    setWindowTitle(tr("Textures"));
+    connect(ui.loadButton, SIGNAL(clicked(void)), this, SLOT(reload()));
 }
 
 Creator::~Creator()
@@ -25,7 +21,13 @@ Creator::~Creator()
 
 }
 
+void Creator::reload()
+{
+  QString name = ui.modelName->text();
+  
+}
+
 void Creator::rotateOneStep()
 {
-    currentGlWidget->rotateBy(+2 * 16, +2 * 16, -1 * 16);
+    ui.renderWidget->rotateBy(+2 * 16, +2 * 16, -1 * 16);
 }

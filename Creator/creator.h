@@ -16,10 +16,10 @@ public:
 
 private slots:
     void rotateOneStep();
+    void reload();
 
 private:
     Ui::CreatorContent ui;
-    Renderer *currentGlWidget;
 };
 
 #endif // CREATOR_H
