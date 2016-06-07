@@ -39,12 +39,15 @@
     <Filter Include="External">
       <UniqueIdentifier>{b1db6d3a-f727-4eb2-aca6-0a840138e9d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Gui">
+      <UniqueIdentifier>{504a4397-932d-4b1e-9060-2a42adb25187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{79fabbbd-a571-41c6-a335-a5ea516f64e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="creator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -56,17 +59,38 @@
     <ClCompile Include="GeneratedFiles\qrc_creator.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_renderer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_renderer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="creator.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
     <ClCompile Include="Model.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="inputlist.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_inputlist.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_inputlist.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="loghandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_loghandler.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_loghandler.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +105,12 @@
     </CustomBuild>
     <CustomBuild Include="renderer.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inputlist.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="loghandler.h">
+      <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

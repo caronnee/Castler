@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>537</width>
+    <width>753</width>
     <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="15,1,0">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -23,18 +23,8 @@
       <attribute name="title">
        <string>Renderer</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1" rowspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-        <widget class="Renderer" name="renderWidget" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>100</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4">
+       <item>
         <widget class="QGroupBox" name="renderSettings">
          <property name="title">
           <string>Settings</string>
@@ -43,15 +33,15 @@
           <item>
            <widget class="QToolBox" name="toolBox">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>369</width>
-               <height>127</height>
+               <width>234</width>
+               <height>308</height>
               </rect>
              </property>
              <attribute name="label">
@@ -82,8 +72,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>369</width>
-               <height>127</height>
+               <width>121</width>
+               <height>325</height>
               </rect>
              </property>
              <attribute name="label">
@@ -95,15 +85,8 @@
          </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="creatorTab">
-      <attribute name="title">
-       <string>Creator</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="2" column="1">
-        <widget class="QOpenGLWidget" name="cloudPoints">
+       <item>
+        <widget class="Renderer" name="renderWidget" native="true">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -112,7 +95,14 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="creatorTab">
+      <attribute name="title">
+       <string>Creator</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4">
+       <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Settings</string>
@@ -123,26 +113,45 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="inputbutton">
+            <widget class="QWidget" name="inputgroup">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>369</width>
-               <height>133</height>
+               <width>121</width>
+               <height>325</height>
               </rect>
              </property>
              <attribute name="label">
               <string>Input</string>
              </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="InputList" name="inputList"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="saveSettingsButton">
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="playButton">
+                <property name="text">
+                 <string>Play</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="matchesTool">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>98</width>
-               <height>28</height>
+               <width>100</width>
+               <height>30</height>
               </rect>
              </property>
              <attribute name="label">
@@ -154,12 +163,22 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QOpenGLWidget" name="cloudPoints">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>100</height>
+          </size>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
    </item>
    <item>
-    <widget class="QTextBrowser" name="textBrowser"/>
+    <widget class="LogHandler" name="infobox"/>
    </item>
    <item>
     <widget class="QProgressBar" name="progressBar">
@@ -177,6 +196,16 @@
    <extends>QWidget</extends>
    <header location="global">renderer.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>InputList</class>
+   <extends>QListWidget</extends>
+   <header location="global">inputlist.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LogHandler</class>
+   <extends>QTextBrowser</extends>
+   <header location="global">loghandler.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -15,6 +15,7 @@ public:
     ~Creator();
 
 private slots:
+	void SaveSettings();
     void rotateOneStep();
     void reload();
 
