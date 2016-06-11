@@ -14,9 +14,9 @@ void InputList::Load(QFile & loader)
 	QByteArray arr = loader.readAll();
 	QByteArrayList l = arr.split('@');
 	_lastDirectory = QString(l[0]);
-	for (int i = 1; i < l.count(); i++)
+	for (int i = 1; i < l.count()-1; i++)
 	{
-		addItem(l[i]);
+		addVideo(l[i]);
 	}
 }
 void InputList::Save(QFile & writer)
@@ -37,7 +37,19 @@ QString InputList::_lastDirectory = "C:";
 
 void InputList::deleteVideo()
 {
-	removeItemWidget(takeItem( selectedIndexes()[0].row() ));
+	QListWidgetItem * item = takeItem( selectedIndexes()[0].row() );
+	delete item;
+}
+
+void InputList::addVideo(const QString & str)
+{
+	QStringList lst = str.split('/');
+	QString display = lst[lst.size() - 1];
+	QListWidgetItem * item = new QListWidgetItem(str);
+	item->setData(Qt::DisplayRole, display);
+	item->setData(Qt::UserRole, str);
+	addItem(item);
+	this->setItemSelected(item, true);
 }
 
 void InputList::addVideo()
@@ -52,7 +64,7 @@ void InputList::addVideo()
 	_lastDirectory = files[0];
 	for (int i = 0; i < files.size(); i++)
 	{
-		addItem(files[i]);
+		addVideo(files[i]);		
 	}
 }
 
@@ -62,7 +74,7 @@ void InputList::createActions()
 	newAct[ActionNewVideo]->setStatusTip(tr("Add a video to the list"));
 	newAct[ActionDeleteVideo] = new QAction(tr("Delete video"), this);
 	newAct[ActionDeleteVideo]->setStatusTip(tr("Remove video from list"));
-	connect(newAct[ActionNewVideo], &QAction::triggered, this, &InputList::addVideo);
+	connect(newAct[ActionNewVideo], SIGNAL(triggered(void)), this, SLOT(addVideo(void)));
 	connect(newAct[ActionDeleteVideo], &QAction::triggered, this, &InputList::deleteVideo);
 }
 

@@ -3,8 +3,7 @@
 
 #include <QtWidgets/QWidget>
 #include "ui_creator.h"
-
-class Renderer;
+#include "opencv2/highgui/highgui.hpp"
 
 class Creator : public QWidget
 {
@@ -15,6 +14,7 @@ public:
     ~Creator();
 
 private slots:
+	void PlayVideo();
 	void SaveSettings();
     void rotateOneStep();
     void reload();

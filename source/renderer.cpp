@@ -39,6 +39,8 @@
 ****************************************************************************/
 
 #include "renderer.h"
+#include "loghandler.h"
+#include "debug.h"
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
@@ -107,11 +109,19 @@ void Renderer::initializeGL()
   const char *fsrc =
     "uniform sampler2D texture;\n"
     "varying mediump vec4 texc;\n"
-    "void main(void)\n"
+    "void main()\n"
     "{\n"
-    "    gl_FragColor = color(1,1,1,1);\n"
+    "    gl_FragColor = vec4(1,1,1,1);\n"
     "}\n";
-  fshader->compileSourceCode(fsrc);
+  bool compiled = fshader->compileSourceCode(fsrc);
+  const GLubyte * str = glGetString(GL_VERSION);
+//  gf_report(LogHandler::MInfo,str);
+  if (!compiled);
+  {
+	  GLint maxLength = 0;
+	  QString ret = fshader->log();
+	  gf_report(LogHandler::MError,ret.toStdString().c_str());
+  }
 
   program = new QOpenGLShaderProgram;
   program->addShader(vshader);
@@ -126,26 +136,26 @@ void Renderer::initializeGL()
 
 void Renderer::paintGL()
 {
-  glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  QMatrix4x4 m;
-  m.ortho(-0.5f, +0.5f, +0.5f, -0.5f, 4.0f, 15.0f);
-  m.translate(0.0f, 0.0f, -10.0f);
-  m.rotate(xRot / 16.0f, 1.0f, 0.0f, 0.0f);
-  m.rotate(yRot / 16.0f, 0.0f, 1.0f, 0.0f);
-  m.rotate(zRot / 16.0f, 0.0f, 0.0f, 1.0f);
+	QMatrix4x4 m;
+	m.ortho(-0.5f, +0.5f, +0.5f, -0.5f, 4.0f, 15.0f);
+	m.translate(0.0f, 0.0f, -10.0f);
+	m.rotate(xRot / 16.0f, 1.0f, 0.0f, 0.0f);
+	m.rotate(yRot / 16.0f, 0.0f, 1.0f, 0.0f);
+	m.rotate(zRot / 16.0f, 0.0f, 0.0f, 1.0f);
 
-  program->setUniformValue("matrix", m);
-  program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-  program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
-  program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 5 * sizeof(GLfloat));
-  program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, 3 * sizeof(GLfloat), 2, 5 * sizeof(GLfloat));
+	program->setUniformValue("matrix", m);
+	program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
+	program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
+	program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 5 * sizeof(GLfloat));
+	program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, 3 * sizeof(GLfloat), 2, 5 * sizeof(GLfloat));
 
-  for (int i = 0; i < 6; ++i) {
-    //textures[i]->bind();
-    glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
-  }
+	for (int i = 0; i < 6; ++i) {
+		//textures[i]->bind();
+		glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
+	}
 }
 
 void Renderer::mousePressEvent(QMouseEvent *event)

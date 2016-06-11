@@ -26,11 +26,12 @@ protected:
 	};
 	QAction *newAct[NActions];
 	void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
-
+	void addVideo(const QString & str);
 
 private slots:
 	void addVideo();
 	void deleteVideo();
+
 private:
 	void createActions();
 	void clearActions();

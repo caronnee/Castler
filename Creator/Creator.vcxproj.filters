@@ -45,11 +45,11 @@
     <Filter Include="Source Files\Model">
       <UniqueIdentifier>{79fabbbd-a571-41c6-a335-a5ea516f64e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Debug">
+      <UniqueIdentifier>{902fbfe5-7a15-4d4f-b49f-1b7c1b86d93c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -65,26 +65,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_renderer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="creator.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="inputlist.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_inputlist.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_inputlist.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="loghandler.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_loghandler.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -92,25 +77,55 @@
     <ClCompile Include="GeneratedFiles\Release\moc_loghandler.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="../source/main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/creator.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/inputlist.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/renderer.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\videorenderer.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_videorenderer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_videorenderer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/loghandler.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="creator.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="creator.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="creator.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="renderer.h">
+    <CustomBuild Include="../include/creator.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="inputlist.h">
+    <CustomBuild Include="../include/renderer.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="loghandler.h">
-      <Filter>Source Files</Filter>
+    <CustomBuild Include="../include/inputlist.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="../include/loghandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\include\videorenderer.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -120,8 +135,11 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
+    <ClInclude Include="../include/Model.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\debug.h">
+      <Filter>Source Files\Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
