@@ -60,5 +60,4 @@ void VideoRenderer::Load(const QString & str)
 	connect(_capturer, SIGNAL(signalImageReady(const QImage &)), this, SLOT(setImage(const QImage&)));
 	_capturer->moveToThread(&opencvVideoThread);
 	opencvVideoThread.start();
-	return;
 }
