@@ -1,25 +1,26 @@
 ﻿#pragma once
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include "opencv2/highgui/highgui.hpp"
 
-class VideoRenderer : public QOpenGLWidget, public QOpenGLFunctions {
+#include "CaptureVideoFrame.h"
+#include <QThread>
+
+class VideoRenderer : public QWidget {
 	Q_OBJECT
 
-protected:
-	void initializeGL() Q_DECL_OVERRIDE;
-	void paintGL() Q_DECL_OVERRIDE;
+private:
+	CaptureVideoFrame * _capturer = NULL;
+	QThread opencvVideoThread;
+	QImage _img;
+	void paintEvent(QPaintEvent *);
+
+public slots:
+	void setImage(const QImage & img);
+
 public:
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
-	void Load(const QString& str);
+	void Clean();
 	~VideoRenderer();
 
-private:
-	CvCapture* _capture;
-	int _frameH;
-	int _frameW;
-	int _fps;
-	int _numFrames;
-	IplImage* _frame;
-	GLuint _texture;
+	void Load(const QString & str);
 };

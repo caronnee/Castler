@@ -16,8 +16,6 @@ public:
 private slots:
 	void PlayVideo();
 	void SaveSettings();
-    void rotateOneStep();
-    void reload();
 
 private:
     Ui::CreatorContent ui;

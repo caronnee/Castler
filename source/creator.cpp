@@ -8,11 +8,7 @@ Creator::Creator(QWidget *parent)
 {
     ui.setupUi(this);
 
-/// connecters
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-    timer->start(20);
+/// connections
 
 	// connections
     connect(ui.loadButton, SIGNAL(clicked(void)), this, SLOT(reload()));
@@ -55,13 +51,4 @@ void Creator::SaveSettings()
 		return;
 	}
 	list->Save(file);
-}
-void Creator::reload()
-{
-  
-}
-
-void Creator::rotateOneStep()
-{
-    ui.renderWidget->rotateBy(+2 * 16, +2 * 16, -1 * 16);
 }

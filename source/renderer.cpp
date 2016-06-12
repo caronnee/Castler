@@ -44,6 +44,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
+#include <QTimer>
 
 Renderer::Renderer(QWidget *parent)
   : QOpenGLWidget(parent),
@@ -54,6 +55,14 @@ Renderer::Renderer(QWidget *parent)
   program(0)
 {
 //  memset(textures, 0, sizeof(textures));
+	QTimer *timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
+	timer->start(20);
+}
+
+void Renderer::rotateOneStep()
+{
+	rotateBy(+2 * 16, +2 * 16, -1 * 16);
 }
 
 Renderer::~Renderer()
@@ -107,12 +116,13 @@ void Renderer::initializeGL()
 
   QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
   const char *fsrc =
-    "uniform sampler2D texture;\n"
-    "varying mediump vec4 texc;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_FragColor = vec4(1,1,1,1);\n"
-    "}\n";
+	  "#version 100\n"
+	  "uniform sampler2D texture;\n"
+	  "varying mediump vec4 texc;\n"
+	  "void main()\n"
+	  "{\n"
+	  "    gl_FragColor = vec4(1,1,1,1);\n"
+	  "}\n";
   bool compiled = fshader->compileSourceCode(fsrc);
   const GLubyte * str = glGetString(GL_VERSION);
 //  gf_report(LogHandler::MInfo,str);

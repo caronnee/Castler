@@ -1,5 +1,7 @@
 #pragma once
 
+#include "loghandler.h"
+
 #if _DEBUG
 #define DoAssert(cond) if (!(cond)){ __debugbreak();}
 #else
