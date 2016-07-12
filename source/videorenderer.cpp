@@ -12,10 +12,12 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 
 void VideoRenderer::setImage(const QImage & img)
 {
+#if 0
 	if (!_img.isNull()) 
 		gf_report( LogHandler::MInfo, "Viewer dropped frame!" );
+#endif
 	_img = img;
-	DoAssert(_img.size() == size());
+//	DoAssert(_img.size() == size());
 	update();
 }
 
@@ -27,8 +29,9 @@ VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
 void VideoRenderer::Clean()
 {
 	if (_capturer)
+	{
 		delete _capturer;
-
+	}
 	_capturer = NULL;
 	if ( opencvVideoThread.isRunning())
 	{
@@ -44,6 +47,35 @@ VideoRenderer::~VideoRenderer()
 	Clean();
 }
 
+void VideoRenderer::RequestPrevFrame()
+{
+	_capturer->Request(-2);
+}
+
+void VideoRenderer::ShowGreyFrame()
+{
+	_capturer->SwitchMode(ModeGrey);
+}
+
+
+void VideoRenderer::FeaturesFromFrame()
+{
+	_capturer->SwitchMode(ModeFeatures);
+}
+
+void VideoRenderer::RequestNextFrame()
+{
+	_capturer->Request(0);
+}
+
+void VideoRenderer::Pause()
+{
+	_capturer->Pause();
+}
+void VideoRenderer::Stop()
+{
+	_capturer->Stop();
+}
 
 void VideoRenderer::Load(const QString & str)
 {
@@ -58,6 +90,6 @@ void VideoRenderer::Load(const QString & str)
 	_capturer->setFactors(this->size());
 	// connections
 	connect(_capturer, SIGNAL(signalImageReady(const QImage &)), this, SLOT(setImage(const QImage&)));
-	_capturer->moveToThread(&opencvVideoThread);
-	opencvVideoThread.start();
+	//_capturer->moveToThread(&opencvVideoThread);
+	//opencvVideoThread.start();
 }

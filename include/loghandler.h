@@ -32,5 +32,5 @@ public:
 };
 
 void SetLogging(LogHandler * handler);
-void gf_report(LogHandler::MessageLevel, const char * message);
+void gf_report(LogHandler::MessageLevel, const char * format,...);
 

@@ -13,7 +13,9 @@ public:
     Creator(QWidget *parent = 0);
     ~Creator();
 
+
 private slots:
+	void EnablePlay();
 	void PlayVideo();
 	void SaveSettings();
 

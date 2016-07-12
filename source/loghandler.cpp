@@ -26,14 +26,22 @@ LogHandler::~LogHandler()
 
 QString levels[LogHandler::MLevels] = { "Warning:", "Error", "Info" };
 
-void gf_report(LogHandler::MessageLevel level, const char * message)
+#define MAX_MESSAGE_LEN 1024
+
+void gf_report(LogHandler::MessageLevel level, const char * format, ... )
 {
+	char message[256];
+	va_list args;
+	va_start(args, format);
+	vsprintf(message, format, args);
 	GHandler->Report(level, message);
+	va_end(args);
 }
 
 void LogHandler::Report(MessageLevel level, const QString & str)
 {
 	insertPlainText(levels[level]);
+	insertPlainText(" : ");
 	insertPlainText(str);
 	insertPlainText("\n");
 }

@@ -27,7 +27,7 @@ void InputList::Save(QFile & writer)
 	for (int i = 0; i < count(); i++)
 	{
 		QListWidgetItem * it = item(i);
-		QByteArray str = it->data(0).toByteArray();
+		QByteArray str = it->data(Qt::UserRole).toByteArray();
 		size_t written = writer.write(str);
 		writer.write(&delim,1);
 	}
