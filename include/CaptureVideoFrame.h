@@ -29,7 +29,7 @@ protected:
 	int _frameW;
 	int _fps;
 	int _numFrames;
-	cv::Mat _frame;
+	cv::Mat _frame,_status;
 
 	// point for optical flow
 	std::vector<cv::Point2f> _oldcorners;

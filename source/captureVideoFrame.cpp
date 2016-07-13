@@ -54,25 +54,11 @@ void CaptureVideoFrame::timerEvent(QTimerEvent * ev) {
 	// new gray leveled image
 	Fill(frame, oCorners, newgr);
 	
-	cv::Mat status,err;
+	cv::Mat err;
 	cv::TermCriteria crit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 10, 0.03);
-	cv::calcOpticalFlowPyrLK(_gr, newgr, _oldcorners, oCorners, status, err, cv::Size(15, 15), 2, crit);
+	cv::calcOpticalFlowPyrLK(_gr, newgr, _oldcorners, oCorners, _status, err, cv::Size(15, 15), 2, crit);
 	DoAssert(oCorners.size()>0);
-	int full = 0;
-	{
-		//for each that ids fine, draw circle 
-		for (int i = 0; i < status.rows; i++)
-		{
-			if (status.data[i] != 0)
-			{
-				cv::Point2f & p = oCorners[i];
-				cv::circle(frame, p, 5, _colors);
-				full++;
-			}
-		}
-	}
-	gf_report(LogHandler::MInfo, "Tracking corners: Found %d, showing %d",oCorners.size(),full);
-
+	
 	_gr = newgr;
 	_oldcorners = oCorners;
 	
@@ -84,19 +70,35 @@ void CaptureVideoFrame::timerEvent(QTimerEvent * ev) {
 
 void CaptureVideoFrame::ShowCurrent()
 {
+	cv::Mat ret;
+	QImage::Format format;
 	if (_mode&ModeGrey)
 	{
-		//final image
-		const QImage image(_gr.data, _gr.cols, _gr.rows, _gr.step,
-			QImage::Format_Grayscale8, &matDeleter, new cv::Mat(_gr));
-		DoAssert(image.constBits() == _gr.data);
-		emit signalImageReady(image);
-		return;
+		ret = _gr;
+		format = QImage::Format_Grayscale8;
 	}
+	else
+	{
+		ret = _frame;
+		format = QImage::Format_RGB888;
+	}
+	if (_mode & ModeFeatures)
+	{
+		//for each that ids fine, draw circle 
+		for (int i = 0; i < _status.rows; i++)
+		{
+			if (_status.data[i] != 0)
+			{
+				cv::Point2f & p = _oldcorners[i];
+				cv::circle(ret, p, 5, _colors);
+			}
+		}
+	}
+
 	//final image
-	const QImage image(_frame.data, _frame.cols, _frame.rows, _frame.step,
-		QImage::Format_RGB888, &matDeleter, new cv::Mat(_frame));
-	DoAssert(image.constBits() == _frame.data);
+	const QImage image(ret.data, ret.cols, ret.rows, ret.step,
+		format, &matDeleter, new cv::Mat(ret));
+	DoAssert(image.constBits() == ret.data);
 	emit signalImageReady(image);
 }
 
