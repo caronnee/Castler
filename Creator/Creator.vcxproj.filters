@@ -51,6 +51,9 @@
     <Filter Include="Source Files\MemoryManagement">
       <UniqueIdentifier>{dd4fac29-95c1-4f2f-998d-113eb5db36f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Reports">
+      <UniqueIdentifier>{24e351e1-2f3e-478c-becb-c8f111ac2132}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -116,6 +119,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_CaptureVideoFrame.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="reportfunctions.cpp">
+      <Filter>Source Files\Reports</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -155,6 +161,12 @@
     </ClInclude>
     <ClInclude Include="..\include\debug.h">
       <Filter>Source Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="cvhelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportFunctions.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

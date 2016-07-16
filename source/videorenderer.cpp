@@ -83,7 +83,7 @@ void VideoRenderer::Load(const QString & str)
 	_capturer = new CaptureVideoFrame();	
 	if (!_capturer->Load(str))
 	{
-		gf_report(LogHandler::MError, "Unable to load video");
+		gf_report(MError, "Unable to load video");
 		return;
 	}
 	// set size to rendering size

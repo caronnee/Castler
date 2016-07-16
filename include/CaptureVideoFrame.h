@@ -14,6 +14,8 @@ enum CaptureModes
 	ModeGrey = 2,
 };
 
+#include "opencv2\features2d.hpp"
+
 class CaptureVideoFrame : public QObject
 {
 	Q_OBJECT
@@ -22,6 +24,8 @@ protected:
 
 	int _mode = 0;
 
+	std::vector<cv::Point2f> _currentPoints;
+	cv::Ptr<cv::FastFeatureDetector> _ffd;
 	//QColorcolor = np.random.randint(0, 255, (100, 3))
 	QBasicTimer _timer;
 	QScopedPointer<cv::VideoCapture> _capture;
@@ -29,15 +33,16 @@ protected:
 	int _frameW;
 	int _fps;
 	int _numFrames;
-	cv::Mat _frame,_status;
-
-	// point for optical flow
-	std::vector<cv::Point2f> _oldcorners;
+	std::vector<cv::KeyPoint> _keypoints;
+	cv::Mat _frame;
 	cv::Scalar _colors;
 	
-	void Fill(cv::Mat&frame, std::vector<cv::Point2f>& corners, cv::Mat& gr);
-
-public slots:
+	void Init();
+	void Fill(cv::Mat&frame, 
+		std::vector<cv::KeyPoint>& corners, 
+		cv::Mat& gr, 
+		std::vector<cv::Point2f>&points);
+	public slots:
 	
 signals :
 	void signalImageReady(const QImage& image);

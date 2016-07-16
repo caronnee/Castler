@@ -1,8 +1,9 @@
 #pragma once
 
-#include<Qtextbrowser>
+#include <Qtextbrowser>
+#include "ReportFunctions.h"
 
-class LogHandler :public QTextBrowser
+class LogHandler :public QTextBrowser, public IReportFunction
 {
 	Q_OBJECT
 
@@ -14,15 +15,6 @@ private slots:
 
 public:
 
-	enum MessageLevel
-	{
-		MInfo,
-		MWarning,
-		MError,
-		MLevels
-	};
-
-
 	LogHandler(QWidget *parent);
 	~LogHandler();
 
@@ -30,7 +22,4 @@ public:
 
 	void contextMenuEvent(QContextMenuEvent *event);
 };
-
-void SetLogging(LogHandler * handler);
-void gf_report(LogHandler::MessageLevel, const char * format,...);
 

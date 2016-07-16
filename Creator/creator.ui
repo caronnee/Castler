@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="15,1,0">
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
       <number>1</number>
      </property>
@@ -190,6 +190,11 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Comparer</string>
+      </attribute>
      </widget>
     </widget>
    </item>

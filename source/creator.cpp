@@ -59,7 +59,7 @@ void Creator::SaveSettings()
 	QFile file("settings.cfg");
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		ui.infobox->Report(LogHandler::MError,"Unable to open setting file");
+		ui.infobox->Report(MError,"Unable to open setting file");
 		return;
 	}
 	list->Save(file);
