@@ -5,6 +5,15 @@
 #include <QTimerEvent>
 #include "debug.h"
 
+
+void CaptureVideoFrame::StartDetecting()
+{
+	_ffd = cv::FastFeatureDetector::create();
+	Fill(_frame, _keypoints, _gr, _currentPoints);
+
+	_timer.start(_seconds, this);
+}
+
 bool CaptureVideoFrame::Load(const QString & str)
 {
 	_capture.reset( new cv::VideoCapture(str.toStdString()));
@@ -22,17 +31,8 @@ bool CaptureVideoFrame::Load(const QString & str)
 	//todo more precise
 	_seconds = 1000 / _fps;
 	_colors = cv::Scalar(0, 1, 0);
-	Init();
-	_timer.start(_seconds,this);
 
-	//Fill(_frame, _oldcorners, _gr);
 	return true;
-}
-
-void CaptureVideoFrame::Init()
-{
-	_ffd = cv::FastFeatureDetector::create();
-	Fill(_frame, _keypoints, _gr, _currentPoints);
 }
 
 #include "cvhelpers.h"
@@ -54,6 +54,15 @@ void CaptureVideoFrame::Fill(cv::Mat&frame, std::vector<cv::KeyPoint>& corners, 
 static void matDeleter(void* mat) { delete static_cast<cv::Mat*>(mat); }
 
 #include <set>
+
+void CaptureVideoFrame::StartCalibration()
+{
+	calibrate();
+}
+
+void CaptureVideoFrame::calibrate() {
+
+}
 
 void CaptureVideoFrame::timerEvent(QTimerEvent * ev) {
 	if (ev->timerId() != _timer.timerId()) 

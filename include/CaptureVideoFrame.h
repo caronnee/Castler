@@ -37,7 +37,6 @@ protected:
 	cv::Mat _frame;
 	cv::Scalar _colors;
 	
-	void Init();
 	void Fill(cv::Mat&frame, 
 		std::vector<cv::KeyPoint>& corners, 
 		cv::Mat& gr, 
@@ -45,10 +44,18 @@ protected:
 	public slots:
 	
 signals :
+	
 	void signalImageReady(const QImage& image);
 
+	// nothing cool, just calibrate according to video/image. Signal when result is ready
+	void calibrationResult(int errorcode, cv::Mat calibration);
 public:
 	//load
+	void calibrate();
+
+	void StartDetecting();
+	void StartCalibration();
+
 	bool Load(const QString & str);
 	void timerEvent(QTimerEvent * ev);
 	void ShowCurrent();

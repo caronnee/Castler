@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>753</width>
+    <width>806</width>
     <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="15,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1,1">
    <item>
     <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
@@ -72,7 +72,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>121</width>
+               <width>132</width>
                <height>325</height>
               </rect>
              </property>
@@ -128,9 +128,16 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
+              <widget class="QPushButton" name="loadSetButton">
+               <property name="text">
+                <string>Load set</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="saveSettingsButton">
                <property name="text">
-                <string>Save</string>
+                <string>Save set</string>
                </property>
               </widget>
              </item>
@@ -191,10 +198,82 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="compareTab">
       <attribute name="title">
        <string>Comparer</string>
       </attribute>
+     </widget>
+     <widget class="QWidget" name="calibTab">
+      <attribute name="title">
+       <string>Calibration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,10,1">
+       <item>
+        <widget class="QLabel" name="calibrationLabel">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="lineWidth">
+          <number>3</number>
+         </property>
+         <property name="text">
+          <string>&lt;none&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_2" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="VideoRenderer" name="calibrationVideo">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>100</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_3" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="loadCalibrationButton">
+            <property name="text">
+             <string>Load calibration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="runCalibrationButton">
+            <property name="text">
+             <string>runCalibration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveCalib">
+            <property name="text">
+             <string>Save calibration</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

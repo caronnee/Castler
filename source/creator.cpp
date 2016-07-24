@@ -23,6 +23,10 @@ Creator::Creator(QWidget *parent)
 	connect(ui.stopButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Stop));
 	connect(ui.greyButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(ShowGreyFrame(void)));
 
+	//calibration connects
+	connect(ui.loadCalibrationButton, SIGNAL(clicked()), this, SLOT(LoadCalibration(void)));
+	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
+
 	QFile file("settings.cfg");
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
@@ -30,6 +34,27 @@ Creator::Creator(QWidget *parent)
 	}
 	// TODO change for this ;)
 	SetLogging(ui.infobox);
+}
+
+void Creator::RunCalibration()
+{
+	//ui.calibrationVideo->StartCalibration(ui.calibrationLabel->text());
+}
+
+void Creator::LoadCalibration()
+{
+	QStringList files = QFileDialog::getOpenFileNames(
+		this,
+		"Select one or more video files to open",
+		_lastDirectory,
+		"Images (*.avi *.mpeg *.mp4 *.calibrated)");
+	if (files.count() == 0)
+		return;
+	_lastDirectory = files[0];
+	for (int i = 0; i < files.size(); i++)
+	{
+		ui.calibrationLabel->setText(files[0]);
+	}
 }
 
 Creator::~Creator()
@@ -50,7 +75,7 @@ void Creator::PlayVideo()
 	QString defname = ui.inputList->selectedItems()[0]->data(Qt::UserRole).toString();
 	if (defname.size() == 0)
 		return;
-	ui.cloudPoints->Load(defname);
+	ui.cloudPoints->Start(defname, VideoRenderer::ActionDetect);
 }
 
 void Creator::SaveSettings()

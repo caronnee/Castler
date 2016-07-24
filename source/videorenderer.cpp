@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <QPainter>
 #include "debug.h"
+#include "ReportFunctions.h"
 
 void VideoRenderer::paintEvent(QPaintEvent *)
 {
@@ -77,7 +78,7 @@ void VideoRenderer::Stop()
 	_capturer->Stop();
 }
 
-void VideoRenderer::Load(const QString & str)
+void VideoRenderer::Start(const QString & str, VideoAction action)
 {
 	Clean();
 	_capturer = new CaptureVideoFrame();	
@@ -86,10 +87,28 @@ void VideoRenderer::Load(const QString & str)
 		gf_report(MError, "Unable to load video");
 		return;
 	}
+	_capturer->StartDetecting();
 	// set size to rendering size
 	_capturer->setFactors(this->size());
 	// connections
 	connect(_capturer, SIGNAL(signalImageReady(const QImage &)), this, SLOT(setImage(const QImage&)));
 	//_capturer->moveToThread(&opencvVideoThread);
 	//opencvVideoThread.start();
+	switch (action)
+	{
+	ActionCalibrate:
+		{
+			_capturer->StartCalibration();
+			break;
+		}
+	ActionDetect:
+		{
+			_capturer->StartDetecting();
+			break;
+		}
+	default:
+	{
+		ErrorMessage("Action not known");
+	}
+	}
 }

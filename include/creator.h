@@ -7,17 +7,19 @@
 
 class Creator : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
+		QString _lastDirectory;
 public:
     Creator(QWidget *parent = 0);
     ~Creator();
-
-
+	
 private slots:
 	void EnablePlay();
 	void PlayVideo();
 	void SaveSettings();
+	void LoadCalibration();
+	void RunCalibration();
 
 private:
     Ui::CreatorContent ui;

@@ -26,10 +26,17 @@ public slots:
 	void RequestPrevFrame();
 
 public:
-	
+
+	enum VideoAction
+	{
+		ActionDetect,
+		ActionCalibrate,
+		NActions
+	};
+
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
 	void Clean();
 	~VideoRenderer();
 
-	void Load(const QString & str);
+	void Start(const QString & str, VideoAction action);	
 };
