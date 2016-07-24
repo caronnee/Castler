@@ -19,6 +19,7 @@ public:
 
 #define ErrorMessage(format, ...) \
     do { \
+		__debugbreak();\
         gf_report( MError, format, ##__VA_ARGS__); \
     } while(0)
 

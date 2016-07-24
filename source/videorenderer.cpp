@@ -87,7 +87,6 @@ void VideoRenderer::Start(const QString & str, VideoAction action)
 		gf_report(MError, "Unable to load video");
 		return;
 	}
-	_capturer->StartDetecting();
 	// set size to rendering size
 	_capturer->setFactors(this->size());
 	// connections
@@ -96,19 +95,19 @@ void VideoRenderer::Start(const QString & str, VideoAction action)
 	//opencvVideoThread.start();
 	switch (action)
 	{
-	ActionCalibrate:
+		case ActionCalibrate:
 		{
 			_capturer->StartCalibration();
 			break;
 		}
-	ActionDetect:
+		case ActionDetect:
 		{
 			_capturer->StartDetecting();
 			break;
 		}
-	default:
-	{
-		ErrorMessage("Action not known");
-	}
+		default:
+		{
+			ErrorMessage("Action not known");
+		}
 	}
 }
