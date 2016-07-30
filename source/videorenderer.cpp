@@ -81,14 +81,14 @@ void VideoRenderer::Stop()
 void VideoRenderer::Start(const QString & str, VideoAction action)
 {
 	Clean();
-	_capturer = new CaptureVideoFrame();	
+	_capturer = new FrameProcessor();	
 	if (!_capturer->Load(str))
 	{
 		gf_report(MError, "Unable to load video");
 		return;
 	}
 	// set size to rendering size
-	_capturer->setFactors(this->size());
+	_capturer->SetFactors(this->size());
 	// connections
 	connect(_capturer, SIGNAL(signalImageReady(const QImage &)), this, SLOT(setImage(const QImage&)));
 	//_capturer->moveToThread(&opencvVideoThread);
@@ -97,6 +97,7 @@ void VideoRenderer::Start(const QString & str, VideoAction action)
 	{
 		case ActionCalibrate:
 		{
+			_capturer->SwitchMode(ModeFeatures);
 			_capturer->StartCalibration();
 			break;
 		}

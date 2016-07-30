@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -257,6 +257,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="calibrationImages">
+            <property name="text">
+             <string>Locad calibration images</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="runCalibrationButton">
             <property name="text">
              <string>runCalibration</string>
@@ -267,6 +274,13 @@
            <widget class="QPushButton" name="saveCalib">
             <property name="text">
              <string>Save calibration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showCalibrationGrey">
+            <property name="text">
+             <string>Show grey</string>
             </property>
            </widget>
           </item>

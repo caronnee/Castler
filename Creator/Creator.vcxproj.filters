@@ -110,17 +110,20 @@
     <ClCompile Include="../source/Model.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\captureVideoFrame.cpp">
-      <Filter>Source Files\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CaptureVideoFrame.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CaptureVideoFrame.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="reportfunctions.cpp">
       <Filter>Source Files\Reports</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProvider.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\FrameProcessor.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_FrameProcessor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_FrameProcessor.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,7 +148,7 @@
     <CustomBuild Include="..\include\videorenderer.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\include\CaptureVideoFrame.h">
+    <CustomBuild Include="..\include\FrameProcessor.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -162,11 +165,11 @@
     <ClInclude Include="..\include\debug.h">
       <Filter>Source Files\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="cvhelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ReportFunctions.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imageprovider.h">
+      <Filter>Source Files\Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

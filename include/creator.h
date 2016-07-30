@@ -12,7 +12,7 @@ class Creator : public QWidget
 		QString _lastDirectory;
 public:
     Creator(QWidget *parent = 0);
-    ~Creator();
+	~Creator();
 	
 private slots:
 	void EnablePlay();

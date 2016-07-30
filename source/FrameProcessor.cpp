@@ -1,12 +1,10 @@
-#include "CaptureVideoFrame.h"
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
+#include "FrameProcessor.h"
 #include <QTimer>
 #include <QTimerEvent>
 #include "debug.h"
 
 
-void CaptureVideoFrame::StartDetecting()
+void FrameProcessor::StartDetecting()
 {
 	_ffd = cv::FastFeatureDetector::create();
 	Fill(_frame, _keypoints, _gr, _currentPoints);
@@ -14,7 +12,7 @@ void CaptureVideoFrame::StartDetecting()
 	_timer.start(_seconds, this);
 }
 
-bool CaptureVideoFrame::Load(const QString & str)
+bool FrameProcessor::Load(const QString & str)
 {
 	_capture.reset( new cv::VideoCapture(str.toStdString()));
 	if (!_capture->isOpened())
@@ -35,15 +33,16 @@ bool CaptureVideoFrame::Load(const QString & str)
 	return true;
 }
 
-#include "cvhelpers.h"
-
-void CaptureVideoFrame::Fill(cv::Mat&frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points )
+void FrameProcessor::Fill(cv::Mat&frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points )
 {
 	_capture->read(frame);
-
+	
 	cv::cvtColor(frame, gr, CV_BGR2GRAY);
-	_ffd->detect(gr, corners);
-	KeypointsToPoints(corners, points);
+	cv::cvtColor(frame, frame, CV_BGR2RGB);
+
+	if (_ffd)
+		_ffd->detect(gr, corners);
+	cv::KeyPoint::convert(corners, points);
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
 }
 
@@ -55,19 +54,47 @@ static void matDeleter(void* mat) { delete static_cast<cv::Mat*>(mat); }
 
 #include <set>
 
-void CaptureVideoFrame::StartCalibration()
+#define chessWidth 3
+#define chessHeight 4
+
+void FrameProcessor::StartCalibration()
 {
-	calibrate();
+	_chesspoints.clear();
+	for (int i = 0; i < chessWidth; i++)
+	{
+		for (int j = 0; j < chessHeight; j++)
+		{
+			_chesspoints.push_back( cv::Point2f( i, j));
+		}
+	}
+	_mode |= ModeCalibrate;
+	_timer.start(100, this);
 }
 
-void CaptureVideoFrame::calibrate() {
+int index = 0;
 
-}
-
-void CaptureVideoFrame::timerEvent(QTimerEvent * ev) {
+void FrameProcessor::timerEvent(QTimerEvent * ev) {
 	if (ev->timerId() != _timer.timerId()) 
 		return;
 	
+	if (_mode & ModeCalibrate)
+	{
+		Fill(_frame, _keypoints, _gr, _currentPoints);
+		std::vector<cv::Point2f> corners;
+
+		bool chessPattern = findChessboardCorners(_gr, cv::Size(chessWidth, chessHeight), corners, cv::CALIB_CB_ADAPTIVE_THRESH);
+
+		if (chessPattern)
+		{
+			gf_report(MInfo, "%d : FOUND", index++);
+		}
+		else
+		{
+			gf_report(MInfo, "%d : Not found", index++);
+		}
+		ShowCurrent();
+		return;
+	}
 	cv::Mat frame;
 
 	std::vector<cv::KeyPoint> newKeypoints;
@@ -106,7 +133,7 @@ void CaptureVideoFrame::timerEvent(QTimerEvent * ev) {
 
 	// feature from the next frame
 	std::vector<cv::Point2f> right_features; // detected features
-	KeypointsToPoints( _keypoints, right_features);
+	cv::KeyPoint::convert( _keypoints, right_features);
 	cv::Mat right_features_flat = cv::Mat(right_features).reshape(1, right_features.size());
 	// Look around each OF point in the right image
 	// for any features that were detected in its area
@@ -159,13 +186,10 @@ void CaptureVideoFrame::timerEvent(QTimerEvent * ev) {
 	_gr = newgr;
 	_keypoints = newKeypoints;
 	
-	cv::resize( frame, _frame, cv::Size(_xSize,_ySize));
-	cv::cvtColor(_frame, _frame, CV_BGR2RGB);
-
 	ShowCurrent();
 }
 
-void CaptureVideoFrame::ShowCurrent()
+void FrameProcessor::ShowCurrent()
 {
 	cv::Mat ret;
 	QImage::Format format;
@@ -191,26 +215,28 @@ void CaptureVideoFrame::ShowCurrent()
 			}
 		}
 	}
+	cv::resize(ret, _result, cv::Size(_xSize, _ySize));
 
 	//final image
-	const QImage image(ret.data, ret.cols, ret.rows, ret.step,
-		format, &matDeleter, new cv::Mat(ret));
-	DoAssert(image.constBits() == ret.data);
+	const QImage image(_result.data, _result.cols, _result.rows, _result.step,
+		format, &matDeleter, new cv::Mat(_result));
+
+	DoAssert(image.constBits() == _result.data);
 	emit signalImageReady(image);
 }
 
-CaptureVideoFrame::~CaptureVideoFrame()
+FrameProcessor::~FrameProcessor()
 {
 	_timer.stop();
 	DoAssert(!_timer.isActive());
 }
-void CaptureVideoFrame::setFactors(const QSize& size)
+void FrameProcessor::SetFactors(const QSize& size)
 {
 	_xSize = size.width();
 	_ySize = size.height();
 }
 
-void CaptureVideoFrame::Pause()
+void FrameProcessor::Pause()
 {
 	if (!_timer.isActive())
 		_timer.start(_seconds, this);
@@ -221,7 +247,7 @@ void CaptureVideoFrame::Pause()
 	}
 }
 
-void CaptureVideoFrame::Stop()
+void FrameProcessor::Stop()
 {
 	Pause();
 	_capture->set(cv::CAP_PROP_POS_FRAMES, 0);
@@ -229,7 +255,7 @@ void CaptureVideoFrame::Stop()
 	ShowCurrent();
 }
 
-void CaptureVideoFrame::Request(int frames)
+void FrameProcessor::Request(int frames)
 {
 	if (_timer.isActive())
 		return;
@@ -243,7 +269,7 @@ void CaptureVideoFrame::Request(int frames)
 	ShowCurrent();
 }
 
-void CaptureVideoFrame::SwitchMode(int flag)
+void FrameProcessor::SwitchMode(int flag)
 {
 	_mode ^= flag;
 }

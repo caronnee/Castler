@@ -2,7 +2,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 
-#include "CaptureVideoFrame.h"
+#include "FrameProcessor.h"
 #include <QThread>
 
 class VideoRenderer : public QWidget {
@@ -11,7 +11,7 @@ class VideoRenderer : public QWidget {
 private:
 	int _mode = 0;
 
-	CaptureVideoFrame * _capturer = NULL;
+	FrameProcessor * _capturer = NULL;
 	QThread opencvVideoThread;
 	QImage _img;
 	void paintEvent(QPaintEvent *);

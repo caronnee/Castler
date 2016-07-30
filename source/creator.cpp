@@ -26,6 +26,7 @@ Creator::Creator(QWidget *parent)
 	//calibration connects
 	connect(ui.loadCalibrationButton, SIGNAL(clicked()), this, SLOT(LoadCalibration(void)));
 	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
+	connect(ui.showCalibrationGrey, SIGNAL(clicked()), ui.calibrationVideo, SLOT(ShowGreyFrame(void)));
 
 	QFile file("settings.cfg");
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -34,27 +35,37 @@ Creator::Creator(QWidget *parent)
 	}
 	// TODO change for this ;)
 	SetLogging(ui.infobox);
+
+#if _DEBUG
+	ui.calibrationLabel->setText("c:\\work\\DP1\\Castler\\Creator\\calibration\\calibration.3gp");
+#endif
 }
 
 void Creator::RunCalibration()
 {
-	//ui.calibrationVideo->StartCalibration(ui.calibrationLabel->text());
+	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionCalibrate);
 }
 
 void Creator::LoadCalibration()
 {
-	QStringList files = QFileDialog::getOpenFileNames(
+	QString str = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+		"",
+		QFileDialog::ShowDirsOnly
+		| QFileDialog::DontResolveSymlinks);
+
+	ui.calibrationLabel->setText(str);
+	/*QStringList files = QFileDialog::getOpenFileNames(
 		this,
 		"Select one or more video files to open",
 		_lastDirectory,
-		"Images (*.avi *.mpeg *.mp4 *.calibrated)");
+		"Images (*.avi *.mpeg *.mp4 *.3gp *.calibrated)");
 	if (files.count() == 0)
 		return;
 	_lastDirectory = files[0];
 	for (int i = 0; i < files.size(); i++)
 	{
 		ui.calibrationLabel->setText(files[0]);
-	}
+	}*/
 }
 
 Creator::~Creator()

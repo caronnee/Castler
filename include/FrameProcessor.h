@@ -12,15 +12,17 @@ enum CaptureModes
 	ModeNormal = 0,
 	ModeFeatures = 1,
 	ModeGrey = 2,
+	ModeCalibrate = 4
 };
 
 #include "opencv2\features2d.hpp"
 
-class CaptureVideoFrame : public QObject
+class FrameProcessor : public QObject
 {
 	Q_OBJECT
 
 protected:
+	cv::Mat _result;
 
 	int _mode = 0;
 
@@ -28,20 +30,19 @@ protected:
 	cv::Ptr<cv::FastFeatureDetector> _ffd;
 	//QColorcolor = np.random.randint(0, 255, (100, 3))
 	QBasicTimer _timer;
-	QScopedPointer<cv::VideoCapture> _capture;
-	int _frameH;
-	int _frameW;
-	int _fps;
-	int _numFrames;
+	
 	std::vector<cv::KeyPoint> _keypoints;
 	cv::Mat _frame;
 	cv::Scalar _colors;
 	
+	std::vector<cv::Point2f> _chesspoints;
+
 	void Fill(cv::Mat&frame, 
 		std::vector<cv::KeyPoint>& corners, 
 		cv::Mat& gr, 
 		std::vector<cv::Point2f>&points);
-	public slots:
+
+public slots:
 	
 signals :
 	
@@ -51,16 +52,14 @@ signals :
 	void calibrationResult(int errorcode, cv::Mat calibration);
 public:
 	//load
-	void calibrate();
-
 	void StartDetecting();
 	void StartCalibration();
-
 	bool Load(const QString & str);
+
 	void timerEvent(QTimerEvent * ev);
 	void ShowCurrent();
-	~CaptureVideoFrame();
-	void setFactors(const QSize& size);
+	~FrameProcessor();
+	void SetFactors(const QSize& size);
 	void Pause();
 	void Stop();
 	void Request( int frames);
