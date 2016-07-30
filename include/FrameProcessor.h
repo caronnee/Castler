@@ -16,6 +16,7 @@ enum CaptureModes
 };
 
 #include "opencv2\features2d.hpp"
+#include "imageprovider.h"
 
 class FrameProcessor : public QObject
 {
@@ -23,7 +24,7 @@ class FrameProcessor : public QObject
 
 protected:
 	cv::Mat _result;
-
+	IImageProvider * _provider;
 	int _mode = 0;
 
 	std::vector<cv::Point2f> _currentPoints;
@@ -58,6 +59,7 @@ public:
 
 	void timerEvent(QTimerEvent * ev);
 	void ShowCurrent();
+	FrameProcessor();
 	~FrameProcessor();
 	void SetFactors(const QSize& size);
 	void Pause();

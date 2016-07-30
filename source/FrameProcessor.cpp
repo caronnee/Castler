@@ -14,28 +14,15 @@ void FrameProcessor::StartDetecting()
 
 bool FrameProcessor::Load(const QString & str)
 {
-	_capture.reset( new cv::VideoCapture(str.toStdString()));
-	if (!_capture->isOpened())
-	{
-		DoAssert(false);
+	_provider = CreateProvider(str);
+	if (_provider == false || _provider->IsValid() == false )
 		return false;
-	}
-	// params for ShiTomasi corner detection
-
-	_frameH = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
-	_frameW = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
-	_fps = _capture->get(CV_CAP_PROP_FPS);
-	_numFrames = _capture->get(CV_CAP_PROP_FRAME_COUNT);
-	//todo more precise
-	_seconds = 1000 / _fps;
-	_colors = cv::Scalar(0, 1, 0);
-
 	return true;
 }
 
 void FrameProcessor::Fill(cv::Mat&frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points )
 {
-	_capture->read(frame);
+	_provider->NextFrame(frame);
 	
 	cv::cvtColor(frame, gr, CV_BGR2GRAY);
 	cv::cvtColor(frame, frame, CV_BGR2RGB);
@@ -225,6 +212,12 @@ void FrameProcessor::ShowCurrent()
 	emit signalImageReady(image);
 }
 
+FrameProcessor::FrameProcessor()
+{
+	_provider = NULL;
+	_colors = cv::Scalar(0, 1, 0);
+}
+
 FrameProcessor::~FrameProcessor()
 {
 	_timer.stop();
@@ -249,8 +242,8 @@ void FrameProcessor::Pause()
 
 void FrameProcessor::Stop()
 {
-	Pause();
-	_capture->set(cv::CAP_PROP_POS_FRAMES, 0);
+	_timer.stop();
+	_provider->SetPosition(0);
 	Fill(_frame, _keypoints, _gr,_currentPoints);
 	ShowCurrent();
 }
@@ -259,12 +252,8 @@ void FrameProcessor::Request(int frames)
 {
 	if (_timer.isActive())
 		return;
-	double ret = _capture->get( cv::CAP_PROP_POS_FRAMES)+frames;
-	if (ret < 0)
-		ret = 0;
-	if (ret > _numFrames)
-		ret = _numFrames;
-	_capture->set(cv::CAP_PROP_POS_FRAMES, ret);
+	_provider->SetPosition(_provider->Position() + frames);
+	
 	Fill(_frame, _keypoints, _gr,_currentPoints);
 	ShowCurrent();
 }

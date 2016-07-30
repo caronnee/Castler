@@ -54,6 +54,9 @@
     <Filter Include="Source Files\Reports">
       <UniqueIdentifier>{24e351e1-2f3e-478c-becb-c8f111ac2132}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ImageProviders">
+      <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -110,12 +113,6 @@
     <ClCompile Include="../source/Model.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="reportfunctions.cpp">
-      <Filter>Source Files\Reports</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageProvider.cpp">
-      <Filter>Source Files\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\FrameProcessor.cpp">
       <Filter>Source Files\Source</Filter>
     </ClCompile>
@@ -124,6 +121,18 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_FrameProcessor.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoProvider.cpp">
+      <Filter>Source Files\ImageProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="ImagesProvider.cpp">
+      <Filter>Source Files\ImageProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="reportfunctions.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProvider.cpp">
+      <Filter>Source Files\ImageProviders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,8 +177,14 @@
     <ClInclude Include="ReportFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VideoProvider.h">
+      <Filter>Source Files\ImageProviders</Filter>
+    </ClInclude>
+    <ClInclude Include="ImagesProvider.h">
+      <Filter>Source Files\ImageProviders</Filter>
+    </ClInclude>
     <ClInclude Include="imageprovider.h">
-      <Filter>Source Files\Source</Filter>
+      <Filter>Source Files\ImageProviders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
