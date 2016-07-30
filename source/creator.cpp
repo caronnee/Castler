@@ -27,6 +27,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
 	connect(ui.showCalibrationGrey, SIGNAL(clicked()), ui.calibrationVideo, SLOT(ShowGreyFrame(void)));
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
+	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
 
 	QFile file("settings.cfg");
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text))

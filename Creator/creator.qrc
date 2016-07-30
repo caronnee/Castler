@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="Creator">
+    <qresource prefix="/Creator">
+        <file>Resources/beachCastle.ico</file>
     </qresource>
 </RCC>

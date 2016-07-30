@@ -7,9 +7,12 @@
 void FrameProcessor::StartDetecting()
 {
 	_ffd = cv::FastFeatureDetector::create();
-	Fill(_frame, _keypoints, _gr, _currentPoints);
-
-	_timer.start(_seconds, this);
+	if ( Prepare(_frame, _keypoints, _gr, _currentPoints))
+		_timer.start(_seconds, this);
+	else
+	{
+		gf_report(MError, "Unable to start");
+	}
 }
 
 bool FrameProcessor::Load(const QString & str)
@@ -17,27 +20,34 @@ bool FrameProcessor::Load(const QString & str)
 	_provider = CreateProvider(str);
 	if (_provider == false || _provider->IsValid() == false )
 		return false;
+	_seconds = _provider->Step() / 1000;
 	return true;
 }
 
-void FrameProcessor::Fill(cv::Mat&frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points )
+bool FrameProcessor::Prepare(cv::Mat&frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points )
 {
-	_provider->NextFrame(frame);
+	if (_provider->NextFrame(frame) == false)
+		return false;
 	
 	cv::cvtColor(frame, gr, CV_BGR2GRAY);
 	cv::cvtColor(frame, frame, CV_BGR2RGB);
 
 	if (_ffd)
+	{
 		_ffd->detect(gr, corners);
+	}
 	cv::KeyPoint::convert(corners, points);
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
+	return true;
 }
 
 #include "debug.h"
 #include "loghandler.h"
 #include <opencv2/opencv.hpp>
 
-static void matDeleter(void* mat) { delete static_cast<cv::Mat*>(mat); }
+static void matDeleter(void* mat) {
+	delete static_cast<cv::Mat*>(mat); 
+}
 
 #include <set>
 
@@ -55,7 +65,9 @@ void FrameProcessor::StartCalibration()
 		}
 	}
 	_mode |= ModeCalibrate;
-	_timer.start(100, this);
+	_seconds = _provider->Step() / 1000;
+	Prepare(_frame, _keypoints, _gr, _currentPoints);
+	_timer.start(_seconds, this);
 }
 
 int index = 0;
@@ -66,7 +78,6 @@ void FrameProcessor::timerEvent(QTimerEvent * ev) {
 	
 	if (_mode & ModeCalibrate)
 	{
-		Fill(_frame, _keypoints, _gr, _currentPoints);
 		std::vector<cv::Point2f> corners;
 
 		bool chessPattern = findChessboardCorners(_gr, cv::Size(chessWidth, chessHeight), corners, cv::CALIB_CB_ADAPTIVE_THRESH);
@@ -80,6 +91,12 @@ void FrameProcessor::timerEvent(QTimerEvent * ev) {
 			gf_report(MInfo, "%d : Not found", index++);
 		}
 		ShowCurrent();
+		if (!Prepare(_frame, _keypoints, _gr, _currentPoints))
+		{
+			Stop();
+			gf_report(MInfo, "No more frames to use");
+			return;
+		}
 		return;
 	}
 	cv::Mat frame;
@@ -90,7 +107,12 @@ void FrameProcessor::timerEvent(QTimerEvent * ev) {
 	// new gray leveled image
 	std::vector<cv::Point2f> convertedKeypoints;
 
-	Fill(frame, newKeypoints, newgr, convertedKeypoints);
+	if (!Prepare(frame, newKeypoints, newgr, convertedKeypoints))
+	{
+		Stop();
+		gf_report(MInfo, "No more frames to use");
+		return;
+	}
 	
 	std::vector<uchar> status;
 	std::vector<float> err;
@@ -244,7 +266,7 @@ void FrameProcessor::Stop()
 {
 	_timer.stop();
 	_provider->SetPosition(0);
-	Fill(_frame, _keypoints, _gr,_currentPoints);
+	Prepare(_frame, _keypoints, _gr,_currentPoints);
 	ShowCurrent();
 }
 
@@ -254,7 +276,7 @@ void FrameProcessor::Request(int frames)
 		return;
 	_provider->SetPosition(_provider->Position() + frames);
 	
-	Fill(_frame, _keypoints, _gr,_currentPoints);
+	Prepare(_frame, _keypoints, _gr,_currentPoints);
 	ShowCurrent();
 }
 

@@ -38,7 +38,7 @@ protected:
 	
 	std::vector<cv::Point2f> _chesspoints;
 
-	void Fill(cv::Mat&frame, 
+	bool Prepare(cv::Mat&frame, 
 		std::vector<cv::KeyPoint>& corners, 
 		cv::Mat& gr, 
 		std::vector<cv::Point2f>&points);
