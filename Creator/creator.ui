@@ -257,7 +257,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="calibrationImages">
+           <widget class="QPushButton" name="calibrationFolderButton">
             <property name="text">
              <string>Locad calibration images</string>
             </property>

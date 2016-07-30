@@ -8,10 +8,9 @@ Creator::Creator(QWidget *parent)
 {
     ui.setupUi(this);
 
-/// connections
-
 	// connections
-    //connect(ui.loadButton, SIGNAL(clicked(void)), this, SLOT(reload()));
+    
+	// Data connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
 	connect(ui.pauseButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Pause(void)));
@@ -27,6 +26,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.loadCalibrationButton, SIGNAL(clicked()), this, SLOT(LoadCalibration(void)));
 	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
 	connect(ui.showCalibrationGrey, SIGNAL(clicked()), ui.calibrationVideo, SLOT(ShowGreyFrame(void)));
+	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
 
 	QFile file("settings.cfg");
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -46,15 +46,19 @@ void Creator::RunCalibration()
 	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionCalibrate);
 }
 
-void Creator::LoadCalibration()
+void Creator::LoadCalibrationImages()
 {
 	QString str = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
 		"",
 		QFileDialog::ShowDirsOnly
 		| QFileDialog::DontResolveSymlinks);
 
+	_lastDirectory = str;
 	ui.calibrationLabel->setText(str);
-	/*QStringList files = QFileDialog::getOpenFileNames(
+}
+void Creator::LoadCalibration()
+{
+	QStringList files = QFileDialog::getOpenFileNames(
 		this,
 		"Select one or more video files to open",
 		_lastDirectory,
@@ -62,10 +66,7 @@ void Creator::LoadCalibration()
 	if (files.count() == 0)
 		return;
 	_lastDirectory = files[0];
-	for (int i = 0; i < files.size(); i++)
-	{
-		ui.calibrationLabel->setText(files[0]);
-	}*/
+	ui.calibrationLabel->setText(files[0]);
 }
 
 Creator::~Creator()

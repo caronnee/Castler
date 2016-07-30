@@ -21,6 +21,7 @@ private slots:
 	void LoadCalibration();
 	void RunCalibration();
 
+	void LoadCalibrationImages();
 private:
     Ui::CreatorContent ui;
 };
