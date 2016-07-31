@@ -13,8 +13,6 @@ class InputList : public QListWidget {
 public:
 	InputList(QWidget * parent = Q_NULLPTR);
 	~InputList();
-	void Load(QFile & loader);
-	void Save(QFile & writer);
 
 	static QString _lastDirectory;
 protected:
@@ -26,9 +24,11 @@ protected:
 	};
 	QAction *newAct[NActions];
 	void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
+
+public:
 	void addVideo(const QString & str);
 
-private slots:
+public slots:
 	void addVideo();
 	void deleteVideo();
 

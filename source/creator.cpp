@@ -10,6 +10,10 @@ Creator::Creator(QWidget *parent)
 
 	// connections
     
+	// Global application
+	_shortcuts.push_back( new QShortcut(QKeySequence("Ctrl+s"),this));
+	connect(_shortcuts[0], SIGNAL(activated()), this, SLOT(SaveSettings()));
+
 	// Data connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
@@ -29,12 +33,13 @@ Creator::Creator(QWidget *parent)
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
 
-	QFile file("settings.cfg");
-	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		ui.inputList->Load(file);
-	}
-	// TODO change for this ;)
+	LoadSettings();
+	//QFile file("settings.cfg");
+	//if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+	//{
+	//	ui.inputList->Load(file);
+	//}
+	//// TODO change for this ;)
 	SetLogging(ui.infobox);
 
 #if _DEBUG
@@ -54,7 +59,7 @@ void Creator::LoadCalibrationImages()
 		QFileDialog::ShowDirsOnly
 		| QFileDialog::DontResolveSymlinks);
 
-	_lastDirectory = str;
+	InputList::_lastDirectory = str;
 	ui.calibrationLabel->setText(str);
 }
 void Creator::LoadCalibration()
@@ -62,11 +67,11 @@ void Creator::LoadCalibration()
 	QStringList files = QFileDialog::getOpenFileNames(
 		this,
 		"Select one or more video files to open",
-		_lastDirectory,
+		InputList::_lastDirectory,
 		"Images (*.avi *.mpeg *.mp4 *.3gp *.calibrated)");
 	if (files.count() == 0)
 		return;
-	_lastDirectory = files[0];
+	InputList::_lastDirectory = files[0];
 	ui.calibrationLabel->setText(files[0]);
 }
 
@@ -91,14 +96,65 @@ void Creator::PlayVideo()
 	ui.cloudPoints->Start(defname, VideoRenderer::ActionDetect);
 }
 
+const char * CSettingFileName = "/settings.castler";
+
+void Creator::LoadSettings()
+{
+	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
+	QSettings settings(settingspath, QSettings::IniFormat);
+
+	QVariant str = settings.value("calibrationInput");
+	ui.calibrationLabel->setText(str.toString());
+	str = settings.value("lastDir").toString();
+	InputList::_lastDirectory = str.toString();
+
+	QString last = settings.value("lastOpened").toString();
+	QString settingLastName = QApplication::applicationDirPath() + "\\" + last;
+	QSettings settingsLast(settingLastName, QSettings::IniFormat);
+	int size = settingsLast.beginReadArray("input");
+	for (int i = 0; i<size ; i++)
+	{
+		settingsLast.setArrayIndex(i);
+		ui.inputList->addVideo(settingsLast.value("input").toString());
+	}
+	settingsLast.endArray();
+}
+
 void Creator::SaveSettings()
 {
-	InputList * list = ui.inputList;
-	QFile file("settings.cfg");
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
+	QSettings settings(settingspath, QSettings::IniFormat);
+
+	settings.setValue("calibrationInput", ui.calibrationLabel->text());
+	settings.setValue("lastDir", InputList::_lastDirectory);
+	settings.setValue("lastOpened", "last");
+
+	QString name = "last";
+	if (ui.modelLabel->text().size())
 	{
-		ui.infobox->Report(MError,"Unable to open setting file");
-		return;
+		name = ui.modelLabel->text();
 	}
-	list->Save(file);
+	QString model = QApplication::applicationDirPath() + "\\" + name;
+	QSettings modelSettings(model, QSettings::IniFormat);
+	modelSettings.beginWriteArray("input");
+	
+	for (int i = 0; i < ui.inputList->count(); i++)
+	{
+		modelSettings.setArrayIndex(i);
+		QVariant str = ui.inputList->item(i)->data(Qt::UserRole);
+		modelSettings.setValue("input", str);
+	}
+	modelSettings.endArray();
+
+	
+	modelSettings.sync();
+	settings.sync();
+	//InputList * list = ui.inputList;
+	//QFile file("settings.cfg");
+	//if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	//{
+	//	ui.infobox->Report(MError,"Unable to open setting file");
+	//	return;
+	//}
+	//list->Save(file);
 }

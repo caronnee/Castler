@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -107,7 +107,14 @@
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="10,0">
+         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,10,0">
+          <item>
+           <widget class="QLabel" name="modelLabel">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="VideoRenderer" name="cloudPoints">
             <property name="minimumSize">

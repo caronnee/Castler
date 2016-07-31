@@ -9,30 +9,6 @@ InputList::~InputList() {
 	clearActions();
 }
 
-void InputList::Load(QFile & loader)
-{
-	QByteArray arr = loader.readAll();
-	QByteArrayList l = arr.split('@');
-	_lastDirectory = QString(l[0]);
-	for (int i = 1; i < l.count()-1; i++)
-	{
-		addVideo(l[i]);
-	}
-}
-void InputList::Save(QFile & writer)
-{
-	writer.write(_lastDirectory.toStdString().c_str());
-	char  delim = '@';
-	writer.write(&delim,1);
-	for (int i = 0; i < count(); i++)
-	{
-		QListWidgetItem * it = item(i);
-		QByteArray str = it->data(Qt::UserRole).toByteArray();
-		size_t written = writer.write(str);
-		writer.write(&delim,1);
-	}
-}
-
 QString InputList::_lastDirectory = "C:";
 
 void InputList::deleteVideo()
