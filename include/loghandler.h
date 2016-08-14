@@ -13,13 +13,16 @@ private:
 private slots:
 	void clearLog();
 
+public slots:
+	void Report(MessageLevel level, const QString & str);
+
 public:
 
 	LogHandler(QWidget *parent);
 	~LogHandler();
 
-	void Report(MessageLevel level, const QString & str);
 
 	void contextMenuEvent(QContextMenuEvent *event);
+	
 };
 

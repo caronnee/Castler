@@ -1,4 +1,7 @@
-- make Gengine class ;) for rendering content
-- show help
-- process multiple images
+- move to the other thread when rendering video/images
+- calibrate, show undistorted
+- find chessboard in the videos
+
 - create a structure
+- make GEngine class ;) for rendering content
+- create structure from motion

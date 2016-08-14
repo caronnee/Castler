@@ -6,51 +6,48 @@
 #include <QBasicTimer>
 #include <opencv2\core\core.hpp>
 
-
-enum CaptureModes
-{
-	ModeNormal = 0,
-	ModeFeatures = 1,
-	ModeGrey = 2,
-	ModeCalibrate = 4
-};
-
 #include "opencv2\features2d.hpp"
 #include "imageprovider.h"
+#include <QThread>
+#include <stack>
+#include <QImage>
+#include "worker.hpp"
 
 class FrameProcessor : public QObject
 {
 	Q_OBJECT
-
+		;
+	std::stack<cv::Mat> _images;
+	Worker _worker;
 protected:
-	cv::Mat _result;
-	IImageProvider * _provider;
-	int _mode = 0;
+	// main thread doing openCV stuff
+	QThread _thread;
 
-	std::vector<cv::Point2f> _currentPoints;
-	cv::Ptr<cv::FastFeatureDetector> _ffd;
+	// provider 
+	IImageProvider * _provider;
+
 	//QColorcolor = np.random.randint(0, 255, (100, 3))
+	// timer for sending images to show
 	QBasicTimer _timer;
 	
-	std::vector<cv::KeyPoint> _keypoints;
-	cv::Mat _frame;
-	cv::Scalar _colors;
-	
-	std::vector<cv::Point2f> _chesspoints;
-
-	bool Prepare(cv::Mat&frame, 
-		std::vector<cv::KeyPoint>& corners, 
-		cv::Mat& gr, 
-		std::vector<cv::Point2f>&points);
-
 public slots:
-	
-signals :
-	
-	void signalImageReady(const QImage& image);
+	void ThreadStopped();
+	void ImageReported(cv::Mat image);
 
+signals :
+	void imageReadySignal(cv::Mat image);
+	void reportSignal(MessageLevel level, const QString& string);
 	// nothing cool, just calibrate according to video/image. Signal when result is ready
 	void calibrationResult(int errorcode, cv::Mat calibration);
+	void finishedSignal();
+
+public slots:
+	void Report(MessageLevel level, const QString & message);
+
+private:
+	// scale to get this to the QT label size
+	int _seconds;
+
 public:
 	//load
 	void StartDetecting();
@@ -58,19 +55,13 @@ public:
 	bool Load(const QString & str);
 
 	void timerEvent(QTimerEvent * ev);
+
 	void ShowCurrent();
 	FrameProcessor();
 	~FrameProcessor();
-	void SetFactors(const QSize& size);
 	void Pause();
 	void Stop();
-	void Request( int frames);
+	void Request(int frames);
 
-private:
-	int _xSize;
-	int _ySize;
-	cv::Mat _gr;
-	int _seconds;
-public:
 	void SwitchMode(int flag);
 };

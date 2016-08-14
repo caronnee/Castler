@@ -7,24 +7,30 @@
 void VideoRenderer::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
-	p.drawImage(0, 0, _img);
+	cv::Mat matched;
+	if (_img.empty())
+		return;// do not paint
+	QSize s = size();
+	cv::resize(_img, matched, cv::Size(s.width(),s.height()));
+	QImage::Format  format = QImage::Format_RGB888;
+	cv::MatStep step = matched.step;
+	if (step[1] == 1)
+	{
+		format = QImage::Format_Grayscale8;
+	}
+	const QImage image(matched.data, matched.cols, matched.rows, matched.step, format);
+	p.drawImage(0, 0, image);
 	//m_img = QImage();
 }
 
-void VideoRenderer::setImage(const QImage & img)
+void VideoRenderer::setImage(cv::Mat img)
 {
-#if 0
-	if (!_img.isNull()) 
-		gf_report( LogHandler::MInfo, "Viewer dropped frame!" );
-#endif
 	_img = img;
-//	DoAssert(_img.size() == size());
 	update();
 }
 
 VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
 	setAttribute(Qt::WA_OpaquePaintEvent);
-	opencvVideoThread.start();
 }
 
 void VideoRenderer::Clean()
@@ -34,13 +40,6 @@ void VideoRenderer::Clean()
 		delete _capturer;
 	}
 	_capturer = NULL;
-	if ( opencvVideoThread.isRunning())
-	{
-		// close all objects
-		opencvVideoThread.quit();
-		//TODO investigate
-		opencvVideoThread.wait();
-	}
 }
 
 VideoRenderer::~VideoRenderer()
@@ -55,6 +54,9 @@ void VideoRenderer::RequestPrevFrame()
 
 void VideoRenderer::ShowGreyFrame()
 {
+	if (!_capturer)
+		return;
+	emit reportSignal(MInfo, "Showing grey frame");
 	_capturer->SwitchMode(ModeGrey);
 }
 
@@ -78,21 +80,29 @@ void VideoRenderer::Stop()
 	_capturer->Stop();
 }
 
-void VideoRenderer::Start(const QString & str, VideoAction action)
+void VideoRenderer::Report(MessageLevel level, const QString & message)
+{
+	emit reportSignal(level, message);
+}
+void VideoRenderer::NoMoreImages()
+{
+	emit reportSignal(MInfo, "Done");
+	emit Finished();
+}
+
+bool VideoRenderer::Start(const QString & str, VideoAction action)
 {
 	Clean();
 	_capturer = new FrameProcessor();	
 	if (!_capturer->Load(str))
 	{
-		gf_report(MError, "Unable to load video");
-		return;
+		return false;
 	}
-	// set size to rendering size
-	_capturer->SetFactors(this->size());
 	// connections
-	connect(_capturer, SIGNAL(signalImageReady(const QImage &)), this, SLOT(setImage(const QImage&)));
-	//_capturer->moveToThread(&opencvVideoThread);
-	//opencvVideoThread.start();
+	connect(_capturer, SIGNAL(imageReadySignal(cv::Mat)), this, SLOT(setImage(cv::Mat)));
+	connect(_capturer, SIGNAL(finishedSignal()), this, SLOT(NoMoreImages()));
+	connect(_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), this, SLOT(Report(MessageLevel,const QString &)));
+	
 	switch (action)
 	{
 		case ActionCalibrate:
@@ -106,9 +116,9 @@ void VideoRenderer::Start(const QString & str, VideoAction action)
 			_capturer->StartDetecting();
 			break;
 		}
-		default:
-		{
-			ErrorMessage("Action not known");
-		}
 	}
+	return true;
 }
+
+//void SetLogging(IReportFunction * handler);
+//void gf_report(MessageLevel level, const char * format, ...);

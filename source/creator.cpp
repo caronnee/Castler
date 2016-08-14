@@ -8,9 +8,24 @@ Creator::Creator(QWidget *parent)
 {
     ui.setupUi(this);
 
+	for (int c = 0; c < ui.matrixWidget->horizontalHeader()->count(); ++c)
+	{
+		ui.matrixWidget->horizontalHeader()->setSectionResizeMode(
+			c, QHeaderView::Stretch);
+	}
+
+	for (int c = 0; c < ui.matrixWidget->verticalHeader()->count(); ++c)
+	{
+		ui.matrixWidget->verticalHeader()->setSectionResizeMode(
+			c, QHeaderView::Stretch);
+	}
+
+	qRegisterMetaType<MessageLevel>("MessageLevel");
+	qRegisterMetaType<cv::Mat>("cv::Mat");
 	// connections
     
 	// Global application
+	// shortcuts
 	_shortcuts.push_back( new QShortcut(QKeySequence("Ctrl+s"),this));
 	connect(_shortcuts[0], SIGNAL(activated()), this, SLOT(SaveSettings()));
 
@@ -19,11 +34,12 @@ Creator::Creator(QWidget *parent)
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
 	connect(ui.pauseButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Pause(void)));
 	connect(ui.cloudPoints, SIGNAL(Finished(void)), this, SLOT(EnablePlay()));
+	connect(ui.cloudPoints, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
 	connect(ui.nextFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestNextFrame()));
 	connect(ui.prevFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestPrevFrame()));
 	connect(ui.stopButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Stop(void)));
 	connect(ui.featuresButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(FeaturesFromFrame()));
-	connect(ui.stopButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Stop));
+	connect(ui.stopButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Stop()));
 	connect(ui.greyButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(ShowGreyFrame(void)));
 
 	//calibration connects
@@ -31,20 +47,10 @@ Creator::Creator(QWidget *parent)
 	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
 	connect(ui.showCalibrationGrey, SIGNAL(clicked()), ui.calibrationVideo, SLOT(ShowGreyFrame(void)));
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
+	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
 
 	LoadSettings();
-	//QFile file("settings.cfg");
-	//if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-	//{
-	//	ui.inputList->Load(file);
-	//}
-	//// TODO change for this ;)
-	SetLogging(ui.infobox);
-
-#if _DEBUG
-	ui.calibrationLabel->setText("c:\\work\\DP1\\Castler\\Creator\\calibration\\calibration.3gp");
-#endif
 }
 
 void Creator::RunCalibration()

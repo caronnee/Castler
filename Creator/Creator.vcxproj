@@ -61,6 +61,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Shlwapi.lib;opencv_ts310d.lib;opencv_world310d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\*.* $(TargetDir) /s /d</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -101,6 +104,9 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_videorenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_worker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_creator.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </PrecompiledHeader>
@@ -130,10 +136,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_videorenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_worker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ImageProcessor.cpp" />
     <ClCompile Include="ImageProvider.cpp" />
     <ClCompile Include="ImagesProvider.cpp" />
     <ClCompile Include="reportfunctions.cpp" />
     <ClCompile Include="VideoProvider.cpp" />
+    <ClCompile Include="worker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="../include/creator.h">
@@ -161,8 +172,19 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ImageProcessor.h" />
     <ClInclude Include="ImagesProvider.h" />
     <ClInclude Include="VideoProvider.h" />
+    <CustomBuild Include="worker.hpp">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing worker.hpp...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-Ic:\work\DP1\opencv_src\gen" "-Ic:\work\DP1\opencv_src\modules\calib3d\include" "-Ic:\work\DP1\opencv_src\modules\core\include" "-Ic:\work\DP1\opencv_src\modules\cudaarithm\include" "-Ic:\work\DP1\opencv_src\modules\cudabgsegm\include" "-Ic:\work\DP1\opencv_src\modules\cudacodec\include" "-Ic:\work\DP1\opencv_src\modules\cudafeatures2d\include" "-Ic:\work\DP1\opencv_src\modules\cudafilters\include" "-Ic:\work\DP1\opencv_src\modules\cudaimgproc\include" "-Ic:\work\DP1\opencv_src\modules\cudalegacy\include" "-Ic:\work\DP1\opencv_src\modules\cudaobjdetect\include" "-Ic:\work\DP1\opencv_src\modules\cudaoptflow\include" "-Ic:\work\DP1\opencv_src\modules\cudastereo\include" "-Ic:\work\DP1\opencv_src\modules\cudawarping\include" "-Ic:\work\DP1\opencv_src\modules\cudev\include" "-Ic:\work\DP1\opencv_src\modules\features2d\include" "-Ic:\work\DP1\opencv_src\modules\flann\include" "-Ic:\work\DP1\opencv_src\modules\highgui\include" "-Ic:\work\DP1\opencv_src\modules\imgcodecs\include" "-Ic:\work\DP1\opencv_src\modules\imgproc\include" "-Ic:\work\DP1\opencv_src\modules\ml\include" "-Ic:\work\DP1\opencv_src\modules\objdetect\include" "-Ic:\work\DP1\opencv_src\modules\photo\include" "-Ic:\work\DP1\opencv_src\modules\shape\include" "-Ic:\work\DP1\opencv_src\modules\stitching\include" "-Ic:\work\DP1\opencv_src\modules\superres\include" "-Ic:\work\DP1\opencv_src\modules\ts\include" "-Ic:\work\DP1\opencv_src\modules\video\include" "-Ic:\work\DP1\opencv_src\modules\videoio\include" "-Ic:\work\DP1\opencv_src\modules\videostab\include" "-Ic:\work\DP1\opencv_src\modules\viz\include" "-Ic:\work\DP1\opencv_src\modules\world\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-IC:\work\DP1\Castler\include" "-Ic:\work\DP1\opencv_src\include"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing worker.hpp...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-Ic:\work\DP1\opencv_src\gen" "-Ic:\work\DP1\opencv_src\modules\calib3d\include" "-Ic:\work\DP1\opencv_src\modules\core\include" "-Ic:\work\DP1\opencv_src\modules\cudaarithm\include" "-Ic:\work\DP1\opencv_src\modules\cudabgsegm\include" "-Ic:\work\DP1\opencv_src\modules\cudacodec\include" "-Ic:\work\DP1\opencv_src\modules\cudafeatures2d\include" "-Ic:\work\DP1\opencv_src\modules\cudafilters\include" "-Ic:\work\DP1\opencv_src\modules\cudaimgproc\include" "-Ic:\work\DP1\opencv_src\modules\cudalegacy\include" "-Ic:\work\DP1\opencv_src\modules\cudaobjdetect\include" "-Ic:\work\DP1\opencv_src\modules\cudaoptflow\include" "-Ic:\work\DP1\opencv_src\modules\cudastereo\include" "-Ic:\work\DP1\opencv_src\modules\cudawarping\include" "-Ic:\work\DP1\opencv_src\modules\cudev\include" "-Ic:\work\DP1\opencv_src\modules\features2d\include" "-Ic:\work\DP1\opencv_src\modules\flann\include" "-Ic:\work\DP1\opencv_src\modules\highgui\include" "-Ic:\work\DP1\opencv_src\modules\imgcodecs\include" "-Ic:\work\DP1\opencv_src\modules\imgproc\include" "-Ic:\work\DP1\opencv_src\modules\ml\include" "-Ic:\work\DP1\opencv_src\modules\objdetect\include" "-Ic:\work\DP1\opencv_src\modules\photo\include" "-Ic:\work\DP1\opencv_src\modules\shape\include" "-Ic:\work\DP1\opencv_src\modules\stitching\include" "-Ic:\work\DP1\opencv_src\modules\superres\include" "-Ic:\work\DP1\opencv_src\modules\ts\include" "-Ic:\work\DP1\opencv_src\modules\video\include" "-Ic:\work\DP1\opencv_src\modules\videoio\include" "-Ic:\work\DP1\opencv_src\modules\videostab\include" "-Ic:\work\DP1\opencv_src\modules\viz\include" "-Ic:\work\DP1\opencv_src\modules\world\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-IC:\work\DP1\Castler\include" "-Ic:\work\DP1\opencv_src\include"</Command>
+    </CustomBuild>
     <CustomBuild Include="..\include\videorenderer.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing videorenderer.h...</Message>
@@ -235,6 +257,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Creator.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\TodoList.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

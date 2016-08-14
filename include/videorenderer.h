@@ -7,20 +7,25 @@
 
 class VideoRenderer : public QWidget {
 	Q_OBJECT
-
+		;
 private:
 	int _mode = 0;
 
 	FrameProcessor * _capturer = NULL;
-	QThread opencvVideoThread;
-	QImage _img;
+	cv::Mat _img;
 	void paintEvent(QPaintEvent *);
+
+signals:
+	void reportSignal(MessageLevel level, const QString & str);
+	void Finished();
 
 public slots:
 	void ShowGreyFrame();
 	void FeaturesFromFrame();
-	void setImage(const QImage & img);
+	void setImage(cv::Mat img);
 	void Stop();
+	void Report(MessageLevel level, const QString & message);
+	void NoMoreImages();
 	void Pause();
 	void RequestNextFrame();
 	void RequestPrevFrame();
@@ -35,8 +40,8 @@ public:
 	};
 
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
-	void Clean();
 	~VideoRenderer();
 
-	void Start(const QString & str, VideoAction action);	
+	bool Start(const QString & str, VideoAction action);
+	void Clean();
 };

@@ -130,7 +130,8 @@ void Renderer::initializeGL()
   {
 	  GLint maxLength = 0;
 	  QString ret = fshader->log();
-	  gf_report(MError,ret.toStdString().c_str());
+	  __debugbreak();
+	  //emit reportSignal(MError,ret);
   }
 
   program = new QOpenGLShaderProgram;

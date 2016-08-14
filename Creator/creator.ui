@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>806</width>
+    <width>887</width>
     <height>578</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -72,7 +72,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>132</width>
+               <width>148</width>
                <height>325</height>
               </rect>
              </property>
@@ -214,7 +214,7 @@
       <attribute name="title">
        <string>Calibration</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,10,1">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,10,0">
        <item>
         <widget class="QLabel" name="calibrationLabel">
          <property name="frameShape">
@@ -241,13 +241,170 @@
         <widget class="QWidget" name="widget_2" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="VideoRenderer" name="calibrationVideo">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>100</height>
-             </size>
+           <widget class="QFrame" name="frame_2">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,1">
+             <item>
+              <widget class="VideoRenderer" name="calibrationVideo">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>100</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QFrame" name="frame_3">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="4" column="0" colspan="2">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Radial distortion</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Focus:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0" colspan="3">
+                 <widget class="QLabel" name="pPointLabel">
+                  <property name="text">
+                   <string>Principal point</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>Tangetial distortion</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="7">
+                 <widget class="QDoubleSpinBox" name="k3"/>
+                </item>
+                <item row="4" column="4">
+                 <widget class="QDoubleSpinBox" name="k1"/>
+                </item>
+                <item row="4" column="6">
+                 <widget class="QDoubleSpinBox" name="k2"/>
+                </item>
+                <item row="6" column="0" colspan="2">
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Camera matrix</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="6" colspan="2">
+                 <widget class="QTableWidget" name="matrixWidget">
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::NoEditTriggers</set>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>false</bool>
+                  </property>
+                  <property name="rowCount">
+                   <number>3</number>
+                  </property>
+                  <property name="columnCount">
+                   <number>3</number>
+                  </property>
+                  <attribute name="horizontalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderDefaultSectionSize">
+                   <number>34</number>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderCascadingSectionResizes">
+                   <bool>true</bool>
+                  </attribute>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <column/>
+                  <column/>
+                  <column/>
+                 </widget>
+                </item>
+                <item row="5" column="4">
+                 <widget class="QDoubleSpinBox" name="t1"/>
+                </item>
+                <item row="5" column="6">
+                 <widget class="QDoubleSpinBox" name="t2"/>
+                </item>
+                <item row="3" column="4">
+                 <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                </item>
+                <item row="0" column="4">
+                 <widget class="QDoubleSpinBox" name="xPrincipal"/>
+                </item>
+                <item row="0" column="5">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Y:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="6">
+                 <widget class="QDoubleSpinBox" name="yPrincipal"/>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>X:</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+               <zorder>pPointLabel</zorder>
+               <zorder>widget_3</zorder>
+               <zorder>label_3</zorder>
+               <zorder>label_4</zorder>
+               <zorder>label_7</zorder>
+               <zorder>matrixWidget</zorder>
+               <zorder>k1</zorder>
+               <zorder>k2</zorder>
+               <zorder>k3</zorder>
+               <zorder>label_8</zorder>
+               <zorder>t1</zorder>
+               <zorder>t2</zorder>
+               <zorder>doubleSpinBox</zorder>
+               <zorder>xPrincipal</zorder>
+               <zorder>yPrincipal</zorder>
+               <zorder>label_2</zorder>
+               <zorder>label</zorder>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -266,7 +423,7 @@
           <item>
            <widget class="QPushButton" name="calibrationFolderButton">
             <property name="text">
-             <string>Locad calibration images</string>
+             <string>Load calibration images</string>
             </property>
            </widget>
           </item>
@@ -274,6 +431,13 @@
            <widget class="QPushButton" name="runCalibrationButton">
             <property name="text">
              <string>runCalibration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="nextCalibrationStepButton">
+            <property name="text">
+             <string>Next step</string>
             </property>
            </widget>
           </item>
@@ -297,6 +461,26 @@
              <string>Show grey</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="text">
+             <string>Play undistorted</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

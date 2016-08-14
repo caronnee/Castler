@@ -57,6 +57,9 @@
     <Filter Include="Source Files\ImageProviders">
       <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ImageProcessor">
+      <UniqueIdentifier>{b0ddf950-7de2-4086-8db6-0aae3216416c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -134,6 +137,18 @@
     <ClCompile Include="ImageProvider.cpp">
       <Filter>Source Files\ImageProviders</Filter>
     </ClCompile>
+    <ClCompile Include="worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_worker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_worker.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcessor.cpp">
+      <Filter>Source Files\ImageProcessor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -159,6 +174,9 @@
     </CustomBuild>
     <CustomBuild Include="..\include\FrameProcessor.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="worker.hpp">
+      <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -186,8 +204,14 @@
     <ClInclude Include="imageprovider.h">
       <Filter>Source Files\ImageProviders</Filter>
     </ClInclude>
+    <ClInclude Include="ImageProcessor.h">
+      <Filter>Source Files\ImageProcessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Creator.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\TodoList.txt" />
   </ItemGroup>
 </Project>
