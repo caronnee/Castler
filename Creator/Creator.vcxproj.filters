@@ -60,6 +60,9 @@
     <Filter Include="Source Files\ImageProcessor">
       <UniqueIdentifier>{b0ddf950-7de2-4086-8db6-0aae3216416c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{3d5a55ae-79bc-4641-9a78-73922648a4cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -137,9 +140,6 @@
     <ClCompile Include="ImageProvider.cpp">
       <Filter>Source Files\ImageProviders</Filter>
     </ClCompile>
-    <ClCompile Include="worker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_worker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -148,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="ImageProcessor.cpp">
       <Filter>Source Files\ImageProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="worker.cpp">
+      <Filter>Source Files\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,7 +179,7 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="worker.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Source</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -207,11 +210,16 @@
     <ClInclude Include="ImageProcessor.h">
       <Filter>Source Files\ImageProcessor</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Creator.rc" />
+    <ClInclude Include="typedefs.h">
+      <Filter>Source Files\Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\TodoList.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Creator.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

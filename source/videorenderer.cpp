@@ -90,6 +90,12 @@ void VideoRenderer::NoMoreImages()
 	emit Finished();
 }
 
+void VideoRenderer::ShowParameters(cv::Mat camera, cv::Mat dist)
+{
+	emit setCameraSignal(camera);
+	//emit setDistortion(dist);
+}
+
 bool VideoRenderer::Start(const QString & str, VideoAction action)
 {
 	Clean();
@@ -102,7 +108,8 @@ bool VideoRenderer::Start(const QString & str, VideoAction action)
 	connect(_capturer, SIGNAL(imageReadySignal(cv::Mat)), this, SLOT(setImage(cv::Mat)));
 	connect(_capturer, SIGNAL(finishedSignal()), this, SLOT(NoMoreImages()));
 	connect(_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), this, SLOT(Report(MessageLevel,const QString &)));
-	
+	connect(_capturer->GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), this, SLOT(ShowParameters(cv::Mat, cv::Mat)));
+
 	switch (action)
 	{
 		case ActionCalibrate:

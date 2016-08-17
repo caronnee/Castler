@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1,1">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
    <item>
     <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
@@ -238,7 +238,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_2" native="true">
+        <widget class="QWidget" name="displayFrame" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QFrame" name="frame_2">
@@ -260,7 +260,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QFrame" name="frame_3">
+              <widget class="QFrame" name="parametersFrame">
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -313,7 +313,7 @@
                  </widget>
                 </item>
                 <item row="6" column="6" colspan="2">
-                 <widget class="QTableWidget" name="matrixWidget">
+                 <widget class="QTableWidget" name="cameraMatrix">
                   <property name="layoutDirection">
                    <enum>Qt::LeftToRight</enum>
                   </property>
@@ -374,9 +374,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="6">
-                 <widget class="QDoubleSpinBox" name="yPrincipal"/>
-                </item>
                 <item row="0" column="3">
                  <widget class="QLabel" name="label">
                   <property name="text">
@@ -384,24 +381,17 @@
                   </property>
                  </widget>
                 </item>
+                <item row="0" column="6">
+                 <widget class="QDoubleSpinBox" name="yPrincipal"/>
+                </item>
+                <item row="7" column="7">
+                 <widget class="QPushButton" name="applyCalibrated">
+                  <property name="text">
+                   <string>Apply</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
-               <zorder>pPointLabel</zorder>
-               <zorder>widget_3</zorder>
-               <zorder>label_3</zorder>
-               <zorder>label_4</zorder>
-               <zorder>label_7</zorder>
-               <zorder>matrixWidget</zorder>
-               <zorder>k1</zorder>
-               <zorder>k2</zorder>
-               <zorder>k3</zorder>
-               <zorder>label_8</zorder>
-               <zorder>t1</zorder>
-               <zorder>t2</zorder>
-               <zorder>doubleSpinBox</zorder>
-               <zorder>xPrincipal</zorder>
-               <zorder>yPrincipal</zorder>
-               <zorder>label_2</zorder>
-               <zorder>label</zorder>
               </widget>
              </item>
             </layout>
@@ -411,7 +401,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_3" native="true">
+        <widget class="QWidget" name="controlsFrame" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QPushButton" name="loadCalibrationButton">
@@ -491,13 +481,6 @@
    </item>
    <item>
     <widget class="LogHandler" name="infobox"/>
-   </item>
-   <item>
-    <widget class="QProgressBar" name="progressBar">
-     <property name="value">
-      <number>24</number>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

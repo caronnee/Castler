@@ -17,6 +17,7 @@ private:
 
 signals:
 	void reportSignal(MessageLevel level, const QString & str);
+	void setCameraSignal(cv::Mat camera);
 	void Finished();
 
 public slots:
@@ -26,6 +27,7 @@ public slots:
 	void Stop();
 	void Report(MessageLevel level, const QString & message);
 	void NoMoreImages();
+	void ShowParameters(cv::Mat camera, cv::Mat dist);
 	void Pause();
 	void RequestNextFrame();
 	void RequestPrevFrame();

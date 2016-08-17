@@ -1,7 +1,5 @@
-- move to the other thread when rendering video/images
 - calibrate, show undistorted
-- find chessboard in the videos
-
+- find chessboard in the videos  tries with my camera / drone
 - create a structure
 - make GEngine class ;) for rendering content
 - create structure from motion

@@ -8,15 +8,15 @@ Creator::Creator(QWidget *parent)
 {
     ui.setupUi(this);
 
-	for (int c = 0; c < ui.matrixWidget->horizontalHeader()->count(); ++c)
+	for (int c = 0; c < ui.cameraMatrix->horizontalHeader()->count(); ++c)
 	{
-		ui.matrixWidget->horizontalHeader()->setSectionResizeMode(
+		ui.cameraMatrix->horizontalHeader()->setSectionResizeMode(
 			c, QHeaderView::Stretch);
 	}
 
-	for (int c = 0; c < ui.matrixWidget->verticalHeader()->count(); ++c)
+	for (int c = 0; c < ui.cameraMatrix->verticalHeader()->count(); ++c)
 	{
-		ui.matrixWidget->verticalHeader()->setSectionResizeMode(
+		ui.cameraMatrix->verticalHeader()->setSectionResizeMode(
 			c, QHeaderView::Stretch);
 	}
 
@@ -49,10 +49,27 @@ Creator::Creator(QWidget *parent)
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
 	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
+	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat)), this, SLOT(SetCalibCamera(cv::Mat)));
 
 	LoadSettings();
 }
 
+void Creator::SetCalibCamera(cv::Mat camera)
+{
+#define CAM_X 3
+#define CAM_Y 3
+	DoAssert(camera.cols == 3);
+	DoAssert(camera.rows == 3);
+	for (int i = 0; i < CAM_X; i++)
+	{
+		for (int j = 0; j < CAM_Y; j++)
+		{
+			float v = camera.at<double>(i, j);
+			QVariant val(v);
+			ui.cameraMatrix->setItem(i, j, new QTableWidgetItem(val.toString()));
+		}
+	}
+}
 void Creator::RunCalibration()
 {
 	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionCalibrate);

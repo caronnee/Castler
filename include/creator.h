@@ -23,6 +23,7 @@ private slots:
 	void SaveSettings();
 	void LoadCalibration();
 	void RunCalibration();
+	void SetCalibCamera(cv::Mat camera);
 
 	void LoadCalibrationImages();
 private:

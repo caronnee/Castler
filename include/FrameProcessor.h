@@ -50,6 +50,7 @@ private:
 
 public:
 	//load
+	Worker * GetWorker() { return &_worker; }
 	void StartDetecting();
 	void StartCalibration();
 	bool Load(const QString & str);
