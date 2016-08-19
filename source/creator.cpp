@@ -69,6 +69,9 @@ void Creator::SetCalibCamera(cv::Mat camera)
 			ui.cameraMatrix->setItem(i, j, new QTableWidgetItem(val.toString()));
 		}
 	}
+	// set focus
+	double focusVal = camera.at<double>(0,0);
+	ui.focusValue->setValue(focusVal);
 }
 void Creator::RunCalibration()
 {

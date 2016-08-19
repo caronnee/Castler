@@ -73,7 +73,7 @@
                <x>0</x>
                <y>0</y>
                <width>148</width>
-               <height>325</height>
+               <height>352</height>
               </rect>
              </property>
              <attribute name="label">
@@ -297,13 +297,34 @@
                  </widget>
                 </item>
                 <item row="4" column="7">
-                 <widget class="QDoubleSpinBox" name="k3"/>
+                 <widget class="QDoubleSpinBox" name="k3">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="4" column="4">
-                 <widget class="QDoubleSpinBox" name="k1"/>
+                 <widget class="QDoubleSpinBox" name="k1">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="4" column="6">
-                 <widget class="QDoubleSpinBox" name="k2"/>
+                 <widget class="QDoubleSpinBox" name="k2">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="6" column="0" colspan="2">
                  <widget class="QLabel" name="label_7">
@@ -356,16 +377,44 @@
                  </widget>
                 </item>
                 <item row="5" column="4">
-                 <widget class="QDoubleSpinBox" name="t1"/>
+                 <widget class="QDoubleSpinBox" name="t1">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="5" column="6">
-                 <widget class="QDoubleSpinBox" name="t2"/>
+                 <widget class="QDoubleSpinBox" name="t2">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="3" column="4">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="focusValue">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="QDoubleSpinBox" name="xPrincipal"/>
+                 <widget class="QDoubleSpinBox" name="principalXValue">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="0" column="5">
                  <widget class="QLabel" name="label_2">
@@ -382,7 +431,14 @@
                  </widget>
                 </item>
                 <item row="0" column="6">
-                 <widget class="QDoubleSpinBox" name="yPrincipal"/>
+                 <widget class="QDoubleSpinBox" name="principalYValue">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
                 <item row="7" column="7">
                  <widget class="QPushButton" name="applyCalibrated">

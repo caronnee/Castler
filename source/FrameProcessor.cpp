@@ -73,8 +73,8 @@ FrameProcessor::FrameProcessor()
 	
 	connect(&_thread, SIGNAL(started()), &_worker, SLOT(Process()));
 	connect(&_thread, SIGNAL(finished()), this, SLOT(ThreadStopped()));
-	connect(&_worker, SIGNAL(finished()), &_thread, SLOT(quit()));
-	
+	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(deleteLater()));
+	connect(&_thread, SIGNAL(finished()), &_thread, SLOT(deleteLater()));
 	connect(&_worker, SIGNAL(imageProcessed(cv::Mat)), this, SLOT( ImageReported( cv::Mat )));
 	_worker.moveToThread(&_thread);
 }
@@ -103,8 +103,8 @@ void FrameProcessor::Pause()
 
 void FrameProcessor::Stop()
 {
+	_worker.Terminate();
 	_timer.stop();
-	_thread.exit(0);
 	_provider->SetPosition(0);
 	std::stack<cv::Mat> empty;
 	std::swap(_images, empty);
