@@ -49,29 +49,48 @@ Creator::Creator(QWidget *parent)
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
 	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
-	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat)), this, SLOT(SetCalibCamera(cv::Mat)));
+	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat,int)), this, SLOT(SetCalibCamera(cv::Mat,int)));
+	connect(ui.applyCalibration, SIGNAL(clicked()), this, SIGNAL(setParameters()));
 
+	// rest of the initialization
 	LoadSettings();
 }
 
-void Creator::SetCalibCamera(cv::Mat camera)
+void Creator::SetCalibCamera(cv::Mat camera, int type)
 {
+	if (type == 0)
+	{
 #define CAM_X 3
 #define CAM_Y 3
-	DoAssert(camera.cols == 3);
-	DoAssert(camera.rows == 3);
-	for (int i = 0; i < CAM_X; i++)
-	{
-		for (int j = 0; j < CAM_Y; j++)
+		DoAssert(camera.cols == 3);
+		DoAssert(camera.rows == 3);
+		for (int i = 0; i < CAM_X; i++)
 		{
-			float v = camera.at<double>(i, j);
-			QVariant val(v);
-			ui.cameraMatrix->setItem(i, j, new QTableWidgetItem(val.toString()));
+			for (int j = 0; j < CAM_Y; j++)
+			{
+				float v = camera.at<double>(i, j);
+				QVariant val(v);
+				ui.cameraMatrix->setItem(i, j, new QTableWidgetItem(val.toString()));
+			}
 		}
+		// set focus
+		double focusVal = camera.at<double>(0, 0);
+		ui.focusValue->setValue(focusVal);
 	}
-	// set focus
-	double focusVal = camera.at<double>(0,0);
-	ui.focusValue->setValue(focusVal);
+	else if ( type == 1)
+	{
+		std::vector<double> d(camera);
+		// set distortion parameters
+		ui.k1->setValue(camera.at<double>(0, 0));
+		ui.k2->setValue(camera.at<double>(1, 0));
+		ui.k3->setValue(camera.at<double>(4.0));
+
+		// tangential will be zero - we don't care for them
+	}
+	else
+	{
+		DoAssert(false);
+	}
 }
 void Creator::RunCalibration()
 {

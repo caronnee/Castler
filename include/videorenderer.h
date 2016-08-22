@@ -17,7 +17,7 @@ private:
 
 signals:
 	void reportSignal(MessageLevel level, const QString & str);
-	void setCameraSignal(cv::Mat camera);
+	void setCameraSignal(cv::Mat mat, int type);
 	void Finished();
 
 public slots:

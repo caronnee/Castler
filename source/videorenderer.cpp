@@ -92,8 +92,9 @@ void VideoRenderer::NoMoreImages()
 
 void VideoRenderer::ShowParameters(cv::Mat camera, cv::Mat dist)
 {
-	emit setCameraSignal(camera);
-	//emit setDistortion(dist);
+	emit setCameraSignal(camera,0);
+	emit setCameraSignal(dist,1);
+
 }
 
 bool VideoRenderer::Start(const QString & str, VideoAction action)

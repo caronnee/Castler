@@ -1,5 +1,7 @@
 - calibrate, show undistorted
-- find chessboard in the videos  tries with my camera / drone
-- create a structure
+- find chessboard in the videos tried with my camera / drone
+- do something about renderer to be able to render
+- try to load some ply file
+- create file from bruteforce, ordinary one
 - make GEngine class ;) for rendering content
 - create structure from motion
