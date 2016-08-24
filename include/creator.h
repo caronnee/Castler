@@ -17,6 +17,7 @@ public:
 	~Creator();
 	
 private slots:
+	void SendParameters();
 	void EnablePlay();
 	void PlayVideo();
 	void LoadSettings();

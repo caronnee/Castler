@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include <QtWidgets>
 #include "loghandler.h"
+#include "imageprovider.h"
 
 Creator::Creator(QWidget *parent)
     : QWidget(parent)
@@ -22,6 +23,8 @@ Creator::Creator(QWidget *parent)
 
 	qRegisterMetaType<MessageLevel>("MessageLevel");
 	qRegisterMetaType<cv::Mat>("cv::Mat");
+	qRegisterMetaType<CalibrationSet>("CalibrationSet");
+
 	// connections
     
 	// Global application
@@ -50,10 +53,27 @@ Creator::Creator(QWidget *parent)
 	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
 	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat,int)), this, SLOT(SetCalibCamera(cv::Mat,int)));
-	connect(ui.applyCalibration, SIGNAL(clicked()), this, SIGNAL(setParameters()));
+	connect(ui.applyCalibrationButton, SIGNAL(clicked()), this, SLOT(SendParameters()));
 
 	// rest of the initialization
 	LoadSettings();
+}
+
+void Creator::SendParameters()
+{
+	CalibrationSet calibration;
+	calibration.px = ui.principalXValue->value();
+	calibration.py = ui.principalYValue->value();
+
+	// focus
+	calibration.fx = ui.focusValue->value();
+	calibration.fy = ui.focusValue->value();
+
+	calibration.k1 = ui.k1->value();
+	calibration.k2 = ui.k2->value();
+	calibration.k3 = ui.k3->value();
+
+	ui.calibrationVideo->SetParameters( calibration );
 }
 
 void Creator::SetCalibCamera(cv::Mat camera, int type)

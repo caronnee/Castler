@@ -140,17 +140,17 @@
     <ClCompile Include="ImageProvider.cpp">
       <Filter>Source Files\ImageProviders</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_worker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_worker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="ImageProcessor.cpp">
       <Filter>Source Files\ImageProcessor</Filter>
     </ClCompile>
-    <ClCompile Include="worker.cpp">
+    <ClCompile Include="ExtractionWorker.cpp">
       <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ExtractionWorker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ExtractionWorker.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,7 +178,7 @@
     <CustomBuild Include="..\include\FrameProcessor.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="worker.hpp">
+    <CustomBuild Include="ExtractionWorker.hpp">
       <Filter>Source Files\Source</Filter>
     </CustomBuild>
   </ItemGroup>

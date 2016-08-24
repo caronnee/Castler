@@ -1,35 +1,40 @@
-﻿#include "worker.hpp"
+﻿#include "ExtractionWorker.hpp"
 #include "typedefs.h"
 
-Worker::Worker()
+ExtractionWorker::ExtractionWorker()
 {
 	_exitting = false;
 	_mode = 0;
 }
 
-void Worker::Terminate()
+void ExtractionWorker::Terminate()
 {
 	_exitting = true;
 }
 
-void Worker::SetMode(const int & mode)
+void ExtractionWorker::ChangeCalibration(CalibrationSet calibration)
+{
+	_calibrationSet = calibration;
+}
+
+void ExtractionWorker::SetMode(const int & mode)
 {
 	_mode ^= mode;
 }
 
-void Worker::Report(MessageLevel level, const QString & str)
+void ExtractionWorker::Report(MessageLevel level, const QString & str)
 {
 	emit workerReportSignal(level, str);
 }
 
 #include "ImageProcessor.h"
 
-void Worker::Init(IImageProvider * provider)
+void ExtractionWorker::Init(IImageProvider * provider)
 {
 	_provider = provider;
 }
 
-void Worker::Process()
+void ExtractionWorker::Process()
 {
 	emit workerReportSignal(MInfo, "Starting thread process");
 
@@ -62,13 +67,14 @@ void Worker::Process()
 	{
 		if (_exitting)
 			return;
+
 		if (!processor.Next())
 		{
 			//gf_report(MInfo, "No more frames to use");
 			break;
 		}
 
-		QString str = QString::asprintf("Checking image %d", index++);
+		QString str = QString::asprintf("Processing image %d", index++);
 
 		emit workerReportSignal(MInfo, str);
 
@@ -90,6 +96,16 @@ void Worker::Process()
 			emit workerReportSignal(MInfo, "Detecting features in next image");
 			processor.PerformDetection();
 		}
+
+
+		if (_mode & ModeCalibrate)
+		{
+
+		}
+
+		//////////////////////////////////////////////////////
+		//// final for showing image after all preprocessing
+		//////////////////////////////////////////////////////
 
 		QImage::Format format = QImage::Format_RGB888;
 		if (_mode & ModeGrey)

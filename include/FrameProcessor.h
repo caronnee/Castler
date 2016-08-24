@@ -11,14 +11,15 @@
 #include <QThread>
 #include <stack>
 #include <QImage>
-#include "worker.hpp"
+#include "ExtractionWorker.hpp"
+
 
 class FrameProcessor : public QObject
 {
 	Q_OBJECT
 		;
 	std::stack<cv::Mat> _images;
-	Worker _worker;
+	ExtractionWorker _worker;
 protected:
 	// main thread doing openCV stuff
 	QThread _thread;
@@ -50,7 +51,7 @@ private:
 
 public:
 	//load
-	Worker * GetWorker() { return &_worker; }
+	ExtractionWorker * GetWorker() { return &_worker; }
 	void StartDetecting();
 	void StartCalibration();
 	bool Load(const QString & str);

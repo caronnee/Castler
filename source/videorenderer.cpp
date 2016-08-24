@@ -31,15 +31,23 @@ void VideoRenderer::setImage(cv::Mat img)
 
 VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
 	setAttribute(Qt::WA_OpaquePaintEvent);
+
+	// connections
+	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat)), this, SLOT(setImage(cv::Mat)));
+	connect(&_capturer, SIGNAL(finishedSignal()), this, SLOT(NoMoreImages()));
+	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), this, SLOT(Report(MessageLevel, const QString &)));
+	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), this, SLOT(ShowParameters(cv::Mat, cv::Mat)));
+	connect(this, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
+
 }
 
 void VideoRenderer::Clean()
 {
-	if (_capturer)
-	{
-		delete _capturer;
-	}
-	_capturer = NULL;
+}
+
+void VideoRenderer::SetParameters( CalibrationSet calibration)
+{
+	emit setCalibrationSignal(calibration);
 }
 
 VideoRenderer::~VideoRenderer()
@@ -49,35 +57,33 @@ VideoRenderer::~VideoRenderer()
 
 void VideoRenderer::RequestPrevFrame()
 {
-	_capturer->Request(-2);
+	_capturer.Request(-2);
 }
 
 void VideoRenderer::ShowGreyFrame()
 {
-	if (!_capturer)
-		return;
 	emit reportSignal(MInfo, "Showing grey frame");
-	_capturer->SwitchMode(ModeGrey);
+	_capturer.SwitchMode(ModeGrey);
 }
 
 
 void VideoRenderer::FeaturesFromFrame()
 {
-	_capturer->SwitchMode(ModeFeatures);
+	_capturer.SwitchMode(ModeFeatures);
 }
 
 void VideoRenderer::RequestNextFrame()
 {
-	_capturer->Request(0);
+	_capturer.Request(0);
 }
 
 void VideoRenderer::Pause()
 {
-	_capturer->Pause();
+	_capturer.Pause();
 }
 void VideoRenderer::Stop()
 {
-	_capturer->Stop();
+	_capturer.Stop();
 }
 
 void VideoRenderer::Report(MessageLevel level, const QString & message)
@@ -100,28 +106,22 @@ void VideoRenderer::ShowParameters(cv::Mat camera, cv::Mat dist)
 bool VideoRenderer::Start(const QString & str, VideoAction action)
 {
 	Clean();
-	_capturer = new FrameProcessor();	
-	if (!_capturer->Load(str))
+	if (!_capturer.Load(str))
 	{
 		return false;
 	}
-	// connections
-	connect(_capturer, SIGNAL(imageReadySignal(cv::Mat)), this, SLOT(setImage(cv::Mat)));
-	connect(_capturer, SIGNAL(finishedSignal()), this, SLOT(NoMoreImages()));
-	connect(_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), this, SLOT(Report(MessageLevel,const QString &)));
-	connect(_capturer->GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), this, SLOT(ShowParameters(cv::Mat, cv::Mat)));
-
+	
 	switch (action)
 	{
 		case ActionCalibrate:
 		{
-			_capturer->SwitchMode(ModeFeatures);
-			_capturer->StartCalibration();
+			_capturer.SwitchMode(ModeFeatures);
+			_capturer.StartCalibration();
 			break;
 		}
 		case ActionDetect:
 		{
-			_capturer->StartDetecting();
+			_capturer.StartDetecting();
 			break;
 		}
 	}
