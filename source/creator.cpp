@@ -2,26 +2,29 @@
 #include "renderer.h"
 #include <QtWidgets>
 #include "loghandler.h"
+#include "imageprovider.h"
 
 Creator::Creator(QWidget *parent)
     : QWidget(parent)
 {
     ui.setupUi(this);
 
-	for (int c = 0; c < ui.matrixWidget->horizontalHeader()->count(); ++c)
+	for (int c = 0; c < ui.cameraMatrix->horizontalHeader()->count(); ++c)
 	{
-		ui.matrixWidget->horizontalHeader()->setSectionResizeMode(
+		ui.cameraMatrix->horizontalHeader()->setSectionResizeMode(
 			c, QHeaderView::Stretch);
 	}
 
-	for (int c = 0; c < ui.matrixWidget->verticalHeader()->count(); ++c)
+	for (int c = 0; c < ui.cameraMatrix->verticalHeader()->count(); ++c)
 	{
-		ui.matrixWidget->verticalHeader()->setSectionResizeMode(
+		ui.cameraMatrix->verticalHeader()->setSectionResizeMode(
 			c, QHeaderView::Stretch);
 	}
 
 	qRegisterMetaType<MessageLevel>("MessageLevel");
 	qRegisterMetaType<cv::Mat>("cv::Mat");
+	qRegisterMetaType<CalibrationSet>("CalibrationSet");
+
 	// connections
     
 	// Global application
@@ -49,10 +52,66 @@ Creator::Creator(QWidget *parent)
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
 	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
+	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat,int)), this, SLOT(SetCalibCamera(cv::Mat,int)));
+	connect(ui.applyCalibrationButton, SIGNAL(clicked()), this, SLOT(SendParameters()));
 
+	// rest of the initialization
 	LoadSettings();
 }
 
+void Creator::SendParameters()
+{
+	CalibrationSet calibration;
+	calibration.px = ui.principalXValue->value();
+	calibration.py = ui.principalYValue->value();
+
+	// focus
+	calibration.fx = ui.focusValue->value();
+	calibration.fy = ui.focusValue->value();
+
+	calibration.k1 = ui.k1->value();
+	calibration.k2 = ui.k2->value();
+	calibration.k3 = ui.k3->value();
+
+	ui.calibrationVideo->SetParameters( calibration );
+}
+
+void Creator::SetCalibCamera(cv::Mat camera, int type)
+{
+	if (type == 0)
+	{
+#define CAM_X 3
+#define CAM_Y 3
+		DoAssert(camera.cols == 3);
+		DoAssert(camera.rows == 3);
+		for (int i = 0; i < CAM_X; i++)
+		{
+			for (int j = 0; j < CAM_Y; j++)
+			{
+				float v = camera.at<double>(i, j);
+				QVariant val(v);
+				ui.cameraMatrix->setItem(i, j, new QTableWidgetItem(val.toString()));
+			}
+		}
+		// set focus
+		double focusVal = camera.at<double>(0, 0);
+		ui.focusValue->setValue(focusVal);
+	}
+	else if ( type == 1)
+	{
+		std::vector<double> d(camera);
+		// set distortion parameters
+		ui.k1->setValue(camera.at<double>(0, 0));
+		ui.k2->setValue(camera.at<double>(1, 0));
+		ui.k3->setValue(camera.at<double>(4.0));
+
+		// tangential will be zero - we don't care for them
+	}
+	else
+	{
+		DoAssert(false);
+	}
+}
 void Creator::RunCalibration()
 {
 	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionCalibrate);

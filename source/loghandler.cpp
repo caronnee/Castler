@@ -17,9 +17,11 @@ LogHandler::~LogHandler()
 
 }
 
-QString levels[MLevels] = { "Warning:", "Error", "Info" };
+QString levels[MLevels] = { "Info:", "Warning", "Error" };
 
 #define MAX_MESSAGE_LEN 1024
+
+#include <QScrollBar>
 
 void LogHandler::Report(MessageLevel level, const QString & str)
 {
@@ -27,6 +29,8 @@ void LogHandler::Report(MessageLevel level, const QString & str)
 	insertPlainText(" : ");
 	insertPlainText(str);
 	insertPlainText("\n");
+	QScrollBar *sb = verticalScrollBar();
+	sb->setValue(sb->maximum());
 }
 #include <QMenu>
 

@@ -121,7 +121,7 @@ void Renderer::initializeGL()
 	  "varying mediump vec4 texc;\n"
 	  "void main()\n"
 	  "{\n"
-	  "    gl_FragColor = vec4(1,1,1,1);\n"
+	  "    gl_FragColor = vec4(1,1,0,1);\n"
 	  "}\n";
   bool compiled = fshader->compileSourceCode(fsrc);
   const GLubyte * str = glGetString(GL_VERSION);

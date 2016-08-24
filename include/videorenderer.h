@@ -11,13 +11,15 @@ class VideoRenderer : public QWidget {
 private:
 	int _mode = 0;
 
-	FrameProcessor * _capturer = NULL;
+	FrameProcessor _capturer;
 	cv::Mat _img;
 	void paintEvent(QPaintEvent *);
 
 signals:
 	void reportSignal(MessageLevel level, const QString & str);
+	void setCameraSignal(cv::Mat mat, int type);
 	void Finished();
+	void setCalibrationSignal(CalibrationSet set);
 
 public slots:
 	void ShowGreyFrame();
@@ -26,6 +28,7 @@ public slots:
 	void Stop();
 	void Report(MessageLevel level, const QString & message);
 	void NoMoreImages();
+	void ShowParameters(cv::Mat camera, cv::Mat dist);
 	void Pause();
 	void RequestNextFrame();
 	void RequestPrevFrame();
@@ -44,4 +47,6 @@ public:
 
 	bool Start(const QString & str, VideoAction action);
 	void Clean();
+//	void SetParameters( CalibrationSet calibration);
+	void SetParameters(CalibrationSet calibration);
 };

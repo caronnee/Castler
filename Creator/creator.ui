@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1,1">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
    <item>
     <widget class="QTabWidget" name="ComparePage">
      <property name="currentIndex">
@@ -73,7 +73,7 @@
                <x>0</x>
                <y>0</y>
                <width>148</width>
-               <height>325</height>
+               <height>352</height>
               </rect>
              </property>
              <attribute name="label">
@@ -238,7 +238,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_2" native="true">
+        <widget class="QWidget" name="displayFrame" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QFrame" name="frame_2">
@@ -260,7 +260,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QFrame" name="frame_3">
+              <widget class="QFrame" name="parametersFrame">
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
@@ -268,10 +268,61 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QGridLayout" name="gridLayout">
+                <item row="4" column="7">
+                 <widget class="QDoubleSpinBox" name="k3">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="6">
+                 <widget class="QDoubleSpinBox" name="k2">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="5">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Y:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>X:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="7">
+                 <widget class="QPushButton" name="applyCalibrationButton">
+                  <property name="text">
+                   <string>Apply</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="4" column="0" colspan="2">
                  <widget class="QLabel" name="label_4">
                   <property name="text">
                    <string>Radial distortion</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="4">
+                 <widget class="QDoubleSpinBox" name="k1">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -282,38 +333,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0" colspan="3">
-                 <widget class="QLabel" name="pPointLabel">
-                  <property name="text">
-                   <string>Principal point</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="label_8">
-                  <property name="text">
-                   <string>Tangetial distortion</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="7">
-                 <widget class="QDoubleSpinBox" name="k3"/>
-                </item>
-                <item row="4" column="4">
-                 <widget class="QDoubleSpinBox" name="k1"/>
-                </item>
-                <item row="4" column="6">
-                 <widget class="QDoubleSpinBox" name="k2"/>
-                </item>
-                <item row="6" column="0" colspan="2">
-                 <widget class="QLabel" name="label_7">
-                  <property name="text">
-                   <string>Camera matrix</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="6" colspan="2">
-                 <widget class="QTableWidget" name="matrixWidget">
+                <item row="5" column="6" colspan="2">
+                 <widget class="QTableWidget" name="cameraMatrix">
                   <property name="layoutDirection">
                    <enum>Qt::LeftToRight</enum>
                   </property>
@@ -355,53 +376,51 @@
                   <column/>
                  </widget>
                 </item>
-                <item row="5" column="4">
-                 <widget class="QDoubleSpinBox" name="t1"/>
-                </item>
-                <item row="5" column="6">
-                 <widget class="QDoubleSpinBox" name="t2"/>
-                </item>
                 <item row="3" column="4">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
-                </item>
-                <item row="0" column="4">
-                 <widget class="QDoubleSpinBox" name="xPrincipal"/>
-                </item>
-                <item row="0" column="5">
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Y:</string>
+                 <widget class="QDoubleSpinBox" name="focusValue">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="6">
-                 <widget class="QDoubleSpinBox" name="yPrincipal"/>
+                 <widget class="QDoubleSpinBox" name="principalYValue">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
                 </item>
-                <item row="0" column="3">
-                 <widget class="QLabel" name="label">
+                <item row="0" column="4">
+                 <widget class="QDoubleSpinBox" name="principalXValue">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0" colspan="3">
+                 <widget class="QLabel" name="pPointLabel">
                   <property name="text">
-                   <string>X:</string>
+                   <string>Principal point</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0" colspan="2">
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Camera matrix</string>
                   </property>
                  </widget>
                 </item>
                </layout>
-               <zorder>pPointLabel</zorder>
-               <zorder>widget_3</zorder>
-               <zorder>label_3</zorder>
-               <zorder>label_4</zorder>
-               <zorder>label_7</zorder>
-               <zorder>matrixWidget</zorder>
-               <zorder>k1</zorder>
-               <zorder>k2</zorder>
-               <zorder>k3</zorder>
-               <zorder>label_8</zorder>
-               <zorder>t1</zorder>
-               <zorder>t2</zorder>
-               <zorder>doubleSpinBox</zorder>
-               <zorder>xPrincipal</zorder>
-               <zorder>yPrincipal</zorder>
-               <zorder>label_2</zorder>
-               <zorder>label</zorder>
               </widget>
              </item>
             </layout>
@@ -411,7 +430,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_3" native="true">
+        <widget class="QWidget" name="controlsFrame" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QPushButton" name="loadCalibrationButton">
@@ -491,13 +510,6 @@
    </item>
    <item>
     <widget class="LogHandler" name="infobox"/>
-   </item>
-   <item>
-    <widget class="QProgressBar" name="progressBar">
-     <property name="value">
-      <number>24</number>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
