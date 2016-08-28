@@ -16,12 +16,15 @@ class ImageProcessor
 	IImageProvider * _provider;
 	cv::Mat _ret;
 	cv::Size _frameSize;
-	// handler for the messages
-	IReportFunction * _reporter;
+
+
 public:
+
+	// handler for the messages
+	static IReportFunction * _reporter;
 	bool Next();
-	ImageProcessor(IReportFunction * reporter, IImageProvider * provider);
-	bool Init(bool ffd = false);
+	ImageProcessor();
+	bool Init( IImageProvider * provider, bool ffd = false);
 	cv::Size GetSize();
 	bool Prepare(cv::Mat& frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points);
 	bool PerformCalibration(int chessWidth, int chessHeight, std::vector<cv::Point2f>& corners);
@@ -30,4 +33,5 @@ public:
 	bool DrawFeatures();
 	void ToGrey();
 	cv::Mat GetResult();
+	void ApplyCalibration(CalibrationSet & calibrationSet);
 };

@@ -7,6 +7,10 @@
 Creator::Creator(QWidget *parent)
     : QWidget(parent)
 {
+	qRegisterMetaType<MessageLevel>("MessageLevel");
+	qRegisterMetaType<cv::Mat>("cv::Mat");
+	qRegisterMetaType<CalibrationSet>("CalibrationSet");
+
     ui.setupUi(this);
 
 	for (int c = 0; c < ui.cameraMatrix->horizontalHeader()->count(); ++c)
@@ -21,9 +25,6 @@ Creator::Creator(QWidget *parent)
 			c, QHeaderView::Stretch);
 	}
 
-	qRegisterMetaType<MessageLevel>("MessageLevel");
-	qRegisterMetaType<cv::Mat>("cv::Mat");
-	qRegisterMetaType<CalibrationSet>("CalibrationSet");
 
 	// connections
     
@@ -48,7 +49,6 @@ Creator::Creator(QWidget *parent)
 	//calibration connects
 	connect(ui.loadCalibrationButton, SIGNAL(clicked()), this, SLOT(LoadCalibration(void)));
 	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
-	connect(ui.showCalibrationGrey, SIGNAL(clicked()), ui.calibrationVideo, SLOT(ShowGreyFrame(void)));
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
 	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));

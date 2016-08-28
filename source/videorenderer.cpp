@@ -38,11 +38,7 @@ VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
 	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), this, SLOT(Report(MessageLevel, const QString &)));
 	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), this, SLOT(ShowParameters(cv::Mat, cv::Mat)));
 	connect(this, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
-
-}
-
-void VideoRenderer::Clean()
-{
+//	connect(this, SIGNAL());
 }
 
 void VideoRenderer::SetParameters( CalibrationSet calibration)
@@ -52,7 +48,6 @@ void VideoRenderer::SetParameters( CalibrationSet calibration)
 
 VideoRenderer::~VideoRenderer()
 {
-	Clean();
 }
 
 void VideoRenderer::RequestPrevFrame()
@@ -63,13 +58,13 @@ void VideoRenderer::RequestPrevFrame()
 void VideoRenderer::ShowGreyFrame()
 {
 	emit reportSignal(MInfo, "Showing grey frame");
-	_capturer.SwitchMode(ModeGrey);
+	emit modeChanged(ModeGrey);
 }
 
 
 void VideoRenderer::FeaturesFromFrame()
 {
-	_capturer.SwitchMode(ModeFeatures);
+	emit modeChanged(ModeFeatures);
 }
 
 void VideoRenderer::RequestNextFrame()
@@ -105,24 +100,15 @@ void VideoRenderer::ShowParameters(cv::Mat camera, cv::Mat dist)
 
 bool VideoRenderer::Start(const QString & str, VideoAction action)
 {
-	Clean();
-	if (!_capturer.Load(str))
-	{
-		return false;
-	}
-	
 	switch (action)
 	{
 		case ActionCalibrate:
 		{
-			_capturer.SwitchMode(ModeFeatures);
-			_capturer.StartCalibration();
-			break;
+			return _capturer.Load(str, ModeCalibrate);
 		}
 		case ActionDetect:
 		{
-			_capturer.StartDetecting();
-			break;
+			return _capturer.Load(str, ModeDetect);
 		}
 	}
 	return true;

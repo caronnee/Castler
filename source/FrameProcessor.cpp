@@ -4,39 +4,12 @@
 #include "debug.h"
 #include "loghandler.h"
 
-void FrameProcessor::StartDetecting()
+bool FrameProcessor::Load(const QString & str, int mode)
 {
-	_timer.start(_seconds, this);
-	_thread.start();
-}
-
-bool FrameProcessor::Load(const QString & str)
-{
-	_provider = CreateProvider(str);
-	
-	if (_provider == false || _provider->IsValid() == false )
-		return false;
-
-	_worker.Init(_provider);
-	_seconds = _provider->Step() / 1000;
+	QString s(str);
+	emit inputChangedSignal(s, mode);
+	// = _provider->Step() / 1000;
 	return true;
-}
-
-void FrameProcessor::StartCalibration()
-{
-	if (_timer.isActive())
-	{
-		emit reportSignal(MInfo,"Restarting thread");
-		Stop();// restart
-	}
-	else
-	{
-		emit reportSignal(MInfo, "Starting thread");
-	}
-
-	SwitchMode(ModeCalibrate | ModeFeatures);
-	_timer.start(_seconds, this);
-	_thread.start();
 }
 
 void FrameProcessor::timerEvent(QTimerEvent * ev) {
@@ -67,27 +40,34 @@ void FrameProcessor::Report(MessageLevel level, const QString & message)
 
 FrameProcessor::FrameProcessor()
 {
-	_provider = NULL;
 	// connects
 	connect(&_worker, SIGNAL(workerReportSignal(MessageLevel, const QString &)), this, SLOT(Report(MessageLevel, const QString &)));
-	
+
+	_worker.moveToThread(&_thread);
+
+	connect(this, SIGNAL(inputChangedSignal(QString, int)), &_worker, SLOT(OpenSlot(QString, int)));
 	connect(&_thread, SIGNAL(started()), &_worker, SLOT(Process()));
 	connect(&_thread, SIGNAL(finished()), this, SLOT(ThreadStopped()));
+	connect(this, SIGNAL(cleanupSignal()), &_worker, SLOT(Cleanup()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(deleteLater()));
+	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(Terminate()));
 	connect(&_thread, SIGNAL(finished()), &_thread, SLOT(deleteLater()));
-	connect(&_worker, SIGNAL(imageProcessed(cv::Mat)), this, SLOT( ImageReported( cv::Mat )));
-	_worker.moveToThread(&_thread);
+	connect(&_worker, SIGNAL(imageProcessed(cv::Mat, double)), this, SLOT( ImageReported( cv::Mat,double )));
+	_thread.start();
 }
 
-void FrameProcessor::ImageReported(cv::Mat image)
+void FrameProcessor::ImageReported(cv::Mat image, double seconds)
 {
 	_images.push(image);
+	if (!_timer.isActive())
+		_timer.start(seconds, this);
 }
 
 FrameProcessor::~FrameProcessor()
 {
 	_timer.stop();
 	DoAssert(!_timer.isActive());
+	emit cleanupSignal();
 }
 
 void FrameProcessor::Pause()
@@ -105,7 +85,6 @@ void FrameProcessor::Stop()
 {
 	_worker.Terminate();
 	_timer.stop();
-	_provider->SetPosition(0);
 	std::stack<cv::Mat> empty;
 	std::swap(_images, empty);
 }
@@ -117,12 +96,7 @@ void FrameProcessor::Request(int frames)
 		reportSignal(MError, "Waiting for thread");
 		return;
 	}
-	_provider->SetPosition(_provider->Position() + frames);
+	
+	//_provider->SetPosition(_provider->Position() + frames);
 	ShowCurrent();
 }
-
-void FrameProcessor::SwitchMode(int flag)
-{
-	_worker.SetMode(flag);
-}
-
