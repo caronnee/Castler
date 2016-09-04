@@ -95,7 +95,7 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 			}
 			else
 			{
-				emit workerReportSignal(MInfo, "Calibration");
+				emit workerReportSignal(MInfo, "Calibration not successfull");
 			}
 		}
 	}
