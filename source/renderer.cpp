@@ -54,10 +54,11 @@ Renderer::Renderer(QWidget *parent)
   zRot(0),
   program(0)
 {
+	setFocusPolicy(Qt::ClickFocus);
 //  memset(textures, 0, sizeof(textures));
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-	timer->start(20);
+	//QTimer *timer = new QTimer(this);
+	//connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
+	//timer->start(20);
 }
 
 void Renderer::rotateOneStep()
@@ -93,10 +94,12 @@ void Renderer::initializeGL()
 {
   initializeOpenGLFunctions();
 
-  makeObject();
+  _name = "c:\\work\\DP1\\Castler\\Creator\\models\\bunny.ply";
+  Init();
 
+//  _mesh.ConvertToBB();
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
 
 #define PROGRAM_VERTEX_ATTRIBUTE 0
 #define PROGRAM_TEXCOORD_ATTRIBUTE 1
@@ -104,21 +107,16 @@ void Renderer::initializeGL()
   QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
   const char *vsrc =
     "attribute highp vec4 vertex;\n"
-    "attribute mediump vec4 texCoord;\n"
-    "varying mediump vec4 texc;\n"
     "uniform mediump mat4 matrix;\n"
     "void main(void)\n"
     "{\n"
     "    gl_Position = matrix * vertex;\n"
-    "    texc = texCoord;\n"
     "}\n";
   vshader->compileSourceCode(vsrc);
 
   QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
   const char *fsrc =
 	  "#version 100\n"
-	  "uniform sampler2D texture;\n"
-	  "varying mediump vec4 texc;\n"
 	  "void main()\n"
 	  "{\n"
 	  "    gl_FragColor = vec4(1,1,0,1);\n"
@@ -126,49 +124,62 @@ void Renderer::initializeGL()
   bool compiled = fshader->compileSourceCode(fsrc);
   const GLubyte * str = glGetString(GL_VERSION);
 //  gf_report(LogHandler::MInfo,str);
-  if (!compiled);
+  if (!compiled)
   {
 	  GLint maxLength = 0;
 	  QString ret = fshader->log();
-	  __debugbreak();
+	  bool shaderDidNotCompile = false;
+	  DoAssert(shaderDidNotCompile);
 	  //emit reportSignal(MError,ret);
+	  return;
   }
 
   program = new QOpenGLShaderProgram;
   program->addShader(vshader);
   program->addShader(fshader);
   program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
-  program->bindAttributeLocation("texCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
   program->link();
 
   program->bind();
-  program->setUniformValue("texture", 0);
 }
 
 void Renderer::paintGL()
 {
+	emit reportSignal(MInfo, "Rendering frame");
 	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	QMatrix4x4 m;
-	m.ortho(-0.5f, +0.5f, +0.5f, -0.5f, 4.0f, 15.0f);
-	m.translate(0.0f, 0.0f, -10.0f);
+	m.ortho(-1.f, 1.f, 1.f, -1.f, 0.5f, 10000.0f);
+	m.translate(0.0f, 0.0f, -20.0f);
 	m.rotate(xRot / 16.0f, 1.0f, 0.0f, 0.0f);
 	m.rotate(yRot / 16.0f, 0.0f, 1.0f, 0.0f);
 	m.rotate(zRot / 16.0f, 0.0f, 0.0f, 1.0f);
 
 	program->setUniformValue("matrix", m);
 	program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-	program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
-	program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 5 * sizeof(GLfloat));
-	program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, 3 * sizeof(GLfloat), 2, 5 * sizeof(GLfloat));
-
-	for (int i = 0; i < 6; ++i) {
+	program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+	int total = _mesh.getTrianglesList().size();
+	for (int i = 0; i < total; ++i) {
 		//textures[i]->bind();
-		glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
+		glDrawArrays(GL_TRIANGLE_FAN, i * 3, 3);
 	}
 }
 
+void Renderer::keyPressEvent(QKeyEvent * e)
+{
+	switch (e->key())
+	{
+	case Qt::Key_Space:
+	{
+		xRot = yRot = zRot = 0;
+		// initial position
+		break;
+	}
+	default:
+		break;
+	}
+}
 void Renderer::mousePressEvent(QMouseEvent *event)
 {
   lastPos = event->pos();
@@ -194,32 +205,51 @@ void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)
 
 void Renderer::makeObject()
 {
-  static const int coords[6][4][3] = {
-    { { +1, -1, -1 }, { -1, -1, -1 }, { -1, +1, -1 }, { +1, +1, -1 } },
-    { { +1, +1, -1 }, { -1, +1, -1 }, { -1, +1, +1 }, { +1, +1, +1 } },
-    { { +1, -1, +1 }, { +1, -1, -1 }, { +1, +1, -1 }, { +1, +1, +1 } },
-    { { -1, -1, -1 }, { -1, -1, +1 }, { -1, +1, +1 }, { -1, +1, -1 } },
-    { { +1, -1, +1 }, { -1, -1, +1 }, { -1, -1, -1 }, { +1, -1, -1 } },
-    { { -1, -1, +1 }, { +1, -1, +1 }, { +1, +1, +1 }, { -1, +1, +1 } }
-  };
-
+	if (_mesh.getNumVertices() == 0)
+	{
+		DoAssert(false);
+		return;
+	}
   //for (int j = 0; j < 6; ++j)
   //  textures[j] = new QOpenGLTexture(QImage(QString(":/images/side%1.png").arg(j + 1)).mirrored());
 
   QVector<GLfloat> vertData;
-  for (int i = 0; i < 6; ++i) {
-    for (int j = 0; j < 4; ++j) {
+
+  auto triangles = _mesh.getTrianglesList();
+  cv::Point3f mn = _mesh.getVertex(0), mx = _mesh.getVertex(0);
+  for (int i = 0; i < triangles.size(); ++i) {
       // vertex position
-      vertData.append(0.2 * coords[i][j][0]);
-      vertData.append(0.2 * coords[i][j][1]);
-      vertData.append(0.2 * coords[i][j][2]);
-      // texture coordinate
-      vertData.append(j == 0 || j == 3);
-      vertData.append(j == 0 || j == 1);
-    }
+	  DoAssert(triangles[i].size() == 3);
+
+	  for ( int j = 0; j < triangles[i].size(); j++)
+	  {
+		  cv::Point3f point = _mesh.getVertex( triangles[i][j] );
+		  vertData.append(point.x);
+		  vertData.append(point.y);
+		  vertData.append(point.z);
+		  // no textures yet
+	  }
   }
 
   vbo.create();
   vbo.bind();
   vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
+}
+
+void Renderer::Clear()
+{
+	vbo.destroy();
+}
+
+void Renderer::Init()
+{
+	Clear();
+	_mesh.load(_name.toStdString());
+	makeObject();
+}
+
+void Renderer::Load(QString & str)
+{
+	_name = str;
+	Init();
 }

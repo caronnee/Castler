@@ -63,7 +63,8 @@
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Shlwapi.lib;opencv_ts310d.lib;opencv_world310d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\*.* $(TargetDir) /D /Y /S</Command>
+      <Command>xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.pdb $(TargetDir) /D /Y /S
+xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y /S</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,10 +83,17 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Xml.lib;c:\work\DP1\opencv_src\gen\lib\Release\opencv_ts310.lib;c:\work\DP1\opencv_src\gen\lib\Release\opencv_world310.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.pdb $(TargetDir) /D /Y /S
+xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y /S</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="../source/creator.cpp" />
     <ClCompile Include="..\source\FrameProcessor.cpp" />
+    <ClCompile Include="..\source\model\CsvReader.cpp" />
+    <ClCompile Include="..\source\model\CsvWriter.cpp" />
+    <ClCompile Include="..\source\model\Mesh.cpp" />
     <ClCompile Include="..\source\videorenderer.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -135,7 +143,6 @@
     <ClCompile Include="../source/inputlist.cpp" />
     <ClCompile Include="../source/loghandler.cpp" />
     <ClCompile Include="../source/main.cpp" />
-    <ClCompile Include="../source/Model.cpp" />
     <ClCompile Include="../source/renderer.cpp" />
     <ClCompile Include="GeneratedFiles\Release\moc_videorenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -173,6 +180,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\model\CsvReader.h" />
+    <ClInclude Include="..\source\model\CsvWriter.h" />
+    <ClInclude Include="..\source\model\Mesh.h" />
     <ClInclude Include="ImageProcessor.h" />
     <ClInclude Include="ImagesProvider.h" />
     <ClInclude Include="typedefs.h" />
@@ -239,7 +249,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB  "-Ic:\work\DP1\opencv_src\gen" "-Ic:\work\DP1\opencv_src\modules\calib3d\include" "-Ic:\work\DP1\opencv_src\modules\core\include" "-Ic:\work\DP1\opencv_src\modules\cudaarithm\include" "-Ic:\work\DP1\opencv_src\modules\cudabgsegm\include" "-Ic:\work\DP1\opencv_src\modules\cudacodec\include" "-Ic:\work\DP1\opencv_src\modules\cudafeatures2d\include" "-Ic:\work\DP1\opencv_src\modules\cudafilters\include" "-Ic:\work\DP1\opencv_src\modules\cudaimgproc\include" "-Ic:\work\DP1\opencv_src\modules\cudalegacy\include" "-Ic:\work\DP1\opencv_src\modules\cudaobjdetect\include" "-Ic:\work\DP1\opencv_src\modules\cudaoptflow\include" "-Ic:\work\DP1\opencv_src\modules\cudastereo\include" "-Ic:\work\DP1\opencv_src\modules\cudawarping\include" "-Ic:\work\DP1\opencv_src\modules\cudev\include" "-Ic:\work\DP1\opencv_src\modules\features2d\include" "-Ic:\work\DP1\opencv_src\modules\flann\include" "-Ic:\work\DP1\opencv_src\modules\highgui\include" "-Ic:\work\DP1\opencv_src\modules\imgcodecs\include" "-Ic:\work\DP1\opencv_src\modules\imgproc\include" "-Ic:\work\DP1\opencv_src\modules\ml\include" "-Ic:\work\DP1\opencv_src\modules\objdetect\include" "-Ic:\work\DP1\opencv_src\modules\photo\include" "-Ic:\work\DP1\opencv_src\modules\shape\include" "-Ic:\work\DP1\opencv_src\modules\stitching\include" "-Ic:\work\DP1\opencv_src\modules\superres\include" "-Ic:\work\DP1\opencv_src\modules\ts\include" "-Ic:\work\DP1\opencv_src\modules\video\include" "-Ic:\work\DP1\opencv_src\modules\videoio\include" "-Ic:\work\DP1\opencv_src\modules\videostab\include" "-Ic:\work\DP1\opencv_src\modules\viz\include" "-Ic:\work\DP1\opencv_src\modules\world\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-IC:\work\DP1\Castler\include" "-Ic:\work\DP1\opencv_src\include"</Command>
     </CustomBuild>
-    <ClInclude Include="../include/Model.h" />
     <ClInclude Include="imageprovider.h" />
     <ClInclude Include="ReportFunctions.h" />
     <ClInclude Include="resource.h" />

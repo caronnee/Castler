@@ -10,7 +10,6 @@ enum MessageLevel
 	MLevels
 };
 
-
 class IReportFunction
 {
 public:

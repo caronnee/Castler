@@ -5,9 +5,12 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
+#include "model/Mesh.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
+
+#include "ReportFunctions.h"
 
 class Renderer : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -22,6 +25,7 @@ public:
 
 signals:
   void clicked();
+  void reportSignal(MessageLevel, const QString& string);
 
 private slots:
   void rotateOneStep();
@@ -29,6 +33,7 @@ private slots:
 protected:
   void initializeGL() Q_DECL_OVERRIDE;
   void paintGL() Q_DECL_OVERRIDE;
+  void keyPressEvent(QKeyEvent *);
   void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
   void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
   void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -36,6 +41,8 @@ protected:
 private:
   void makeObject();
 
+  Mesh _mesh;
+  QString _name;
   QColor clearColor;
   QPoint lastPos;
   int xRot;
@@ -44,6 +51,12 @@ private:
   //QOpenGLTexture *textures[6];
   QOpenGLShaderProgram *program;
   QOpenGLBuffer vbo;
+
+private:
+	void Clear();;
+	void Init();
+public:
+	void Load(QString & str);
 };
 
 #endif // RENDERER_H

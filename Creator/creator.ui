@@ -15,16 +15,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
    <item>
-    <widget class="QTabWidget" name="ComparePage">
+    <widget class="QTabWidget" name="CreatorFrame">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
        <string>Renderer</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4">
-       <item>
+      <layout class="QGridLayout" name="gridLayout_3" columnstretch="3,0,10">
+       <item row="1" column="0">
         <widget class="QGroupBox" name="renderSettings">
          <property name="title">
           <string>Settings</string>
@@ -33,24 +33,21 @@
           <item>
            <widget class="QToolBox" name="toolBox">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>234</width>
-               <height>41</height>
+               <width>174</width>
+               <height>333</height>
               </rect>
              </property>
              <attribute name="label">
               <string>File</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="QLineEdit" name="modelName"/>
-              </item>
               <item row="0" column="1">
                <widget class="QPushButton" name="loadButton">
                 <property name="text">
@@ -58,7 +55,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
+              <item row="1" column="1">
                <widget class="QPushButton" name="pushButton">
                 <property name="text">
                  <string>Export</string>
@@ -72,8 +69,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>148</width>
-               <height>352</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
              <attribute name="label">
@@ -85,8 +82,18 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="Renderer" name="renderWidget" native="true">
+       <item row="0" column="0" colspan="3">
+        <widget class="QLabel" name="modelName">
+         <property name="text">
+          <string>&lt;model&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="Renderer" name="renderer" native="true">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -109,7 +116,7 @@
         <widget class="QWidget" name="widget" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,10,0">
           <item>
-           <widget class="QLabel" name="modelLabel">
+           <widget class="QLabel" name="creatorLabel">
             <property name="text">
              <string/>
             </property>

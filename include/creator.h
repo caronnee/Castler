@@ -6,7 +6,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <QShortcut>
 
-class Creator : public QWidget
+class Creator : public QWidget, public IReportFunction
 {
 	Q_OBJECT
 
@@ -15,12 +15,14 @@ class Creator : public QWidget
 public:
     Creator(QWidget *parent = 0);
 	~Creator();
-	
+	void Report(MessageLevel level, const QString & str);
+
 private slots:
 	void SendParameters();
 	void EnablePlay();
 	void PlayVideo();
 	void LoadSettings();
+	void LoadModel();
 	void SaveSettings();
 	void LoadCalibration();
 	void RunCalibration();

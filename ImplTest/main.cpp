@@ -3,6 +3,9 @@
 
 //#define NAME "c:\\work\\DP1\\Castler\\Creator\\calibration\\c2\\0062.jpg"
 #define NAME "c:\\work\\DP1\\Castler\\Creator\\calibration\\calibrationImages\\Image10.tif"
+//#define NAME "c:\\work\\DP1\\Castler\\Creator\\calibration\\Canon\\IMG_0254.JPG"
+//#define NAME "c:\\work\\DP1\\Castler\\Creator\\calibration\\Canon\\IMG_0257.JPG"
+//#define NAME "c:\\work\\DP1\\Castler\\Creator\\calibration\\mobil\\frames\\chess_8_8\\0017.jpg"
 
 int main()
 {
@@ -19,6 +22,9 @@ int main()
 	cv::resize(threasholded, resized, cv::Size(300, 500));
 	imshow("testing", resized);
 
+	cv::Size size(7, 7);
+	std::vector<cv::Point2f> corners;
+	bool found = findChessboardCorners(grey, size, corners, 9);
 	cv::waitKey();
 	return 0;
 }
