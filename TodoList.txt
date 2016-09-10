@@ -1,7 +1,18 @@
 - calibrate, show undistorted
+- use hughes transformation to calibrate
+- find if in the video there is movement degradation
 - find chessboard in the videos tried with my camera / drone
-- do something about renderer to be able to render
-- try to load some ply file
 - create file from bruteforce, ordinary one
-- make GEngine class ;) for rendering content
-- create structure from motion
+- load shader from file
+- show white color based on normal
+- make light, movable light, light == camera, only cone changing
+- filter for errors
+- implement comparator
+- detect moving people, to obscure the behind
+
+//stairs
+//door
+//window
+//holes, furniture
+//pictures on walls
+// filling up holes

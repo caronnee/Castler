@@ -85,7 +85,7 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 			distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 			cv::Size size = processor.GetSize();
 
-			bool calibrated = cv::calibrateCamera(chesses, _foundCoords, size, cameraMatrix, distCoeffs,
+			bool calibrated = _foundCoords.size() && cv::calibrateCamera(chesses, _foundCoords, size, cameraMatrix, distCoeffs,
 				rvecs, tvecs, cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT);
 
 			if (calibrated)
@@ -95,7 +95,7 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 			}
 			else
 			{
-				emit workerReportSignal(MInfo, "Calibration not successfull");
+				emit workerReportSignal(MError, "Calibration not successfull");
 			}
 		}
 	}

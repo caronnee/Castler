@@ -180,6 +180,8 @@ void Creator::LoadSettings()
 	str = settings.value("lastDir").toString();
 	InputList::_lastDirectory = str.toString();
 
+	str = settings.value("screen");
+	ui.creatorTabs->setCurrentIndex(str.toInt());
 	QString last = settings.value("lastOpened").toString();
 	QString settingLastName = QApplication::applicationDirPath() + "\\" + last;
 	QSettings settingsLast(settingLastName, QSettings::IniFormat);
@@ -211,6 +213,7 @@ void Creator::SaveSettings()
 	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
 	QSettings settings(settingspath, QSettings::IniFormat);
 
+	settings.setValue("screen", ui.creatorTabs->currentIndex());
 	settings.setValue("calibrationInput", ui.calibrationLabel->text());
 	settings.setValue("lastDir", InputList::_lastDirectory);
 	settings.setValue("lastOpened", "last");

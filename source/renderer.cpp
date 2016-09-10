@@ -44,7 +44,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
-#include <QTimer>
 
 
 #define ZSTEP 0.3f
@@ -56,10 +55,6 @@ Renderer::Renderer(QWidget *parent)
   program(0)
 {
 	setFocusPolicy(Qt::ClickFocus);
-//  memset(textures, 0, sizeof(textures));
-	//QTimer *timer = new QTimer(this);
-	//connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
-	//timer->start(5);
 	InitPosition();
 }
 void Renderer::Render()
@@ -160,9 +155,6 @@ void Renderer::paintGL()
 	QVector3D vec2(cos(qDegreesToRadians(azimuth)), sin(qDegreesToRadians(azimuth)), 0);
 	QVector3D axis = QVector3D::crossProduct(vec,vec2);
 	m.rotate(elevation, axis);
-	/*m.rotate(xRot , 1.0f, 0.0f, 0.0f);
-	m.rotate(yRot , 0.0f, 1.0f, 0.0f);
-	m.rotate(zRot , 0.0f, 0.0f, 1.0f);*/
 
 	program->setUniformValue("matrix", m);
 	program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
