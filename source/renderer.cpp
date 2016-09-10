@@ -48,7 +48,7 @@
 
 
 #define ZSTEP 0.3f
-#define AngleStep 0.2
+const float AngleStep = 0.5;
 
 Renderer::Renderer(QWidget *parent)
   : QOpenGLWidget(parent),
@@ -57,15 +57,13 @@ Renderer::Renderer(QWidget *parent)
 {
 	setFocusPolicy(Qt::ClickFocus);
 //  memset(textures, 0, sizeof(textures));
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
-	timer->start(5);
+	//QTimer *timer = new QTimer(this);
+	//connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
+	//timer->start(5);
 	InitPosition();
 }
-void Renderer::Render()	
-
+void Renderer::Render()
 {
-	zPos += ZSTEP;
 	update();
 }
 
@@ -92,11 +90,13 @@ void Renderer::setClearColor(const QColor &color)
   update();
 }
 
+#include "Filename.h"
+
 void Renderer::initializeGL()
 {
   initializeOpenGLFunctions();
 
-  _name = "c:\\work\\DP1\\Castler\\Creator\\models\\bunny.ply";
+  _name = GetFullPath("models\\bunny.ply").c_str();
   Init();
 
 //  _mesh.ConvertToBB();
@@ -125,7 +125,6 @@ void Renderer::initializeGL()
 	  "}\n";
   bool compiled = fshader->compileSourceCode(fsrc);
   const GLubyte * str = glGetString(GL_VERSION);
-//  gf_report(LogHandler::MInfo,str);
   if (!compiled)
   {
 	  GLint maxLength = 0;
@@ -145,6 +144,8 @@ void Renderer::initializeGL()
   program->bind();
 }
 
+#include <qmath.h>
+
 void Renderer::paintGL()
 {
 	emit reportSignal(MInfo, "Rendering frame");
@@ -154,6 +155,11 @@ void Renderer::paintGL()
 	QMatrix4x4 m;
 	m.perspective(3.14f/2, 1, 0.5f, 10000.0f);
 	m.translate(0.0f, 0.0f, zPos);
+	m.rotate(azimuth, 0, 0, 1);
+	QVector3D vec(0, 0, 1);
+	QVector3D vec2(cos(qDegreesToRadians(azimuth)), sin(qDegreesToRadians(azimuth)), 0);
+	QVector3D axis = QVector3D::crossProduct(vec,vec2);
+	m.rotate(elevation, axis);
 	/*m.rotate(xRot , 1.0f, 0.0f, 0.0f);
 	m.rotate(yRot , 0.0f, 1.0f, 0.0f);
 	m.rotate(zRot , 0.0f, 0.0f, 1.0f);*/
@@ -209,8 +215,9 @@ void Renderer::keyPressEvent(QKeyEvent * e)
 		break;
 	}
 	default:
-		break;
+		return; // no need updating
 	}
+	update();
 }
 
 void Renderer::mousePressEvent(QMouseEvent *event)

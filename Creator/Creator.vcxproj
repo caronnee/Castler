@@ -95,6 +95,7 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <ClCompile Include="..\source\model\CsvWriter.cpp" />
     <ClCompile Include="..\source\model\Mesh.cpp" />
     <ClCompile Include="..\source\videorenderer.cpp" />
+    <ClCompile Include="filename.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -183,6 +184,7 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <ClInclude Include="..\source\model\CsvReader.h" />
     <ClInclude Include="..\source\model\CsvWriter.h" />
     <ClInclude Include="..\source\model\Mesh.h" />
+    <ClInclude Include="Filename.h" />
     <ClInclude Include="ImageProcessor.h" />
     <ClInclude Include="ImagesProvider.h" />
     <ClInclude Include="typedefs.h" />
