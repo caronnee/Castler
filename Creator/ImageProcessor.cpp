@@ -5,21 +5,23 @@ bool ImageProcessor::Next()
 	return Prepare(_frame, _keypoints, _gr, _currentPoints);
 }
 
-ImageProcessor::ImageProcessor(IReportFunction * reporter, IImageProvider * provider)
+IReportFunction * ImageProcessor::_reporter = NULL;
+
+ImageProcessor::ImageProcessor()
 {
-	_provider = provider;
-	_reporter = reporter;
+	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
 	_ffd = nullptr;
 }
 
-bool ImageProcessor::Init(bool ffd /*= false*/)
+bool ImageProcessor::Init(IImageProvider * provider, bool ffd /*= false*/)
 {
+	_provider = provider;
 	if (ffd)
 	{
 		_ffd = cv::FastFeatureDetector::create();
 	}
-	return Prepare(_frame, _keypoints, _gr, _currentPoints);
+	return true;
 }
 
 cv::Size ImageProcessor::GetSize()
@@ -29,7 +31,7 @@ cv::Size ImageProcessor::GetSize()
 
 bool ImageProcessor::Prepare( cv::Mat& frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points)
 {
-	if (_provider->NextFrame(frame) == false)
+	if (!_provider || _provider->NextFrame(frame) == false)
 		return false;
 
 	_frameSize = frame.size();
@@ -180,4 +182,9 @@ void ImageProcessor::ToGrey()
 cv::Mat ImageProcessor::GetResult()
 {
 	return _ret;
+}
+
+void ImageProcessor::ApplyCalibration(CalibrationSet & calibrationSet)
+{
+
 }

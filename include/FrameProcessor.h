@@ -23,38 +23,34 @@ class FrameProcessor : public QObject
 protected:
 	// main thread doing openCV stuff
 	QThread _thread;
-
-	// provider 
-	IImageProvider * _provider;
-
 	//QColorcolor = np.random.randint(0, 255, (100, 3))
 	// timer for sending images to show
 	QBasicTimer _timer;
 	
 public slots:
 	void ThreadStopped();
-	void ImageReported(cv::Mat image);
+	void ImageReported(cv::Mat image, double seconds);
 
 signals :
+	void cleanupSignal();
 	void imageReadySignal(cv::Mat image);
 	void reportSignal(MessageLevel level, const QString& string);
 	// nothing cool, just calibrate according to video/image. Signal when result is ready
 	void calibrationResult(int errorcode, cv::Mat calibration);
 	void finishedSignal();
-
+	void inputChangedSignal(QString str, int mode);
+	void Start(int flags);
 public slots:
 	void Report(MessageLevel level, const QString & message);
 
 private:
 	// scale to get this to the QT label size
-	int _seconds;
+	int _seconds = 0;
 
 public:
 	//load
 	ExtractionWorker * GetWorker() { return &_worker; }
-	void StartDetecting();
-	void StartCalibration();
-	bool Load(const QString & str);
+	bool Load(const QString & str, int mode);
 
 	void timerEvent(QTimerEvent * ev);
 
@@ -64,6 +60,4 @@ public:
 	void Pause();
 	void Stop();
 	void Request(int frames);
-
-	void SwitchMode(int flag);
 };

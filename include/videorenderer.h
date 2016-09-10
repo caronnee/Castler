@@ -9,7 +9,6 @@ class VideoRenderer : public QWidget {
 	Q_OBJECT
 		;
 private:
-	int _mode = 0;
 
 	FrameProcessor _capturer;
 	cv::Mat _img;
@@ -19,6 +18,7 @@ signals:
 	void reportSignal(MessageLevel level, const QString & str);
 	void setCameraSignal(cv::Mat mat, int type);
 	void Finished();
+	void modeChanged(int);
 	void setCalibrationSignal(CalibrationSet set);
 
 public slots:
@@ -46,7 +46,6 @@ public:
 	~VideoRenderer();
 
 	bool Start(const QString & str, VideoAction action);
-	void Clean();
 //	void SetParameters( CalibrationSet calibration);
 	void SetParameters(CalibrationSet calibration);
 };

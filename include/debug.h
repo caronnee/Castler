@@ -5,5 +5,6 @@
 #if _DEBUG
 #define DoAssert(cond) if (!(cond)){ __debugbreak();}
 #else
-#define DoAssert(cond) if (!(cond)){ OutputDebugString( "Assertion failed");}
+#include <windows.h>
+#define DoAssert(cond) if (!(cond)){ OutputDebugStringA( "Assertion failed");}
 #endif
