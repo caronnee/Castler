@@ -46,24 +46,34 @@
 #include <QMouseEvent>
 #include <QTimer>
 
+
+#define ZSTEP 0.3f
+#define AngleStep 0.2
+
 Renderer::Renderer(QWidget *parent)
   : QOpenGLWidget(parent),
   clearColor(Qt::black),
-  xRot(0),
-  yRot(0),
-  zRot(0),
   program(0)
 {
 	setFocusPolicy(Qt::ClickFocus);
 //  memset(textures, 0, sizeof(textures));
-	//QTimer *timer = new QTimer(this);
-	//connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-	//timer->start(20);
+	QTimer *timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
+	timer->start(5);
+	InitPosition();
+}
+void Renderer::Render()	
+
+{
+	zPos += ZSTEP;
+	update();
 }
 
-void Renderer::rotateOneStep()
+void Renderer::InitPosition()
 {
-	rotateBy(+2 * 16, +2 * 16, -1 * 16);
+	zPos = -20;
+	elevation = 0;
+	azimuth = 0;
 }
 
 Renderer::~Renderer()
@@ -74,14 +84,6 @@ Renderer::~Renderer()
   //  delete textures[i];
   delete program;
   doneCurrent();
-}
-
-void Renderer::rotateBy(int xAngle, int yAngle, int zAngle)
-{
-  xRot += xAngle;
-  yRot += yAngle;
-  zRot += zAngle;
-  update();
 }
 
 void Renderer::setClearColor(const QColor &color)
@@ -150,11 +152,11 @@ void Renderer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	QMatrix4x4 m;
-	m.ortho(-1.f, 1.f, 1.f, -1.f, 0.5f, 10000.0f);
-	m.translate(0.0f, 0.0f, -20.0f);
-	m.rotate(xRot / 16.0f, 1.0f, 0.0f, 0.0f);
-	m.rotate(yRot / 16.0f, 0.0f, 1.0f, 0.0f);
-	m.rotate(zRot / 16.0f, 0.0f, 0.0f, 1.0f);
+	m.perspective(3.14f/2, 1, 0.5f, 10000.0f);
+	m.translate(0.0f, 0.0f, zPos);
+	/*m.rotate(xRot , 1.0f, 0.0f, 0.0f);
+	m.rotate(yRot , 0.0f, 1.0f, 0.0f);
+	m.rotate(zRot , 0.0f, 0.0f, 1.0f);*/
 
 	program->setUniformValue("matrix", m);
 	program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
@@ -170,16 +172,47 @@ void Renderer::keyPressEvent(QKeyEvent * e)
 {
 	switch (e->key())
 	{
+	case Qt::Key_W:
+	{
+		elevation += AngleStep;
+		break;
+	}
+	case Qt::Key_S:
+	{
+		elevation -= AngleStep;
+		break;
+	}
+	case Qt::Key_A:
+	{
+		azimuth -= AngleStep;
+		break;
+	}
+	case Qt::Key_D:
+	{
+		azimuth += AngleStep;
+		break;
+	}
 	case Qt::Key_Space:
 	{
-		xRot = yRot = zRot = 0;
+		InitPosition();
 		// initial position
+		break;
+	}
+	case Qt::Key_Down:
+	{
+		zPos-=ZSTEP;
+		break;
+	}
+	case Qt::Key_Up:
+	{
+		zPos += ZSTEP;
 		break;
 	}
 	default:
 		break;
 	}
 }
+
 void Renderer::mousePressEvent(QMouseEvent *event)
 {
   lastPos = event->pos();
@@ -191,9 +224,9 @@ void Renderer::mouseMoveEvent(QMouseEvent *event)
   int dy = event->y() - lastPos.y();
 
   if (event->buttons() & Qt::LeftButton) {
-    rotateBy(8 * dy, 8 * dx, 0);
+    elevation += dy;
   } else if (event->buttons() & Qt::RightButton) {
-    rotateBy(8 * dy, 0, 8 * dx);
+    azimuth += dx;
   }
   lastPos = event->pos();
 }

@@ -18,9 +18,9 @@ class Renderer : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
   explicit Renderer(QWidget *parent = 0);
+  void InitPosition();
   ~Renderer();
 
-  void rotateBy(int xAngle, int yAngle, int zAngle);
   void setClearColor(const QColor &color);
 
 signals:
@@ -28,7 +28,7 @@ signals:
   void reportSignal(MessageLevel, const QString& string);
 
 private slots:
-  void rotateOneStep();
+	void Render();
 
 protected:
   void initializeGL() Q_DECL_OVERRIDE;
@@ -45,9 +45,8 @@ private:
   QString _name;
   QColor clearColor;
   QPoint lastPos;
-  int xRot;
-  int yRot;
-  int zRot;
+  float zPos;
+  float elevation, azimuth;
   //QOpenGLTexture *textures[6];
   QOpenGLShaderProgram *program;
   QOpenGLBuffer vbo;
