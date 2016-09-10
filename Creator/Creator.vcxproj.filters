@@ -116,9 +116,6 @@
     <ClCompile Include="../source/main.cpp">
       <Filter>Source Files\Source</Filter>
     </ClCompile>
-    <ClCompile Include="../source/Model.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\FrameProcessor.cpp">
       <Filter>Source Files\Source</Filter>
     </ClCompile>
@@ -151,6 +148,15 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ExtractionWorker.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\model\CsvReader.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\model\CsvWriter.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\model\Mesh.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -189,9 +195,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../include/Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\debug.h">
       <Filter>Source Files\Debug</Filter>
     </ClInclude>
@@ -212,6 +215,15 @@
     </ClInclude>
     <ClInclude Include="typedefs.h">
       <Filter>Source Files\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\model\CsvReader.h">
+      <Filter>Source Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\model\CsvWriter.h">
+      <Filter>Source Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\model\Mesh.h">
+      <Filter>Source Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

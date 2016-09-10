@@ -3,6 +3,7 @@
 #include <QtWidgets>
 #include "loghandler.h"
 #include "imageprovider.h"
+#include "opencv2/opencv.hpp"
 
 Creator::Creator(QWidget *parent)
     : QWidget(parent)
@@ -33,7 +34,11 @@ Creator::Creator(QWidget *parent)
 	_shortcuts.push_back( new QShortcut(QKeySequence("Ctrl+s"),this));
 	connect(_shortcuts[0], SIGNAL(activated()), this, SLOT(SaveSettings()));
 
-	// Data connections
+	// rendered connects
+	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
+	connect(ui.renderer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
+
+	// videorender connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
 	connect(ui.pauseButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(Pause(void)));
@@ -145,8 +150,10 @@ Creator::~Creator()
 	
 }
 
-#include "opencv2/opencv.hpp"
-
+void Creator::Report(MessageLevel level, const QString & str)
+{
+	ui.infobox->Report(level, str);
+}
 
 void Creator::EnablePlay()
 {
@@ -185,6 +192,20 @@ void Creator::LoadSettings()
 	settingsLast.endArray();
 }
 
+void Creator::LoadModel()
+{
+	// find the ply file
+	QString str = QFileDialog::getOpenFileName(this, tr("Open model"),
+		InputList::_lastDirectory.toStdString().c_str(),"Model files(*.ply *.xpm *.jpg)");
+
+	if (str.isEmpty())
+		return;
+	InputList::_lastDirectory = str;
+	ui.modelName->setText(str);
+	
+	//load model
+	ui.renderer->Load(str);
+}
 void Creator::SaveSettings()
 {
 	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
@@ -193,11 +214,12 @@ void Creator::SaveSettings()
 	settings.setValue("calibrationInput", ui.calibrationLabel->text());
 	settings.setValue("lastDir", InputList::_lastDirectory);
 	settings.setValue("lastOpened", "last");
+	settings.setValue("model", ui.modelName->text());
 
 	QString name = "last";
-	if (ui.modelLabel->text().size())
+	if (ui.creatorLabel->text().size())
 	{
-		name = ui.modelLabel->text();
+		name = ui.creatorLabel->text();
 	}
 	QString model = QApplication::applicationDirPath() + "\\" + name;
 	QSettings modelSettings(model, QSettings::IniFormat);

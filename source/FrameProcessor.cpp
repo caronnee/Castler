@@ -49,7 +49,7 @@ FrameProcessor::FrameProcessor()
 	connect(&_thread, SIGNAL(started()), &_worker, SLOT(Process()));
 	connect(&_thread, SIGNAL(finished()), this, SLOT(ThreadStopped()));
 	connect(this, SIGNAL(cleanupSignal()), &_worker, SLOT(Cleanup()));
-	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(deleteLater()));
+	connect(&_thread, SIGNAL(finihed()), &_worker, SLOT(deleteLater()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(Terminate()));
 	connect(&_thread, SIGNAL(finished()), &_thread, SLOT(deleteLater()));
 	connect(&_worker, SIGNAL(imageProcessed(cv::Mat, double)), this, SLOT( ImageReported( cv::Mat,double )));

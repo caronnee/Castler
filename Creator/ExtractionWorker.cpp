@@ -105,7 +105,7 @@ void ExtractionWorker::Process()
 {
 	emit workerReportSignal(MInfo, "Starting thread process");
 	// already loaded 
-	_timer.start(5, this);
+	//_timer.start(5, this);
 }
 
 bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )

@@ -113,6 +113,10 @@
       <AdditionalLibraryDirectories>c:\work\DP1\opencv_src\gen\lib\Debug\</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_ts310d.lib;opencv_world310d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.pdb $(TargetDir) /D /Y /S
+xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y /S</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -152,6 +156,10 @@
       <AdditionalDependencies>opencv_ts310.lib;opencv_world310.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>c:\work\DP1\opencv_src\gen\lib\Release\</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.pdb $(TargetDir) /D /Y /S
+xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y /S</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
