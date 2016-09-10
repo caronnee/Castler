@@ -68,6 +68,8 @@ FrameProcessor::~FrameProcessor()
 	_timer.stop();
 	DoAssert(!_timer.isActive());
 	emit cleanupSignal();
+	_thread.disconnect();
+	_thread.terminate();
 }
 
 void FrameProcessor::Pause()
