@@ -42,17 +42,11 @@
     <Filter Include="Source Files\Model">
       <UniqueIdentifier>{79fabbbd-a571-41c6-a335-a5ea516f64e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Debug">
-      <UniqueIdentifier>{902fbfe5-7a15-4d4f-b49f-1b7c1b86d93c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Source">
       <UniqueIdentifier>{504a4397-932d-4b1e-9060-2a42adb25187}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\MemoryManagement">
       <UniqueIdentifier>{dd4fac29-95c1-4f2f-998d-113eb5db36f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Reports">
-      <UniqueIdentifier>{24e351e1-2f3e-478c-becb-c8f111ac2132}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\ImageProviders">
       <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
@@ -62,9 +56,6 @@
     </Filter>
     <Filter Include="Resource">
       <UniqueIdentifier>{3d5a55ae-79bc-4641-9a78-73922648a4cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Filename">
-      <UniqueIdentifier>{8766e259-e9b5-45a5-9730-bcaf6b3a75a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -161,9 +152,6 @@
     <ClCompile Include="..\source\model\Mesh.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="filename.cpp">
-      <Filter>Source Files\Filename</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -201,9 +189,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\debug.h">
-      <Filter>Source Files\Debug</Filter>
-    </ClInclude>
     <ClInclude Include="ReportFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -230,9 +215,6 @@
     </ClInclude>
     <ClInclude Include="..\source\model\Mesh.h">
       <Filter>Source Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Filename.h">
-      <Filter>Source Files\Filename</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
