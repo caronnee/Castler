@@ -20,7 +20,12 @@ ExtractionWorker::ExtractionWorker()
 void ExtractionWorker::Cleanup()
 {
 	_timer.stop();
+	_chesspoints.clear();
+	if (_provider)
+		delete _provider;
+	_provider = NULL;
 }
+
 void ExtractionWorker::Terminate()
 {
 	_mode = 0;
@@ -43,6 +48,7 @@ void ExtractionWorker::Report(MessageLevel level, const QString & str)
 
 void ExtractionWorker::OpenSlot(QString str, int flags)
 {
+	Cleanup();
 	_provider = CreateProvider(str);
 	SetMode(flags);
 	DoAssert(_provider != false && _provider->IsValid());
