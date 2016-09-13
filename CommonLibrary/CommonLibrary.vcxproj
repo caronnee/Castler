@@ -133,13 +133,6 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Creator\filename.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Creator\Filename.h" />
-    <ClInclude Include="..\include\debug.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -7,11 +7,10 @@ ExtractionWorker::ExtractionWorker()
 	_mode = ModeIdle;
 	_chesspoints.clear();
 	_foundCoords.clear();
-	int chessW = 11, chessH = 12;
 #define COEF 50
-	for (int i = 0; i < chessW; i++)
+	for (int i = 0; i < _chessH ; i++)
 	{
-		for (int j = 0; j < chessH; j++)
+		for (int j = 0; j < _chessW; j++)
 		{
 			_chesspoints.push_back(cv::Point3f(COEF*i, COEF*j, 0));
 		}
@@ -85,8 +84,9 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 			distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 			cv::Size size = processor.GetSize();
 
+			int flags = cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5 ;
 			bool calibrated = _foundCoords.size() && cv::calibrateCamera(chesses, _foundCoords, size, cameraMatrix, distCoeffs,
-				rvecs, tvecs, cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT);
+				rvecs, tvecs, flags );
 
 			if (calibrated)
 			{
@@ -110,7 +110,7 @@ void ExtractionWorker::Process()
 
 bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 {
-	cv::Size patternSize(chessW, chessH);
+	cv::Size patternSize(_chessW, _chessH);
 	{
 		if (!processor.Next())
 		{
@@ -127,7 +127,7 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		if (_mode & ModeCalibrate)
 		{
 			CoordsArray corners;
-			processor.PerformCalibration(chessW,chessH, corners);
+			processor.PerformCalibration(_chessW,_chessH, corners);
 			if (corners.size())
 			{
 				found = true;
@@ -139,12 +139,6 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		{
 			emit workerReportSignal(MInfo, "Detecting features in next image");
 			processor.PerformDetection();
-		}
-
-		if (_mode & ModeUndistort)
-		{
-			// show undistorted model according to parameters
-			processor.ApplyCalibration(_calibrationSet);
 		}
 
 		//////////////////////////////////////////////////////
@@ -163,6 +157,12 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 			processor.DrawFeatures();
 		}
 		
+		if (_mode & ModeUndistort)
+		{
+			// show undistorted model according to parameters
+			processor.ApplyCalibration(_calibrationSet);
+		}
+
 		cv::Mat mat =  processor.GetResult();
 		
 		if (found)

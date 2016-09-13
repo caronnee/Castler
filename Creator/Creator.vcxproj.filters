@@ -57,6 +57,12 @@
     <Filter Include="Resource">
       <UniqueIdentifier>{3d5a55ae-79bc-4641-9a78-73922648a4cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Filename">
+      <UniqueIdentifier>{fe48f3bb-1fcb-4aac-9f74-5d1818a73698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{8d3f9077-1b00-4369-9673-e40c4acae876}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -152,6 +158,9 @@
     <ClCompile Include="..\source\model\Mesh.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="filename.cpp">
+      <Filter>Filename</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -215,6 +224,12 @@
     </ClInclude>
     <ClInclude Include="..\source\model\Mesh.h">
       <Filter>Source Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Filename.h">
+      <Filter>Filename</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\debug.h">
+      <Filter>Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
