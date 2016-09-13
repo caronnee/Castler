@@ -7,7 +7,7 @@ ExtractionWorker::ExtractionWorker()
 	_mode = ModeIdle;
 	_chesspoints.clear();
 	_foundCoords.clear();
-#define COEF 50
+#define COEF 10
 	for (int i = 0; i < _chessH ; i++)
 	{
 		for (int j = 0; j < _chessW; j++)

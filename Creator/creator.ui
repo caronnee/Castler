@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -294,8 +294,14 @@
                   <property name="decimals">
                    <number>3</number>
                   </property>
+                  <property name="minimum">
+                   <double>-10000.000000000000000</double>
+                  </property>
                   <property name="maximum">
-                   <double>1000.000000000000000</double>
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -348,7 +354,10 @@
                    <number>3</number>
                   </property>
                   <property name="maximum">
-                   <double>1000.000000000000000</double>
+                   <double>1000000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -357,8 +366,14 @@
                   <property name="decimals">
                    <number>3</number>
                   </property>
+                  <property name="minimum">
+                   <double>-1000.000000000000000</double>
+                  </property>
                   <property name="maximum">
                    <double>1000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -367,8 +382,14 @@
                   <property name="decimals">
                    <number>3</number>
                   </property>
+                  <property name="minimum">
+                   <double>-1000.000000000000000</double>
+                  </property>
                   <property name="maximum">
                    <double>1000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -391,8 +412,14 @@
                   <property name="decimals">
                    <number>3</number>
                   </property>
+                  <property name="minimum">
+                   <double>-10000.000000000000000</double>
+                  </property>
                   <property name="maximum">
-                   <double>1000.000000000000000</double>
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -415,8 +442,14 @@
                   <property name="decimals">
                    <number>3</number>
                   </property>
+                  <property name="minimum">
+                   <double>-10000.000000000000000</double>
+                  </property>
                   <property name="maximum">
-                   <double>1000.000000000000000</double>
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
                   </property>
                  </widget>
                 </item>

@@ -27,7 +27,7 @@ class ExtractionWorker : public QObject, public IReportFunction
 	Q_OBJECT
 		;
 	int _mode;
-	int _chessW = 11, _chessH=10;
+	int _chessW = 11, _chessH=12;
 	// time to check for input
 	QBasicTimer _timer;
 
