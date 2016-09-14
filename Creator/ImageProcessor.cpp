@@ -186,5 +186,18 @@ cv::Mat ImageProcessor::GetResult()
 
 void ImageProcessor::ApplyCalibration(CalibrationSet & calibrationSet)
 {
+	if (calibrationSet.fx <= 0)
+		return;
 
+	cv::Mat distcoefs = cv::Mat::zeros(8, 1, CV_64F);
+	distcoefs.at<double>(0) = calibrationSet.k1;
+	distcoefs.at<double>(1) = calibrationSet.k2;
+	distcoefs.at<double>(4) = calibrationSet.k3;
+	// init rectification
+	cv::Mat r,map1,map2;
+	cv::initUndistortRectifyMap(
+		calibrationSet.camera, distcoefs, cv::Mat(),
+		getOptimalNewCameraMatrix(calibrationSet.camera, distcoefs, _ret.size(), 1, _ret.size(), 0), _ret.size(),
+		CV_16SC2, map1, map2);
+	remap(_ret, _ret, map1, map2, cv::INTER_LINEAR);
 }

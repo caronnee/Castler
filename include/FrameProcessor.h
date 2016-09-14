@@ -39,7 +39,7 @@ signals :
 	void calibrationResult(int errorcode, cv::Mat calibration);
 	void finishedSignal();
 	void inputChangedSignal(QString str, int mode);
-	void Start(int flags);
+
 public slots:
 	void Report(MessageLevel level, const QString & message);
 

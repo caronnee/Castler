@@ -55,6 +55,11 @@ void VideoRenderer::RequestPrevFrame()
 	_capturer.Request(-2);
 }
 
+void VideoRenderer::PlayUndistorted()
+{
+	emit modeChanged(ModeUndistort);
+}
+
 void VideoRenderer::ShowGreyFrame()
 {
 	emit reportSignal(MInfo, "Showing grey frame");
@@ -102,6 +107,10 @@ bool VideoRenderer::Start(const QString & str, VideoAction action)
 {
 	switch (action)
 	{
+		case ActionUndistort:
+		{
+			return _capturer.Load(str, ModeUndistort);
+		}
 		case ActionCalibrate:
 		{
 			return _capturer.Load(str, ModeCalibrate);

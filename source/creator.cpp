@@ -59,7 +59,8 @@ Creator::Creator(QWidget *parent)
 	connect(ui.stopCalibrationButton, SIGNAL(clicked()), ui.calibrationVideo, SLOT(Stop()));
 	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat,int)), this, SLOT(SetCalibCamera(cv::Mat,int)));
 	connect(ui.applyCalibrationButton, SIGNAL(clicked()), this, SLOT(SendParameters()));
-
+	connect(ui.playUndistortedButton, SIGNAL(clicked()), this, SLOT(ShowUndistorted()));
+	connect(ui.saveCalibrationButton, SIGNAL(clicked()), this, SLOT(SaveCalibration()));
 	// rest of the initialization
 	LoadSettings();
 }
@@ -77,6 +78,21 @@ void Creator::SendParameters()
 	calibration.k1 = ui.k1->value();
 	calibration.k2 = ui.k2->value();
 	calibration.k3 = ui.k3->value();
+
+	cv::Mat mat = cv::Mat::eye(3, 3, CV_64F);
+	mat.at<double>(0, 0) = ui.cameraMatrix->item(0, 0)->data(Qt::UserRole).toDouble();
+	mat.at<double>(0, 1) = ui.cameraMatrix->item(0, 1)->data(Qt::UserRole).toDouble();
+	mat.at<double>(0, 2) = ui.cameraMatrix->item(0, 2)->data(Qt::UserRole).toDouble();
+
+	mat.at<double>(1, 0) = ui.cameraMatrix->item(1, 0)->data(Qt::UserRole).toDouble();
+	mat.at<double>(1, 1) = ui.cameraMatrix->item(1, 1)->data(Qt::UserRole).toDouble();
+	mat.at<double>(1, 2) = ui.cameraMatrix->item(1, 2)->data(Qt::UserRole).toDouble();
+
+	mat.at<double>(2, 0) = ui.cameraMatrix->item(2, 0)->data(Qt::UserRole).toDouble();
+	mat.at<double>(2, 1) = ui.cameraMatrix->item(2, 1)->data(Qt::UserRole).toDouble();
+	mat.at<double>(2, 2) = ui.cameraMatrix->item(2, 2)->data(Qt::UserRole).toDouble();
+
+	calibration.camera = mat;
 
 	ui.calibrationVideo->SetParameters( calibration );
 }
@@ -117,6 +133,13 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 		DoAssert(false);
 	}
 }
+
+void Creator::ShowUndistorted()
+{
+	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionUndistort);
+}
+
+
 void Creator::RunCalibration()
 {
 	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionCalibrate);
@@ -130,8 +153,9 @@ void Creator::LoadCalibrationImages()
 		| QFileDialog::DontResolveSymlinks);
 
 	InputList::_lastDirectory = str;
-	ui.calibrationLabel->setText(str);
+	LoadCalibration(str);
 }
+
 void Creator::LoadCalibration()
 {
 	QStringList files = QFileDialog::getOpenFileNames(
@@ -141,8 +165,57 @@ void Creator::LoadCalibration()
 		"Images (*.avi *.mpeg *.mp4 *.3gp *.calibrated)");
 	if (files.count() == 0)
 		return;
-	InputList::_lastDirectory = files[0];
-	ui.calibrationLabel->setText(files[0]);
+	LoadCalibration(files[0]);
+}
+
+const char * CCalibrationExt = ".calibration";
+#include "Filename.h"
+
+void Creator::SaveCalibration()
+{
+	QString input = ui.calibrationLabel->text();
+	std::string title = FindTitle(input.toStdString().c_str());
+	QString calSettingsFile = QApplication::applicationDirPath() + title.c_str() + CCalibrationExt;
+	QSettings calSettings(calSettingsFile, QSettings::IniFormat);
+	if (calSettings.status() == QSettings::NoError)
+	{
+		calSettings.setValue("k1",ui.k1->value());
+		calSettings.setValue("k2",ui.k2->value());
+		calSettings.setValue("k3",ui.k3->value());
+		calSettings.setValue("f", ui.focusValue->value());
+		calSettings.setValue("px",ui.principalXValue->value());
+		calSettings.setValue("py",ui.principalYValue->value());
+	}
+	calSettings.sync();
+}
+
+void Creator::LoadCalibration(const QString & input)
+{
+	InputList::_lastDirectory = input;
+	ui.calibrationLabel->setText(input);
+
+	std::string title = FindTitle(input.toStdString().c_str());
+	QString calSettingsFile = QApplication::applicationDirPath() + title.c_str() + CCalibrationExt;
+	QSettings calSettings(calSettingsFile, QSettings::IniFormat);
+	if (calSettings.status() == QSettings::NoError)
+	{
+		QVariant v;
+		v = calSettings.value("k1");
+		ui.k1->setValue(v.toDouble());
+		v = calSettings.value("k2");
+		ui.k2->setValue(v.toDouble());
+		v = calSettings.value("k3");
+		ui.k3->setValue(v.toDouble());
+
+		v = calSettings.value("f");
+		ui.focusValue->setValue(v.toDouble());
+
+		v = calSettings.value("px");
+		ui.principalXValue->setValue(v.toDouble());
+
+		v = calSettings.value("py");
+		ui.principalYValue->setValue(v.toDouble());
+	}
 }
 
 Creator::~Creator()
@@ -170,6 +243,7 @@ void Creator::PlayVideo()
 
 const char * CSettingFileName = "/settings.castler";
 
+
 void Creator::LoadSettings()
 {
 	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
@@ -177,6 +251,10 @@ void Creator::LoadSettings()
 
 	QVariant str = settings.value("calibrationInput");
 	ui.calibrationLabel->setText(str.toString());
+	if (!str.isNull())
+	{
+		LoadCalibration(str.toString());		
+	}
 	str = settings.value("lastDir").toString();
 	InputList::_lastDirectory = str.toString();
 

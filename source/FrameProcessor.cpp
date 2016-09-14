@@ -8,7 +8,6 @@ bool FrameProcessor::Load(const QString & str, int mode)
 {
 	QString s(str);
 	emit inputChangedSignal(s, mode);
-	// = _provider->Step() / 1000;
 	return true;
 }
 

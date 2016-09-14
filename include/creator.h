@@ -16,9 +16,12 @@ public:
     Creator(QWidget *parent = 0);
 	~Creator();
 	void Report(MessageLevel level, const QString & str);
+	void LoadCalibration(const QString & str);
 
 private slots:
+
 	void SendParameters();
+	void SaveCalibration();
 	void EnablePlay();
 	void PlayVideo();
 	void LoadSettings();
@@ -27,6 +30,7 @@ private slots:
 	void LoadCalibration();
 	void RunCalibration();
 	void SetCalibCamera(cv::Mat camera, int type);
+	void ShowUndistorted();
 	void LoadCalibrationImages();
 private:
     Ui::CreatorContent ui;

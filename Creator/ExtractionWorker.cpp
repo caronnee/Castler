@@ -7,23 +7,26 @@ ExtractionWorker::ExtractionWorker()
 	_mode = ModeIdle;
 	_chesspoints.clear();
 	_foundCoords.clear();
+	_provider = NULL;
+}
+
+void ExtractionWorker::Cleanup()
+{
+	_timer.stop();
+	_mode = ModeIdle;
+	_chesspoints.clear();
+	if (_provider)
+		delete _provider;
+	_provider = NULL;
+
 #define COEF 10
-	for (int i = 0; i < _chessH ; i++)
+	for (int i = 0; i < _chessH; i++)
 	{
 		for (int j = 0; j < _chessW; j++)
 		{
 			_chesspoints.push_back(cv::Point3f(COEF*i, COEF*j, 0));
 		}
 	}
-}
-
-void ExtractionWorker::Cleanup()
-{
-	_timer.stop();
-	_chesspoints.clear();
-	if (_provider)
-		delete _provider;
-	_provider = NULL;
 }
 
 void ExtractionWorker::Terminate()

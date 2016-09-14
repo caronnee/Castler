@@ -11,3 +11,16 @@ std::string GetFullPath(const std::string & relativeName)
 	str += relativeName;
 	return str;
 }
+
+std::string FindTitle(const std::string & path)
+{
+	int t = path.find_last_of('\\');
+	int tt = path.find_last_of('/');
+	t = max(t, tt);
+	if (t <= 0)
+		return path;
+	int dt = path.find_last_of('.');
+	if (dt < t)
+		return path.substr(t);
+	return path.substr(t, dt - t - 1);
+}

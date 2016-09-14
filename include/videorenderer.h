@@ -22,6 +22,7 @@ signals:
 	void setCalibrationSignal(CalibrationSet set);
 
 public slots:
+	void PlayUndistorted();
 	void ShowGreyFrame();
 	void FeaturesFromFrame();
 	void setImage(cv::Mat img);
@@ -39,6 +40,7 @@ public:
 	{
 		ActionDetect,
 		ActionCalibrate,
+		ActionUndistort,
 		NActions
 	};
 
