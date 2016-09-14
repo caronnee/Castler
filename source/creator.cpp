@@ -117,6 +117,10 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 		// set focus
 		double focusVal = camera.at<double>(0, 0);
 		ui.focusValue->setValue(focusVal);
+		QVariant val = camera.at<double>(0, 2);
+		ui.principalXValue->setValue(val.toDouble());
+		val = camera.at<double>(1, 2);
+		ui.principalYValue->setValue(val.toDouble());
 	}
 	else if ( type == 1)
 	{
@@ -209,12 +213,21 @@ void Creator::LoadCalibration(const QString & input)
 
 		v = calSettings.value("f");
 		ui.focusValue->setValue(v.toDouble());
+		ui.cameraMatrix->setItem(0, 0, new QTableWidgetItem(v.toString()));
+		ui.cameraMatrix->setItem(1, 1, new QTableWidgetItem(v.toString()));
 
 		v = calSettings.value("px");
 		ui.principalXValue->setValue(v.toDouble());
+		ui.cameraMatrix->setItem(0, 2, new QTableWidgetItem(v.toString()));
 
 		v = calSettings.value("py");
 		ui.principalYValue->setValue(v.toDouble());
+		ui.cameraMatrix->setItem(1, 2, new QTableWidgetItem(v.toString()));
+		ui.cameraMatrix->setItem(2, 2, new QTableWidgetItem("1.0"));
+		ui.cameraMatrix->setItem(0, 1, new QTableWidgetItem("0.0"));
+		ui.cameraMatrix->setItem(1, 0, new QTableWidgetItem("0.0"));
+		ui.cameraMatrix->setItem(2, 0, new QTableWidgetItem("0.0"));
+		ui.cameraMatrix->setItem(2, 1, new QTableWidgetItem("0.0"));
 	}
 }
 
