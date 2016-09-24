@@ -275,79 +275,6 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QGridLayout" name="gridLayout">
-                <item row="5" column="0" colspan="2">
-                 <widget class="QLabel" name="label_4">
-                  <property name="text">
-                   <string>Radial distortion</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="3">
-                 <widget class="QLabel" name="label">
-                  <property name="text">
-                   <string>X:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="4">
-                 <widget class="QDoubleSpinBox" name="k1">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-10000.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>10000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="6" colspan="2">
-                 <widget class="QTableWidget" name="cameraMatrix">
-                  <property name="layoutDirection">
-                   <enum>Qt::LeftToRight</enum>
-                  </property>
-                  <property name="sizeAdjustPolicy">
-                   <enum>QAbstractScrollArea::AdjustToContents</enum>
-                  </property>
-                  <property name="editTriggers">
-                   <set>QAbstractItemView::NoEditTriggers</set>
-                  </property>
-                  <property name="alternatingRowColors">
-                   <bool>false</bool>
-                  </property>
-                  <property name="rowCount">
-                   <number>3</number>
-                  </property>
-                  <property name="columnCount">
-                   <number>3</number>
-                  </property>
-                  <attribute name="horizontalHeaderVisible">
-                   <bool>false</bool>
-                  </attribute>
-                  <attribute name="horizontalHeaderCascadingSectionResizes">
-                   <bool>true</bool>
-                  </attribute>
-                  <attribute name="horizontalHeaderDefaultSectionSize">
-                   <number>34</number>
-                  </attribute>
-                  <attribute name="verticalHeaderVisible">
-                   <bool>false</bool>
-                  </attribute>
-                  <attribute name="verticalHeaderCascadingSectionResizes">
-                   <bool>true</bool>
-                  </attribute>
-                  <row/>
-                  <row/>
-                  <row/>
-                  <column/>
-                  <column/>
-                  <column/>
-                 </widget>
-                </item>
                 <item row="4" column="4">
                  <widget class="QDoubleSpinBox" name="focusValue">
                   <property name="decimals">
@@ -400,7 +327,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="7" column="7">
+                <item row="6" column="7">
                  <widget class="QPushButton" name="applyCalibrationButton">
                   <property name="text">
                    <string>Apply</string>
@@ -423,17 +350,40 @@
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="0" colspan="2">
-                 <widget class="QLabel" name="label_7">
+                <item row="5" column="0" colspan="2">
+                 <widget class="QLabel" name="label_4">
                   <property name="text">
-                   <string>Camera matrix</string>
+                   <string>Radial distortion</string>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="label_3">
+                <item row="1" column="3">
+                 <widget class="QLabel" name="label">
                   <property name="text">
-                   <string>Focus:</string>
+                   <string>X:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="4">
+                 <widget class="QDoubleSpinBox" name="k1">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-10000.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10000.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="showGreyMode">
+                  <property name="text">
+                   <string>ShowGrey</string>
                   </property>
                  </widget>
                 </item>
@@ -460,10 +410,10 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QCheckBox" name="showGreyMode">
+                <item row="4" column="0">
+                 <widget class="QLabel" name="label_3">
                   <property name="text">
-                   <string>ShowGrey</string>
+                   <string>Focus:</string>
                   </property>
                  </widget>
                 </item>

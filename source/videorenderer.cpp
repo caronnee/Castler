@@ -25,7 +25,7 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 
 void VideoRenderer::setImage(cv::Mat img)
 {
-	_img = img;
+	_img = img.clone();
 	update();
 }
 

@@ -14,19 +14,6 @@ Creator::Creator(QWidget *parent)
 
     ui.setupUi(this);
 
-	for (int c = 0; c < ui.cameraMatrix->horizontalHeader()->count(); ++c)
-	{
-		ui.cameraMatrix->horizontalHeader()->setSectionResizeMode(
-			c, QHeaderView::Stretch);
-	}
-
-	for (int c = 0; c < ui.cameraMatrix->verticalHeader()->count(); ++c)
-	{
-		ui.cameraMatrix->verticalHeader()->setSectionResizeMode(
-			c, QHeaderView::Stretch);
-	}
-
-
 	// connections
     
 	// Global application
@@ -79,20 +66,18 @@ void Creator::SendParameters()
 	calibration.k2 = ui.k2->value();
 	calibration.k3 = ui.k3->value();
 
-	cv::Mat mat = cv::Mat::eye(3, 3, CV_64F);
-	mat.at<double>(0, 0) = ui.cameraMatrix->item(0, 0)->data(Qt::UserRole).toDouble();
-	mat.at<double>(0, 1) = ui.cameraMatrix->item(0, 1)->data(Qt::UserRole).toDouble();
-	mat.at<double>(0, 2) = ui.cameraMatrix->item(0, 2)->data(Qt::UserRole).toDouble();
 
-	mat.at<double>(1, 0) = ui.cameraMatrix->item(1, 0)->data(Qt::UserRole).toDouble();
-	mat.at<double>(1, 1) = ui.cameraMatrix->item(1, 1)->data(Qt::UserRole).toDouble();
-	mat.at<double>(1, 2) = ui.cameraMatrix->item(1, 2)->data(Qt::UserRole).toDouble();
-
-	mat.at<double>(2, 0) = ui.cameraMatrix->item(2, 0)->data(Qt::UserRole).toDouble();
-	mat.at<double>(2, 1) = ui.cameraMatrix->item(2, 1)->data(Qt::UserRole).toDouble();
-	mat.at<double>(2, 2) = ui.cameraMatrix->item(2, 2)->data(Qt::UserRole).toDouble();
-
-	calibration.camera = mat;
+#if DEBUG_CAMERA
+	std::vector<double> array;
+	if (mat.isContinuous()) {
+		array.assign((double*)mat.datastart, (double*)mat.dataend);
+	}
+	else {
+		for (int i = 0; i < mat.rows; ++i) {
+			array.insert(array.end(), (float*)mat.ptr<uchar>(i), (float*)mat.ptr<uchar>(i) + mat.cols);
+		}
+	}
+#endif
 
 	ui.calibrationVideo->SetParameters( calibration );
 }
@@ -103,7 +88,7 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 	{
 #define CAM_X 3
 #define CAM_Y 3
-		DoAssert(camera.cols == 3);
+		/*DoAssert(camera.cols == 3);
 		DoAssert(camera.rows == 3);
 		for (int i = 0; i < CAM_X; i++)
 		{
@@ -113,7 +98,7 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 				QVariant val(v);
 				ui.cameraMatrix->setItem(i, j, new QTableWidgetItem(val.toString()));
 			}
-		}
+		}*/
 		// set focus
 		double focusVal = camera.at<double>(0, 0);
 		ui.focusValue->setValue(focusVal);
@@ -140,6 +125,7 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 
 void Creator::ShowUndistorted()
 {
+	SendParameters();
 	ui.calibrationVideo->Start(ui.calibrationLabel->text(), VideoRenderer::ActionUndistort);
 }
 
@@ -213,21 +199,12 @@ void Creator::LoadCalibration(const QString & input)
 
 		v = calSettings.value("f");
 		ui.focusValue->setValue(v.toDouble());
-		ui.cameraMatrix->setItem(0, 0, new QTableWidgetItem(v.toString()));
-		ui.cameraMatrix->setItem(1, 1, new QTableWidgetItem(v.toString()));
 
 		v = calSettings.value("px");
 		ui.principalXValue->setValue(v.toDouble());
-		ui.cameraMatrix->setItem(0, 2, new QTableWidgetItem(v.toString()));
 
 		v = calSettings.value("py");
 		ui.principalYValue->setValue(v.toDouble());
-		ui.cameraMatrix->setItem(1, 2, new QTableWidgetItem(v.toString()));
-		ui.cameraMatrix->setItem(2, 2, new QTableWidgetItem("1.0"));
-		ui.cameraMatrix->setItem(0, 1, new QTableWidgetItem("0.0"));
-		ui.cameraMatrix->setItem(1, 0, new QTableWidgetItem("0.0"));
-		ui.cameraMatrix->setItem(2, 0, new QTableWidgetItem("0.0"));
-		ui.cameraMatrix->setItem(2, 1, new QTableWidgetItem("0.0"));
 	}
 }
 

@@ -187,17 +187,46 @@ cv::Mat ImageProcessor::GetResult()
 void ImageProcessor::ApplyCalibration(CalibrationSet & calibrationSet)
 {
 	if (calibrationSet.fx <= 0)
+	{
+		DoAssert(false);
 		return;
+	}
 
+#if DEBUG_CAMERA
+	std::vector<double> array;
+	cv::Mat mat = calibrationSet.camera;
+	if (mat.isContinuous()) {
+		array.assign((double*)mat.datastart, (double*)mat.dataend);
+	}
+	else {
+		for (int i = 0; i < mat.rows; ++i) {
+			array.insert(array.end(), (float*)mat.ptr<uchar>(i), (float*)mat.ptr<uchar>(i) + mat.cols);
+		}
+	}
+#endif
 	cv::Mat distcoefs = cv::Mat::zeros(8, 1, CV_64F);
 	distcoefs.at<double>(0) = calibrationSet.k1;
 	distcoefs.at<double>(1) = calibrationSet.k2;
 	distcoefs.at<double>(4) = calibrationSet.k3;
 	// init rectification
 	cv::Mat r,map1,map2;
+	cv::Mat camera = cv::Mat::eye(3, 3, CV_64F);
+	camera.at<double>(0, 0) = calibrationSet.fx;
+	camera.at<double>(1, 1) = calibrationSet.fy;
+	camera.at<double>(0, 2) = calibrationSet.px;
+	camera.at<double>(1, 2) = calibrationSet.py;
 	cv::initUndistortRectifyMap(
-		calibrationSet.camera, distcoefs, cv::Mat(),
-		getOptimalNewCameraMatrix(calibrationSet.camera, distcoefs, _ret.size(), 1, _ret.size(), 0), _ret.size(),
+		camera, distcoefs, cv::Mat(),
+		getOptimalNewCameraMatrix(camera, distcoefs, _ret.size(), 1, _ret.size(), 0), _ret.size(),
 		CV_16SC2, map1, map2);
-	remap(_ret, _ret, map1, map2, cv::INTER_LINEAR);
+	cv::Mat cl = _ret.clone();
+#if SHOW_UNDISTORTED
+	imshow("First", cl);
+#endif
+	remap(cl, _ret, map1, map2, cv::INTER_LINEAR);
+#if SHOW_UNDISTORTED
+	imshow("After", cl);
+	imshow("Second", _ret);
+	cv::waitKey();
+#endif
 }
