@@ -4,6 +4,16 @@
 #include <QMetaType>
 #include <opencv2/opencv.hpp>
 
+enum CaptureModes
+{
+	ModeIdle = 1, // do nothing
+	ModeFeatures = 1 << 1,
+	ModeGrey = 1 << 2,
+	ModeCalibrate = 1 << 3,
+	ModeDetect = 1 << 4,
+	ModeUndistort = 1 << 5,
+};
+
 struct CalibrationSet
 {
 	float px, py, k1, k2, k3, fx, fy;

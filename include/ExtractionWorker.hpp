@@ -7,16 +7,6 @@
 #include "imageprovider.h"
 #include <set>
 
-enum CaptureModes
-{
-	ModeIdle = 1, // do nothing
-	ModeFeatures = 1 << 1,
-	ModeGrey = 1 << 2,
-	ModeCalibrate = 1 << 3,
-	ModeDetect = 1 << 4,
-	ModeUndistort = 1 << 5,
-};
-
 #include <QBasicTimer>
 #include "typedefs.h"
 #include <QTimerEvent>

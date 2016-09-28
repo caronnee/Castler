@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -40,8 +40,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>174</width>
-               <height>333</height>
+               <width>98</width>
+               <height>70</height>
               </rect>
              </property>
              <attribute name="label">
@@ -216,6 +216,83 @@
       <attribute name="title">
        <string>Comparer</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6" stretch="10,1">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="CompareWindow" name="leftImage" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="CompareWindow" name="rightImage" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QPushButton" name="pushButton_4">
+           <property name="text">
+            <string>Next pair</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="compareLabel">
+           <property name="text">
+            <string>0 / 0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="text">
+            <string>Previous pair</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="calibTab">
       <attribute name="title">
@@ -498,6 +575,11 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>CompareWindow</class>
+   <extends>QWidget</extends>
+   <header location="global">CompareWindow.h</header>
+  </customwidget>
   <customwidget>
    <class>Renderer</class>
    <extends>QWidget</extends>
