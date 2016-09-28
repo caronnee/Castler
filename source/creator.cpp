@@ -154,13 +154,13 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 void Creator::ShowUndistorted()
 {
 	SendParameters();
-	_capturer.Load(ui.calibrationLabel->text(), VideoRenderer::ActionUndistort);
+	_capturer.Load(ui.calibrationLabel->text(),ModeUndistort);
 }
 
 
 void Creator::RunCalibration()
 {
-	_capturer.Load(ui.calibrationLabel->text(), VideoRenderer::ActionCalibrate);
+	_capturer.Load(ui.calibrationLabel->text(), ModeCalibrate);
 }
 
 void Creator::LoadCalibrationImages()
@@ -256,7 +256,7 @@ void Creator::PlayVideo()
 	QString defname = ui.inputList->selectedItems()[0]->data(Qt::UserRole).toString();
 	if (defname.size() == 0)
 		return;
-	_capturer.Load(defname, VideoRenderer::ActionDetect);
+	_capturer.Load(defname, ModeDetect);
 }
 
 const char * CSettingFileName = "/settings.castler";

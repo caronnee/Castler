@@ -26,18 +26,9 @@ public slots:
 	void ShowParameters(cv::Mat camera, cv::Mat dist);
 	
 public:
-
-	enum VideoAction
-	{
-		ActionDetect,
-		ActionCalibrate,
-		ActionUndistort,
-		NActions
-	};
-
+	
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
 	~VideoRenderer();
-
 
 	void SetParameters(CalibrationSet calibration);
 };
