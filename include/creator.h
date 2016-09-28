@@ -5,21 +5,33 @@
 #include "ui_creator.h"
 #include "opencv2/highgui/highgui.hpp"
 #include <QShortcut>
+#include "FrameProcessor.h"
 
 class Creator : public QWidget, public IReportFunction
 {
 	Q_OBJECT
 
 	
+	// application shorcuts
 	std::vector<QShortcut *> _shortcuts;
+
+	// one common processor for images
+	FrameProcessor _capturer;
+
 public:
     Creator(QWidget *parent = 0);
 	~Creator();
 	void Report(MessageLevel level, const QString & str);
 	void LoadCalibration(const QString & str);
 
-private slots:
+signals:
+	void modeChanged(int);
 
+private slots:
+	void FeaturesFromFrame();
+	void ShowGreyFrame();
+	void Stop();
+	void Pause();
 	void SendParameters();
 	void SaveCalibration();
 	void EnablePlay();
