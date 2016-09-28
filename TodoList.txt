@@ -1,4 +1,4 @@
-- calibrate, show undistorted
+- manually pick up point that might be similar. automated help
 - use hughes transformation to calibrate
 - find if in the video there is movement degradation
 - find chessboard in the videos tried with my camera / drone
