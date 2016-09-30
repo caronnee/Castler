@@ -38,6 +38,7 @@ bool VideoProvider::IsValid()
 bool VideoProvider::NextFrame(cv::Mat& frame)
 {
 	_capture->read(frame);
+	cv::cvtColor(frame, frame, CV_BGR2RGB);
 	return Position() != _numFrames;
 }
 

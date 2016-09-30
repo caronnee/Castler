@@ -35,8 +35,7 @@ bool ImageProcessor::Prepare( cv::Mat& frame, std::vector<cv::KeyPoint>& corners
 		return false;
 
 	_frameSize = frame.size();
-	cv::cvtColor(frame, gr, CV_BGR2GRAY);
-	cv::cvtColor(frame, frame, CV_BGR2RGB);
+	cv::cvtColor(frame, gr, CV_RGB2GRAY);
 
 	if (_ffd)
 	{

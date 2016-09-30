@@ -9,7 +9,6 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 	if (_img.empty())
 		return;// do not paint
 
-	QPainter p(this);
 	cv::Mat matched;
 
 	QSize s = size();
@@ -21,6 +20,7 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 		format = QImage::Format_Grayscale8;
 	}
 	const QImage image(matched.data, matched.cols, matched.rows, matched.step, format);
+	QPainter p(this);
 	p.drawImage(0, 0, image);
 	//m_img = QImage();
 }

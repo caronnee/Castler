@@ -117,7 +117,6 @@ void ExtractionWorker::PreparePair(int start)
 {
 	if (!_provider)
 		return;
-	_provider->SetPosition(start);
 	cv::Mat m1, m2;
 	_provider->NextFrame(m1);
 	_provider->NextFrame(m2);

@@ -1,8 +1,6 @@
 #pragma once
 
 // popup size in pixels
-#define DESIRED_POPUP_SIZE	20
-
 #include <QWidget>
 #include <qpoint.h>
 
