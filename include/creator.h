@@ -20,14 +20,19 @@ class Creator : public QWidget, public IReportFunction
 
 public:
     Creator(QWidget *parent = 0);
-	~Creator();
+
 	void Report(MessageLevel level, const QString & str);
 	void LoadCalibration(const QString & str);
 
+	~Creator();
+
 signals:
 	void modeChanged(int);
+	void PreparePairSignal(int);
 
 private slots:
+    void GetNextImagePair();
+	void SetCompare(cv::Mat left, cv::Mat right);
 	void FeaturesFromFrame();
 	void ShowGreyFrame();
 	void Stop();

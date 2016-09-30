@@ -34,15 +34,16 @@ class ExtractionWorker : public QObject, public IReportFunction
 	ImageProcessor processor;
 private:
 	bool RunExtractionStep( ImageProcessor& processor );
+
 public:
 	// constructor
 	ExtractionWorker();
 
-	void SetMode(const int & mode);
 
 	void Report(MessageLevel level, const QString & str);
 
 signals:
+	void imagePairSignal(cv::Mat left, cv::Mat right);
 	void started(int optimalseconds);
 	void workerReportSignal(MessageLevel level, const QString & str);
 	void finished();
@@ -50,10 +51,11 @@ signals:
 	void camParametersSignal(cv::Mat camera, cv::Mat distCoeffs);
 
 public slots:
-
-// main thread loop
+	void SetMode(int mode);
+	// main thread loop
+	void PreparePair(int start);
 	void Process();
-	void OpenSlot(QString str, int flags);
+	void OpenSlot(QString str);
 	void Cleanup();
 	void Terminate();
 	void ChangeCalibration(CalibrationSet );

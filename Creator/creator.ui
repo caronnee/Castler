@@ -40,8 +40,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>98</width>
-               <height>70</height>
+               <width>174</width>
+               <height>333</height>
               </rect>
              </property>
              <attribute name="label">
@@ -244,9 +244,9 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QPushButton" name="pushButton_4">
+          <widget class="QPushButton" name="comparePrev">
            <property name="text">
-            <string>Next pair</string>
+            <string>Previous pair</string>
            </property>
           </widget>
          </item>
@@ -284,9 +284,9 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="compareNext">
            <property name="text">
-            <string>Previous pair</string>
+            <string>Next pair</string>
            </property>
           </widget>
          </item>

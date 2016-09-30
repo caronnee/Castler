@@ -21,6 +21,9 @@ Creator::Creator(QWidget *parent)
 	_shortcuts.push_back( new QShortcut(QKeySequence("Ctrl+s"),this));
 	connect(_shortcuts[0], SIGNAL(activated()), this, SLOT(SaveSettings()));
 
+	// worker connects
+	connect(this, SIGNAL(modeChanged(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
+
 	// rendered connects
 	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
 	connect(ui.renderer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
@@ -50,14 +53,30 @@ Creator::Creator(QWidget *parent)
 	connect(ui.playUndistortedButton, SIGNAL(clicked()), this, SLOT(ShowUndistorted()));
 	connect(ui.saveCalibrationButton, SIGNAL(clicked()), this, SLOT(SaveCalibration()));
 
-	// TODO check for too much connections
 	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat)), ui.calibrationVideo, SLOT(setImage(cv::Mat)));
 	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.calibrationVideo, SLOT(Report(MessageLevel, const QString &)));
 	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), ui.calibrationVideo, SLOT(ShowParameters(cv::Mat, cv::Mat)));
 	connect(ui.calibrationVideo, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
 
+	// comparer connects
+	connect(ui.compareNext, SIGNAL(clicked()), this, SLOT(GetNextImagePair()));
+	connect(this, SIGNAL(PreparePairSignal(int)), _capturer.GetWorker(), SLOT(PreparePair(int)));
+	connect(_capturer.GetWorker(), SIGNAL(imagePairSignal(cv::Mat,cv::Mat)), this, SLOT(SetCompare(cv::Mat,cv::Mat)));
+	//connect(ui.comparePrev, SIGNAL(clicked()), this, SLOT(GetPrevImagePair()));
+
 	// rest of the initialization
 	LoadSettings();
+}
+
+void Creator::SetCompare(cv::Mat left, cv::Mat right)
+{
+	ui.leftImage->SetImage(left);
+	ui.rightImage->SetImage(right);
+}
+
+void Creator::GetNextImagePair()
+{
+	emit PreparePairSignal(0);
 }
 
 void Creator::FeaturesFromFrame()
@@ -154,13 +173,13 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 void Creator::ShowUndistorted()
 {
 	SendParameters();
-	_capturer.Load(ui.calibrationLabel->text(),ModeUndistort);
+	emit modeChanged(ModeUndistort);
 }
 
 
 void Creator::RunCalibration()
 {
-	_capturer.Load(ui.calibrationLabel->text(), ModeCalibrate);
+	emit modeChanged(ModeCalibrate);
 }
 
 void Creator::LoadCalibrationImages()
@@ -211,10 +230,11 @@ void Creator::LoadCalibration(const QString & input)
 {
 	InputList::_lastDirectory = input;
 	ui.calibrationLabel->setText(input);
-
+	ui.compareLabel->setText("");
 	std::string title = FindTitle(input.toStdString().c_str());
 	QString calSettingsFile = QApplication::applicationDirPath() + title.c_str() + CCalibrationExt;
 	QSettings calSettings(calSettingsFile, QSettings::IniFormat);
+	_capturer.Load(input);
 	if (calSettings.status() == QSettings::NoError)
 	{
 		QVariant v;
@@ -253,10 +273,7 @@ void Creator::EnablePlay()
 
 void Creator::PlayVideo()
 {
-	QString defname = ui.inputList->selectedItems()[0]->data(Qt::UserRole).toString();
-	if (defname.size() == 0)
-		return;
-	_capturer.Load(defname, ModeDetect);
+	emit modeChanged(ModeDetect);
 }
 
 const char * CSettingFileName = "/settings.castler";

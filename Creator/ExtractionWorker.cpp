@@ -39,9 +39,11 @@ void ExtractionWorker::ChangeCalibration(CalibrationSet calibration)
 	_calibrationSet = calibration;
 } 
 
-void ExtractionWorker::SetMode(const int & mode)
+void ExtractionWorker::SetMode(int mode)
 {
 	_mode ^= mode;
+	if ( _timer.isActive() == false )
+		_timer.start(0, this);
 }
 
 void ExtractionWorker::Report(MessageLevel level, const QString & str)
@@ -49,14 +51,15 @@ void ExtractionWorker::Report(MessageLevel level, const QString & str)
 	emit workerReportSignal(level, str);
 }
 
-void ExtractionWorker::OpenSlot(QString str, int flags)
+void ExtractionWorker::OpenSlot(QString str)
 {
 	Cleanup();
 	_provider = CreateProvider(str);
-	SetMode(flags);
+	
 	DoAssert(_provider != false && _provider->IsValid());
 	processor.Init(_provider);
-	_timer.start(0, this);
+	_mode = ModeIdle;
+	_timer.start(10,this);
 }
 
 void ExtractionWorker::timerEvent(QTimerEvent * ev)
@@ -108,6 +111,17 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 			}
 		}
 	}
+}
+
+void ExtractionWorker::PreparePair(int start)
+{
+	if (!_provider)
+		return;
+	_provider->SetPosition(start);
+	cv::Mat m1, m2;
+	_provider->NextFrame(m1);
+	_provider->NextFrame(m2);
+	emit imagePairSignal(m1, m2);
 }
 
 void ExtractionWorker::Process()

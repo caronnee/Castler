@@ -11,7 +11,8 @@
 - detect moving people, to obscure the behind
 - Panoramas matching? Is it useful?
 - interchangable lens - vplyv na paramatre, ako poznat, ze sa mi zmenil focus?
-- majst kameru so zmenenym focusom vo videu
+- najst kameru so zmenenym focusom vo videu
+- runcalibration sa zmeit na stop, aby bool jasne, ze sa kliklo
 
 //stairs
 //door

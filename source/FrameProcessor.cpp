@@ -4,10 +4,10 @@
 #include "debug.h"
 #include "loghandler.h"
 
-bool FrameProcessor::Load(const QString & str, int mode)
+bool FrameProcessor::Load(const QString & str)
 {
 	QString s(str);
-	emit inputChangedSignal(s, mode);
+	emit inputChangedSignal(s);
 	return true;
 }
 
@@ -44,7 +44,7 @@ FrameProcessor::FrameProcessor()
 
 	_worker.moveToThread(&_thread);
 
-	connect(this, SIGNAL(inputChangedSignal(QString, int)), &_worker, SLOT(OpenSlot(QString, int)));
+	connect(this, SIGNAL(inputChangedSignal(QString)), &_worker, SLOT(OpenSlot(QString)));
 	connect(&_thread, SIGNAL(started()), &_worker, SLOT(Process()));
 	connect(&_thread, SIGNAL(finished()), this, SLOT(ThreadStopped()));
 	connect(this, SIGNAL(cleanupSignal()), &_worker, SLOT(Cleanup()));
@@ -88,16 +88,4 @@ void FrameProcessor::Stop()
 	_timer.stop();
 	std::stack<cv::Mat> empty;
 	std::swap(_images, empty);
-}
-
-void FrameProcessor::Request(int frames)
-{
-	if (_timer.isActive() || _thread.isRunning())
-	{
-		reportSignal(MError, "Waiting for thread");
-		return;
-	}
-	
-	//_provider->SetPosition(_provider->Position() + frames);
-	ShowCurrent();
 }

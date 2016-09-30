@@ -7,6 +7,7 @@
 #include <qpoint.h>
 
 #include <QMouseEvent>
+#include <opencv2/opencv.hpp>
 
 class CompareWindow: public QWidget {
 	Q_OBJECT
@@ -18,17 +19,21 @@ class CompareWindow: public QWidget {
 		NPaintModes
 	};
 
-	QImage _image;
+	cv::Mat _image;
+
 	QPointF _coords;
+
 	PaintMode _paintMode = PaintNone;
 
 signals:
 
-public slots:
-
+	public slots :
 public:
 	// constructor
 	CompareWindow(QWidget * parent);
+
+	// sets which image should be used
+	void SetImage(cv::Mat image);
 
 	// possible to pis out differencies, zoom in and so on
 	void mouseMoveEvent(QMouseEvent * event);

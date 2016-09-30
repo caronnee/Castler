@@ -38,7 +38,7 @@ signals :
 	// nothing cool, just calibrate according to video/image. Signal when result is ready
 	void calibrationResult(int errorcode, cv::Mat calibration);
 	void finishedSignal();
-	void inputChangedSignal(QString str, int mode);
+	void inputChangedSignal(QString str);
 
 public slots:
 	void Report(MessageLevel level, const QString & message);
@@ -48,9 +48,12 @@ private:
 	int _seconds = 0;
 
 public:
+
 	//load
 	ExtractionWorker * GetWorker() { return &_worker; }
-	bool Load(const QString & str, int mode);
+
+	// load images
+	bool Load(const QString & str);
 
 	void timerEvent(QTimerEvent * ev);
 
@@ -59,5 +62,4 @@ public:
 	~FrameProcessor();
 	void Pause();
 	void Stop();
-	void Request(int frames);
 };
