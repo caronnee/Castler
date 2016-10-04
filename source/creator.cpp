@@ -18,8 +18,10 @@ Creator::Creator(QWidget *parent)
     
 	// Global application
 	// shortcuts
-	_shortcuts.push_back( new QShortcut(QKeySequence("Ctrl+s"),this));
+	_shortcuts.push_back(new QShortcut(QKeySequence("Ctrl+s"), this));
+	_shortcuts.push_back(new QShortcut(QKeySequence("Alt+a"), this));
 	connect(_shortcuts[0], SIGNAL(activated()), this, SLOT(SaveSettings()));
+	connect(_shortcuts[1], SIGNAL(activated()), this, SLOT(AddPoint()));
 
 	// worker connects
 	connect(this, SIGNAL(modeChanged(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
@@ -321,6 +323,33 @@ void Creator::LoadModel()
 	//load model
 	ui.renderer->Load(str);
 }
+
+void Creator::AddPoint()
+{
+	if (ui.creatorTabs->currentIndex() != ui.creatorTabs->indexOf(ui.compareTab) )
+	{
+		return;
+	}
+	if (ui.selectedPoints->selectedItems().size() == 0)
+	{
+		int size = ui.selectedPoints->children().size();
+		// just add pair
+		// if some point was selected, add it to this point
+		QStringList list;
+		QString str = QString::asprintf("%d", size);
+		list.append(str);
+		QTreeWidgetItem * item = new QTreeWidgetItem(list, 0);
+		item->addChild(new QTreeWidgetItem(list, 0));
+		ui.selectedPoints->addTopLevelItem(item);
+	}
+
+	
+		
+	//QFileSystemModel *model = new QFileSystemModel;
+	//model->setRootPath(QDir::currentPath());
+	//ui.selectedPoints->setModel(model);
+}
+
 void Creator::SaveSettings()
 {
 	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;

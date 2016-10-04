@@ -1,12 +1,13 @@
 #include "CompareWindow.h"
 #include <QPainter>
+#include "debug.h"
 
 //TODO size of the pixes by settings
-#define DESIRED_POPUP_SIZE	50
+const int DESIRED_POPUP_SIZE = 25;
 
 void CompareWindow::SetImage(cv::Mat image)
 {
-	_image = image;
+	cv::copyMakeBorder(image, _image, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 	update();
 }
 
@@ -21,53 +22,70 @@ void CompareWindow::mouseMoveEvent(QMouseEvent * event)
 {
 	//	emit reportSignal(MInfo, "Mouse moved");
 	_paintMode = PaintArea;
-	_coords = event->localPos();
+
+	_coords = event->localPos() + QPointF(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE);
 	update();
 }
 
 void CompareWindow::paintEvent(QPaintEvent * event)
 {
+	if (_image.empty() || _coords.x() < 0 || _coords.y() < 0 )
+	{
+		// pr paint default image
+		return;
+	}
+
 	// paint the image
 	QPainter painter(this);
-	
-	cv::Mat ret;
-	QSize s = size();
-	if (_image.size().width == 0)
-		return;// do not draw
-	float ratio = s.width() / (float)_image.size().width;
-	cv::Size newSize(_image.size());
+	QSize viewportSize = size();
+
+	cv::Size imageSize = _image.size();
+	cv::Size newSizeWithBorders = imageSize;
+
+	// viewport should be shown without border
+	float ratio = (viewportSize.width() + DESIRED_POPUP_SIZE * 2) / (float)(imageSize.width);
 	{
-		float ratio2 = s.height() / (float)_image.size().height;
+		float ratio2 = (viewportSize.height() + DESIRED_POPUP_SIZE * 2) / (float)(imageSize.height);
 		if (ratio2 < ratio)
 		{
 			ratio = ratio2;
 		}
-		newSize.width *= ratio;
-		newSize.height *= ratio;
+		newSizeWithBorders.width *= ratio;
+		newSizeWithBorders.height *= ratio;
 	}
-	cv::resize(_image, ret,newSize);
+	cv::Mat showImage;
+	cv::resize(_image, showImage, newSizeWithBorders);
 
+	//TODO move to RGB
 	if (_paintMode == PaintArea)
 	{
+		float ratio = showImage.size().width / (float)(imageSize.width);
+
 		//new size
-		cv::Point2f originalPoint(_coords.x() / ratio,_coords.y()/ratio);
-		cv::Size ss(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE);
+		cv::Point2f originalPoint(_coords.x() / ratio - DESIRED_POPUP_SIZE, _coords.y()/ratio - DESIRED_POPUP_SIZE);
+		
+		cv::Size ss(DESIRED_POPUP_SIZE*2, DESIRED_POPUP_SIZE*2);
 		// convert the point to the point of original image
 		cv::Rect rect(originalPoint, ss);
-		cv::Mat rected = _image(rect);
+		
+		cv::Mat rected = _image(rect).clone();
 		// merge this with the rect
-		cv::Rect ret_rect(_coords.x(), _coords.y(), DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE);
-		rected.copyTo(ret(ret_rect));
+		cv::Rect ret_rect(_coords.x(), _coords.y(), DESIRED_POPUP_SIZE*2, DESIRED_POPUP_SIZE*2);
+		cv::circle(rected, cv::Point2f(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE), 3, cv::Scalar(0, 255, 0), 2);
+		rected.copyTo(showImage(ret_rect));
 	}
 
 	QImage::Format  format = QImage::Format_RGB888;
 
-	cv::MatStep step = ret.step;
+	cv::Rect showRect(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, showImage.size().width - DESIRED_POPUP_SIZE*2, showImage.size().height - DESIRED_POPUP_SIZE*2);
+	DoAssert(showRect.width == size().width() || showRect.height == size().height());
+	cv::Mat showMat = showImage(showRect);
+	cv::MatStep step = showMat.step;
 	if (step[1] == 1)
 	{
 		format = QImage::Format_Grayscale8;
 	}
-	const QImage image(ret.data, ret.cols, ret.rows, ret.step, format);
+	const QImage image(showMat.data, showMat.cols, showMat.rows, showMat.step, format);
 
 	painter.drawImage(0,0,image);
 }

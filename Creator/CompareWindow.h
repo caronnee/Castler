@@ -19,6 +19,7 @@ class CompareWindow: public QWidget {
 
 	cv::Mat _image;
 
+	// real position in shown image
 	QPointF _coords;
 
 	PaintMode _paintMode = PaintNone;

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
+  <layout class="QVBoxLayout" name="creatorLayout" stretch="10,1">
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
@@ -69,8 +69,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>98</width>
-               <height>28</height>
+               <width>174</width>
+               <height>312</height>
               </rect>
              </property>
              <attribute name="label">
@@ -108,7 +108,7 @@
       <attribute name="title">
        <string>Creator</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,10">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
        <item>
         <widget class="InputList" name="inputList"/>
        </item>
@@ -216,9 +216,9 @@
       <attribute name="title">
        <string>Comparer</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6" stretch="10,1">
+      <layout class="QVBoxLayout" name="verticalLayout_6" stretch="10,1,1">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,3,1">
          <item>
           <widget class="CompareWindow" name="leftImage" native="true">
            <property name="minimumSize">
@@ -238,6 +238,49 @@
             </size>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="selectedPoints">
+           <attribute name="headerVisible">
+            <bool>false</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="featuresLayout">
+         <item>
+          <widget class="QComboBox" name="lineHelpers">
+           <property name="currentText">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="applyButton">
+           <property name="text">
+            <string>Apply</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>
