@@ -43,6 +43,7 @@ private slots:
 	void PlayVideo();
 	void LoadSettings();
 	void LoadModel();
+	void AddNewPoint();
 	void AddPoint();
 	void SaveSettings();
 	void LoadCalibration();

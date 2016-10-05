@@ -20,8 +20,10 @@ Creator::Creator(QWidget *parent)
 	// shortcuts
 	_shortcuts.push_back(new QShortcut(QKeySequence("Ctrl+s"), this));
 	_shortcuts.push_back(new QShortcut(QKeySequence("Alt+a"), this));
+	_shortcuts.push_back(new QShortcut(QKeySequence("Alt+n"), this));
 	connect(_shortcuts[0], SIGNAL(activated()), this, SLOT(SaveSettings()));
 	connect(_shortcuts[1], SIGNAL(activated()), this, SLOT(AddPoint()));
+	connect(_shortcuts[2], SIGNAL(activated()), this, SLOT(AddNewPoint()));
 
 	// worker connects
 	connect(this, SIGNAL(modeChanged(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
@@ -324,30 +326,33 @@ void Creator::LoadModel()
 	ui.renderer->Load(str);
 }
 
-void Creator::AddPoint()
+void Creator::AddNewPoint()
 {
-	if (ui.creatorTabs->currentIndex() != ui.creatorTabs->indexOf(ui.compareTab) )
+	if (ui.creatorTabs->currentIndex() != ui.creatorTabs->indexOf(ui.compareTab))
 	{
 		return;
 	}
-	if (ui.selectedPoints->selectedItems().size() == 0)
-	{
-		int size = ui.selectedPoints->children().size();
-		// just add pair
-		// if some point was selected, add it to this point
-		QStringList list;
-		QString str = QString::asprintf("%d", size);
-		list.append(str);
-		QTreeWidgetItem * item = new QTreeWidgetItem(list, 0);
-		item->addChild(new QTreeWidgetItem(list, 0));
-		ui.selectedPoints->addTopLevelItem(item);
-	}
+	int size = ui.selectedPoints->topLevelItemCount();
+	// just add pair
+	// if some point was selected, add it to this point
+	QStringList list;
+	QString str = QString::asprintf("%d", size);
+	list.append(str);
+	QTreeWidgetItem * item = new QTreeWidgetItem(list, 0);
+	ui.selectedPoints->addTopLevelItem(item);
+	ui.selectedPoints->clearSelection();
+	ui.selectedPoints->setItemSelected(item, true);
+}
 
-	
-		
-	//QFileSystemModel *model = new QFileSystemModel;
-	//model->setRootPath(QDir::currentPath());
-	//ui.selectedPoints->setModel(model);
+
+void Creator::AddPoint()
+{
+	QStringList list;
+	QString str;
+	QTreeWidgetItem * item = ui.selectedPoints->selectedItems()[0];
+	list.append(QString::asprintf("%d", item->childCount()));
+	QTreeWidgetItem * child = new QTreeWidgetItem(list, 0);
+	item->addChild(child);
 }
 
 void Creator::SaveSettings()

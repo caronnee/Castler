@@ -8,6 +8,23 @@ const int DESIRED_POPUP_SIZE = 25;
 void CompareWindow::SetImage(cv::Mat image)
 {
 	cv::copyMakeBorder(image, _image, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+
+	newSizeWithBorders = _image.size();
+	cv::Size imageSize = _image.size();
+
+	QSize viewportSize = size();
+	// viewport should be shown without border
+	float ratio = (viewportSize.width() + DESIRED_POPUP_SIZE * 2) / (float)(imageSize.width);
+	{
+		float ratio2 = (viewportSize.height() + DESIRED_POPUP_SIZE * 2) / (float)(imageSize.height);
+		if (ratio2 < ratio)
+		{
+			ratio = ratio2;
+		}
+		newSizeWithBorders.width *= ratio;
+		newSizeWithBorders.height *= ratio;
+	}
+
 	update();
 }
 
@@ -23,13 +40,21 @@ void CompareWindow::mouseMoveEvent(QMouseEvent * event)
 	//	emit reportSignal(MInfo, "Mouse moved");
 	_paintMode = PaintArea;
 
-	_coords = event->localPos() + QPointF(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE);
+	QPointF candidate = event->localPos() + QPointF(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE);
+	if ((candidate.x() + DESIRED_POPUP_SIZE*2 >= newSizeWithBorders.width)
+		|| (candidate.y() + DESIRED_POPUP_SIZE*2 >= newSizeWithBorders.height)
+		|| (candidate.x() < DESIRED_POPUP_SIZE)
+		|| (candidate.y() < DESIRED_POPUP_SIZE)
+		)
+		return;
+
+	_coords = candidate;
 	update();
 }
 
 void CompareWindow::paintEvent(QPaintEvent * event)
 {
-	if (_image.empty() || _coords.x() < 0 || _coords.y() < 0 )
+	if (_image.empty() )
 	{
 		// pr paint default image
 		return;
@@ -40,20 +65,8 @@ void CompareWindow::paintEvent(QPaintEvent * event)
 	QSize viewportSize = size();
 
 	cv::Size imageSize = _image.size();
-	cv::Size newSizeWithBorders = imageSize;
-
-	// viewport should be shown without border
-	float ratio = (viewportSize.width() + DESIRED_POPUP_SIZE * 2) / (float)(imageSize.width);
-	{
-		float ratio2 = (viewportSize.height() + DESIRED_POPUP_SIZE * 2) / (float)(imageSize.height);
-		if (ratio2 < ratio)
-		{
-			ratio = ratio2;
-		}
-		newSizeWithBorders.width *= ratio;
-		newSizeWithBorders.height *= ratio;
-	}
 	cv::Mat showImage;
+
 	cv::resize(_image, showImage, newSizeWithBorders);
 
 	//TODO move to RGB
