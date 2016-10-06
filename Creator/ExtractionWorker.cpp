@@ -113,13 +113,23 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 	}
 }
 
-void ExtractionWorker::PreparePair(int start)
+void ExtractionWorker::PreparePair(int start, int modifier)
 {
 	if (!_provider)
 		return;
 	cv::Mat m1, m2;
 	_provider->NextFrame(m1);
 	_provider->NextFrame(m2);
+	if (modifier == CannyModifier)
+	{
+		cv::Mat blurred;
+		cv::blur(m1, blurred, cv::Size(15, 15));
+		cv::Canny(blurred, m1, 20, 60, 3);
+		
+		cv::blur(m2, blurred, cv::Size(15, 15));
+		cv::Canny(blurred, m2, 20, 60, 3);
+	}
+	// applyModifier
 	emit imagePairSignal(m1, m2);
 }
 

@@ -18,6 +18,8 @@ class Creator : public QWidget, public IReportFunction
 	// one common processor for images
 	FrameProcessor _capturer;
 
+	int _modifier;
+
 public:
     Creator(QWidget *parent = 0);
 
@@ -28,10 +30,12 @@ public:
 
 signals:
 	void modeChanged(int);
-	void PreparePairSignal(int);
+	void PreparePairSignal(int,int);
 
 private slots:
-    void GetNextImagePair();
+
+	void SetModifier();
+	void GetNextImagePair();
 	void SetCompare(cv::Mat left, cv::Mat right);
 	void FeaturesFromFrame();
 	void ShowGreyFrame();

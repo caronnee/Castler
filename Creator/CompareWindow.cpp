@@ -7,6 +7,11 @@ const int DESIRED_POPUP_SIZE = 25;
 
 void CompareWindow::SetImage(cv::Mat image)
 {
+	// make this colored
+	if (image.step[1] != 3)
+	{
+		cv::cvtColor(image, image, CV_GRAY2RGB);
+	}
 	cv::copyMakeBorder(image, _image, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
 	newSizeWithBorders = _image.size();
@@ -91,7 +96,7 @@ void CompareWindow::paintEvent(QPaintEvent * event)
 	QImage::Format  format = QImage::Format_RGB888;
 
 	cv::Rect showRect(DESIRED_POPUP_SIZE, DESIRED_POPUP_SIZE, showImage.size().width - DESIRED_POPUP_SIZE*2, showImage.size().height - DESIRED_POPUP_SIZE*2);
-	DoAssert(showRect.width == size().width() || showRect.height == size().height());
+//	DoAssert(showRect.width == size().width() || showRect.height == size().height());
 	cv::Mat showMat = showImage(showRect);
 	cv::MatStep step = showMat.step;
 	if (step[1] == 1)

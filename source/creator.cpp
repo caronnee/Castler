@@ -8,11 +8,17 @@
 Creator::Creator(QWidget *parent)
     : QWidget(parent)
 {
+	_modifier = 0;
+
 	qRegisterMetaType<MessageLevel>("MessageLevel");
 	qRegisterMetaType<cv::Mat>("cv::Mat");
 	qRegisterMetaType<CalibrationSet>("CalibrationSet");
 
     ui.setupUi(this);
+
+	// populate values to comboboxes
+	ui.modifierCombo->addItem("None", QVariant(NoneModifier));
+	ui.modifierCombo->addItem("Canny", QVariant(CannyModifier));
 
 	// connections
     
@@ -64,12 +70,19 @@ Creator::Creator(QWidget *parent)
 
 	// comparer connects
 	connect(ui.compareNext, SIGNAL(clicked()), this, SLOT(GetNextImagePair()));
-	connect(this, SIGNAL(PreparePairSignal(int)), _capturer.GetWorker(), SLOT(PreparePair(int)));
-	connect(_capturer.GetWorker(), SIGNAL(imagePairSignal(cv::Mat,cv::Mat)), this, SLOT(SetCompare(cv::Mat,cv::Mat)));
+	connect(this, SIGNAL(PreparePairSignal(int, int)), _capturer.GetWorker(), SLOT(PreparePair(int,int)));
+	connect(_capturer.GetWorker(), SIGNAL(imagePairSignal(cv::Mat, cv::Mat)), this, SLOT(SetCompare(cv::Mat, cv::Mat)));
+	connect(ui.applyModifierButton, SIGNAL(clicked()), this, SLOT(SetModifier()));
 	//connect(ui.comparePrev, SIGNAL(clicked()), this, SLOT(GetPrevImagePair()));
 
 	// rest of the initialization
 	LoadSettings();
+}
+
+void Creator::SetModifier()
+{
+	_modifier = ui.modifierCombo->currentData(Qt::UserRole).toInt();
+	emit PreparePairSignal(-2, _modifier);
 }
 
 void Creator::SetCompare(cv::Mat left, cv::Mat right)
@@ -80,7 +93,7 @@ void Creator::SetCompare(cv::Mat left, cv::Mat right)
 
 void Creator::GetNextImagePair()
 {
-	emit PreparePairSignal(0);
+	emit PreparePairSignal(0, _modifier);
 }
 
 void Creator::FeaturesFromFrame()

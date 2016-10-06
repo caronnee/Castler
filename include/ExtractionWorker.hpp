@@ -12,6 +12,13 @@
 #include <QTimerEvent>
 #include "imageprovider.h"
 
+enum Modifiers
+{
+	NoneModifier,
+	CannyModifier,
+	NModifiers
+};
+
 class ExtractionWorker : public QObject, public IReportFunction
 {
 	Q_OBJECT
@@ -41,7 +48,7 @@ public:
 
 
 	void Report(MessageLevel level, const QString & str);
-
+	
 signals:
 	void imagePairSignal(cv::Mat left, cv::Mat right);
 	void started(int optimalseconds);
@@ -53,7 +60,7 @@ signals:
 public slots:
 	void SetMode(int mode);
 	// main thread loop
-	void PreparePair(int start);
+	void PreparePair(int start, int modifier);
 	void Process();
 	void OpenSlot(QString str);
 	void Cleanup();

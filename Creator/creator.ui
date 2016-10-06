@@ -256,14 +256,14 @@
        <item>
         <layout class="QHBoxLayout" name="featuresLayout">
          <item>
-          <widget class="QComboBox" name="lineHelpers">
+          <widget class="QComboBox" name="modifierCombo">
            <property name="currentText">
             <string/>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="applyButton">
+          <widget class="QPushButton" name="applyModifierButton">
            <property name="text">
             <string>Apply</string>
            </property>
