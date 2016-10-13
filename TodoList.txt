@@ -1,12 +1,12 @@
+- load shader from some file
+- implement normals
 - manually pick up point that might be similar. automated help
-- after firt popup, movement of the mouse should be considered on the bigger picture. After som shortcut
 - offect canny to set correspondece. POssible other detections
 - detect degradation from camera movement
 - use hughes transformation to calibrate
 - find if in the video there is movement degradation
 - find chessboard in the videos tried with my camera / drone
 - create file from bruteforce, ordinary one
-- load shader from XML file
 - show white color based on normal
 - make light, movable light, light == camera, only cone changing
 - filter for errors
@@ -16,6 +16,14 @@
 - interchangable lens - vplyv na paramatre, ako poznat, ze sa mi zmenil focus?
 - najst kameru so zmenenym focusom vo videu
 - runcalibration sa zmeit na stop, aby bool jasne, ze sa kliklo
+- reconstructon from one photo / painting
+
+// use standard calibration code [Tsai87]
+– use view correlation [Bogart91]
+– use through the lens camera control [Gleicher92]
+
+Scattered data interpolation - sparse 3D to surface
+
 
 //stairs
 //door

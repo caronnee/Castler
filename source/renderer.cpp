@@ -87,6 +87,9 @@ void Renderer::setClearColor(const QColor &color)
 
 #include "Filename.h"
 
+char vertexShader[1024];
+char fragmentShader[1024];
+
 void Renderer::initializeGL()
 {
   initializeOpenGLFunctions();
@@ -102,31 +105,44 @@ void Renderer::initializeGL()
 #define PROGRAM_TEXCOORD_ATTRIBUTE 1
 
   QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
-  const char *vsrc =
-    "attribute highp vec4 vertex;\n"
-    "uniform mediump mat4 matrix;\n"
-    "void main(void)\n"
-    "{\n"
-    "    gl_Position = matrix * vertex;\n"
-    "}\n";
-  vshader->compileSourceCode(vsrc);
-
   QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
-  const char *fsrc =
-	  "#version 100\n"
-	  "void main()\n"
-	  "{\n"
-	  "    gl_FragColor = vec4(1,1,0,1);\n"
-	  "}\n";
-  bool compiled = fshader->compileSourceCode(fsrc);
-  const GLubyte * str = glGetString(GL_VERSION);
+
+  bool compiled;
+  {
+	  std::string str = GetFullPath("shaders\\vertexShader.ogl");
+	  QFile file(str.c_str());
+	  file.open(QIODevice::ReadOnly | QIODevice::Text);
+	  QByteArray content = file.readAll();
+
+	  const char * vsrc = content.constData();
+	  vertexShader[0] = '\0';
+	  strcat(vertexShader, vsrc);
+	  compiled = vshader->compileSourceCode(vertexShader);
+	  file.close();
+  }
+
+  DoAssert(compiled);
+  {
+	  std::string str = GetFullPath("shaders\\fragmentShader.ogl");
+	  QFile file(str.c_str());
+	  file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+	  QByteArray content = file.readAll();
+
+	  const char * fsrc = content.constData();
+	  fragmentShader[0] = '\0';
+	  strcat(fragmentShader, fsrc);
+	  compiled &= fshader->compileSourceCode(fragmentShader);
+	  const GLubyte * xstr = glGetString(GL_VERSION);
+	  file.close();
+  }
+  
   if (!compiled)
   {
 	  GLint maxLength = 0;
 	  QString ret = fshader->log();
 	  bool shaderDidNotCompile = false;
-	  DoAssert(shaderDidNotCompile);
-	  //emit reportSignal(MError,ret);
+	  emit reportSignal(MError,ret);
 	  return;
   }
 
@@ -143,6 +159,8 @@ void Renderer::initializeGL()
 
 void Renderer::paintGL()
 {
+	if (!program)
+		return;
 	emit reportSignal(MInfo, "Rendering frame");
 	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

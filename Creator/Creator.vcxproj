@@ -318,6 +318,8 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <Text Include="..\TodoList.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="bin\shaders\fragmentShader.ogl" />
+    <None Include="bin\shaders\vertexShader.ogl" />
     <None Include="research.tex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
