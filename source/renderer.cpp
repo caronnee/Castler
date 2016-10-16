@@ -44,115 +44,130 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
-
+#include "Filename.h"
 
 #define ZSTEP 0.3f
 const float AngleStep = 0.5;
 
 Renderer::Renderer(QWidget *parent)
   : QOpenGLWidget(parent),
-  clearColor(Qt::black),
+  _background(Qt::black),
   program(0)
 {
 	setFocusPolicy(Qt::ClickFocus);
+	_movementFlag = 0;
 	InitPosition();
 }
-void Renderer::Render()
+
+void Renderer::ChangeShaders()
 {
-	update();
+	CleanShaders();
+#define PROGRAM_VERTEX_ATTRIBUTE 0
+#define PROGRAM_TEXCOORD_ATTRIBUTE 1
+
+	QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
+	QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
+
+	bool compiled;
+	{
+		std::string str = GetFullPath("shaders\\vertexShader.ogl");
+		QFile file(str.c_str());
+		file.open(QIODevice::ReadOnly | QIODevice::Text);
+		QByteArray content = file.readAll();
+
+		const char * vertexShader = content.constData();
+		compiled = vshader->compileSourceCode(vertexShader);
+		file.close();
+	}
+
+	if (!compiled)
+	{
+		GLint maxLength = 0;
+		QString ret = "VertexShader +" + vshader->log();
+		bool shaderDidNotCompile = false;
+		emit reportSignal(MError, ret);
+		return;
+	}
+
+	{
+		std::string str = GetFullPath("shaders\\fragmentShader.ogl");
+		QFile file(str.c_str());
+		file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+		QByteArray content = file.readAll();
+
+		const char * fragmentShader = content.constData();
+		compiled &= fshader->compileSourceCode(fragmentShader);
+		const GLubyte * xstr = glGetString(GL_VERSION);
+		file.close();
+	}
+
+	if (!compiled)
+	{
+		GLint maxLength = 0;
+		QString ret = "Fragment shader:" + fshader->log();
+		bool shaderDidNotCompile = false;
+		emit reportSignal(MError, ret);
+		return;
+	}
+
+
+	makeCurrent();
+
+	program = new QOpenGLShaderProgram;
+	program->addShader(vshader);
+	program->addShader(fshader);
+	program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
+	program->link();
+
+	program->bind();
+
+	CreateModels();
 }
 
 void Renderer::InitPosition()
 {
+	xPos = yPos = 0;
 	zPos = -20;
 	elevation = 0;
 	azimuth = 0;
 }
 
+void Renderer::CleanShaders()
+{
+	if ( program )
+	{
+		makeCurrent();
+		vbo.destroy();
+		delete program;
+	}
+	program = 0;
+}
+
 Renderer::~Renderer()
 {
-  makeCurrent();
-  vbo.destroy();
-  //for (int i = 0; i < 6; ++i)
-  //  delete textures[i];
-  delete program;
-  doneCurrent();
+	CleanShaders();
+	doneCurrent();
 }
 
 void Renderer::setClearColor(const QColor &color)
 {
-  clearColor = color;
+  _background = color;
   update();
 }
-
-#include "Filename.h"
-
-char vertexShader[1024];
-char fragmentShader[1024];
 
 void Renderer::initializeGL()
 {
   initializeOpenGLFunctions();
 
-  _name = GetFullPath("models\\bunny.ply").c_str();
-  Init();
+  _name = GetFullPath("models\\cube.ply").c_str();
 
-//  _mesh.ConvertToBB();
   glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
 
-#define PROGRAM_VERTEX_ATTRIBUTE 0
-#define PROGRAM_TEXCOORD_ATTRIBUTE 1
+  ChangeShaders();
 
-  QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
-  QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
-
-  bool compiled;
-  {
-	  std::string str = GetFullPath("shaders\\vertexShader.ogl");
-	  QFile file(str.c_str());
-	  file.open(QIODevice::ReadOnly | QIODevice::Text);
-	  QByteArray content = file.readAll();
-
-	  const char * vsrc = content.constData();
-	  vertexShader[0] = '\0';
-	  strcat(vertexShader, vsrc);
-	  compiled = vshader->compileSourceCode(vertexShader);
-	  file.close();
-  }
-
-  DoAssert(compiled);
-  {
-	  std::string str = GetFullPath("shaders\\fragmentShader.ogl");
-	  QFile file(str.c_str());
-	  file.open(QIODevice::ReadOnly | QIODevice::Text);
-
-	  QByteArray content = file.readAll();
-
-	  const char * fsrc = content.constData();
-	  fragmentShader[0] = '\0';
-	  strcat(fragmentShader, fsrc);
-	  compiled &= fshader->compileSourceCode(fragmentShader);
-	  const GLubyte * xstr = glGetString(GL_VERSION);
-	  file.close();
-  }
-  
-  if (!compiled)
-  {
-	  GLint maxLength = 0;
-	  QString ret = fshader->log();
-	  bool shaderDidNotCompile = false;
-	  emit reportSignal(MError,ret);
-	  return;
-  }
-
-  program = new QOpenGLShaderProgram;
-  program->addShader(vshader);
-  program->addShader(fshader);
-  program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
-  program->link();
-
-  program->bind();
+  _movementTimer.start(10, this);
 }
 
 #include <qmath.h>
@@ -160,9 +175,14 @@ void Renderer::initializeGL()
 void Renderer::paintGL()
 {
 	if (!program)
+	{
+		glClearColor(0.5, 0.25, 0, _background.alphaF());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		return;
+	}
+
 	emit reportSignal(MInfo, "Rendering frame");
-	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
+	glClearColor(_background.redF(), _background.greenF(), _background.blueF(), _background.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	QMatrix4x4 m;
@@ -186,47 +206,79 @@ void Renderer::paintGL()
 
 void Renderer::keyPressEvent(QKeyEvent * e)
 {
+	SwitchKeys(e);
+	e->accept();
+}
+
+void Renderer::SwitchKeys(QKeyEvent *e)
+{
 	switch (e->key())
 	{
 	case Qt::Key_W:
 	{
-		elevation += AngleStep;
+		_movementFlag ^= MovementRotatePlusElevation;
 		break;
 	}
 	case Qt::Key_S:
 	{
-		elevation -= AngleStep;
+		_movementFlag ^= MovementRotateMinusElevation;
 		break;
 	}
 	case Qt::Key_A:
 	{
-		azimuth -= AngleStep;
+		_movementFlag ^= MovementRotateMinusAzimuth;
 		break;
 	}
 	case Qt::Key_D:
 	{
-		azimuth += AngleStep;
+		_movementFlag ^= MovementRotatePlusAzimuth;
 		break;
 	}
 	case Qt::Key_Space:
 	{
 		InitPosition();
+		update();
 		// initial position
 		break;
 	}
 	case Qt::Key_Down:
 	{
-		zPos-=ZSTEP;
+		_movementFlag ^= MovementMinusDepth;
 		break;
 	}
 	case Qt::Key_Up:
 	{
-		zPos += ZSTEP;
+		_movementFlag ^= MovementPlusDepth;
 		break;
 	}
-	default:
-		return; // no need updating
 	}
+}
+
+void Renderer::keyReleaseEvent(QKeyEvent *e)
+{
+	SwitchKeys(e);
+	e->accept();
+}
+void Renderer::timerEvent(QTimerEvent *e)
+{
+	if ((e->timerId() != _movementTimer.timerId()) || _movementFlag == 0 )
+	{
+		// no need to render
+		return;
+	}
+	emit reportSignal(MInfo, "Checking setting");
+	if (_movementFlag & MovementRotatePlusAzimuth)
+		azimuth += AngleStep;
+	if (_movementFlag & MovementRotateMinusAzimuth)
+		azimuth -= AngleStep;
+	if (_movementFlag & MovementRotatePlusElevation)
+		elevation += AngleStep;
+	if (_movementFlag & MovementRotateMinusElevation)
+		elevation -= AngleStep;
+	if (_movementFlag & MovementMinusDepth)
+		zPos -= ZSTEP;
+	if (_movementFlag & MovementPlusDepth)
+		zPos += ZSTEP;
 	update();
 }
 
@@ -253,8 +305,10 @@ void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)
   emit clicked();
 }
 
-void Renderer::makeObject()
+void Renderer::CreateModels()
 {
+	_mesh.Clear();
+	_mesh.load(_name.toStdString());
 	if (_mesh.getNumVertices() == 0)
 	{
 		DoAssert(false);
@@ -281,25 +335,16 @@ void Renderer::makeObject()
 	  }
   }
 
-  vbo.create();
-  vbo.bind();
+  bool test2 = vbo.create();
+  DoAssert(test2);
+  bool test = vbo.bind();
+  DoAssert(test);
   vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
-}
-
-void Renderer::Clear()
-{
-	vbo.destroy();
-}
-
-void Renderer::Init()
-{
-	Clear();
-	_mesh.load(_name.toStdString());
-	makeObject();
+  update();
 }
 
 void Renderer::Load(QString & str)
 {
 	_name = str;
-	Init();
+	CreateModels();
 }

@@ -1,9 +1,14 @@
-
 attribute highp vec4 vertex;
-
+attribute highp vec4 normal;
 uniform mediump mat4 matrix;
-    
+uniform mediump vec4 material; 
+uniform highp vec4 lightPos;
+uniform highp vec4 cameraPos;
+
+	
 void main(void)
 {
+    vec4 lightToVertex = vertex - lightPos;
+	vec4 vertexToCamera = cameraPos - vertex;
     gl_Position = matrix * vertex;
 }

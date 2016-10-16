@@ -37,6 +37,7 @@ Creator::Creator(QWidget *parent)
 	// rendered connects
 	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
 	connect(ui.renderer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
+	connect(ui.reloadShadersButton, SIGNAL(clicked()), ui.renderer, SLOT(ChangeShaders()));
 
 	// videorender connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));

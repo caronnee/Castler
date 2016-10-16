@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QString>
-#include<QObject>
+#include <QObject>
 #include "opencv2/highgui/highgui.hpp"
 #include <QBasicTimer>
 #include <opencv2\core\core.hpp>

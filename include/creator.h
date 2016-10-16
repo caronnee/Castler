@@ -1,7 +1,7 @@
 #ifndef CREATOR_H
 #define CREATOR_H
 
-#include <QtWidgets/QWidget>
+#include "QtWidgets/QWidget.h"
 #include "ui_creator.h"
 #include "opencv2/highgui/highgui.hpp"
 #include <QShortcut>
@@ -33,7 +33,6 @@ signals:
 	void PreparePairSignal(int,int);
 
 private slots:
-
 	void SetModifier();
 	void GetNextImagePair();
 	void SetCompare(cv::Mat left, cv::Mat right);
