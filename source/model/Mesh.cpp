@@ -64,7 +64,6 @@ Mesh::~Mesh()
 /** Load a CSV with *.ply format **/
 void Mesh::load(const std::string path)
 {
-
   // Create the reader
   CsvReader csvReader(path);
 
@@ -79,6 +78,33 @@ void Mesh::load(const std::string path)
   num_vertexs_ = (int)list_vertex_.size();
   num_triangles_ = (int)list_triangles_.size();
 
+  for (int i = 0; i < list_triangles_.size(); i++)
+  {
+	  PolyIndices &poly = list_triangles_[i];
+	  _indices.push_back(poly[0]);
+	  _indices.push_back(poly[1]);
+	  _indices.push_back(poly[2]);
+  }
+}
+
+int Mesh::NIndices()const
+{
+	return _indices.size();
+}
+
+int Mesh::NVertices() const
+{
+	return list_vertex_.size();
+}
+
+const cv::Point3f * Mesh::Vertices()
+{
+	return list_vertex_.data();
+}
+
+const int * Mesh::Indices() const
+{
+	return _indices.data();
 }
 
 void Mesh::AddTriangle(int a, int b, int c)
@@ -88,6 +114,11 @@ void Mesh::AddTriangle(int a, int b, int c)
 	poly.push_back(b);
 	poly.push_back(c);
 	list_triangles_.push_back(poly);
+
+	// lets hope this works
+	_indices.push_back(a);
+	_indices.push_back(b);
+	_indices.push_back(c);
 }
 
 void Mesh::ConvertToBB()
@@ -154,6 +185,7 @@ void Mesh::Clear()
 {
 	list_vertex_.clear();
 	list_triangles_.clear();
+	list_normals_.clear();
 	num_triangles_ = 0;
 	num_vertexs_ = 0;
 }

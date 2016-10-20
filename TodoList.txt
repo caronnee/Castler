@@ -1,5 +1,6 @@
 - load shader from some file
 - implement normals
+- implementant flood vertices for showing - better performance
 - manually pick up point that might be similar. automated help
 - offect canny to set correspondece. POssible other detections
 - detect degradation from camera movement

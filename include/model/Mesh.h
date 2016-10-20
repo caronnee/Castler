@@ -3,6 +3,7 @@
  *
  *  Created on: Apr 9, 2014
  *      Author: edgar
+ * Modified by caronnee
  */
 
 #ifndef MESH_H_
@@ -69,6 +70,16 @@ public:
   int getNumVertices() const { return num_vertexs_; }
 
   void load(const std::string path_file);
+  int NIndices()
+  {
+	  return _indices.size();
+  }
+
+  int NIndices()const;
+  int NVertices()const;
+  const cv::Point3f * Vertices();
+
+  const int * Indices() const;
 
   void AddTriangle(int a, int b, int c);
 
@@ -82,14 +93,25 @@ public:
 private:
   /** The identification number of the mesh */
   int id_;
+
   /** The current number of vertices in the mesh */
   int num_vertexs_;
+
   /** The current number of triangles in the mesh */
   int num_triangles_;
+
   /* The list of triangles of the mesh */
   std::vector<cv::Point3f> list_vertex_;
+
   /* The list of triangles of the mesh */
   std::vector<std::vector<int> > list_triangles_;
+
+  /* The list of normals */
+  std::vector<cv::Point3f> list_normals_;
+
+  /* The list of normals */
+  std::vector<int> _indices;
+
 };
 
 #endif /* OBJECTMESH_H_ */

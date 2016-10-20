@@ -48,7 +48,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
-  void CreateModels();
+  void CreateModels(QVector<GLfloat>& vertData);
 
   // TODO this might be array later
   QPoint lightPosition;
@@ -77,7 +77,10 @@ private:
   QOpenGLShaderProgram *program;
   
   // buffer holding 
-  QOpenGLBuffer vbo;
+  QOpenGLBuffer _vertexBuffer;
+  
+  // normal holding 
+  QOpenGLBuffer _indexBuffer;
 
   // modes for animation of selected object
   enum RenderMovements

@@ -32,7 +32,7 @@ Creator::Creator(QWidget *parent)
 	connect(_shortcuts[2], SIGNAL(activated()), this, SLOT(AddNewPoint()));
 
 	// worker connects
-	connect(this, SIGNAL(modeChanged(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
+	connect(this, SIGNAL(modeChangedSignal(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
 
 	// rendered connects
 	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
@@ -99,12 +99,12 @@ void Creator::GetNextImagePair()
 
 void Creator::FeaturesFromFrame()
 {
-	emit modeChanged(ModeFeatures);
+	emit modeChangedSignal(ModeFeatures);
 }
 
 void Creator::ShowGreyFrame()
 {
-	emit modeChanged(ModeGrey);
+	emit modeChangedSignal(ModeGrey);
 }
 
 void Creator::Stop()
@@ -191,13 +191,13 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 void Creator::ShowUndistorted()
 {
 	SendParameters();
-	emit modeChanged(ModeUndistort);
+	emit modeChangedSignal(ModeUndistort);
 }
 
 
 void Creator::RunCalibration()
 {
-	emit modeChanged(ModeCalibrate);
+	emit modeChangedSignal(ModeCalibrate);
 }
 
 void Creator::LoadCalibrationImages()
@@ -291,7 +291,7 @@ void Creator::EnablePlay()
 
 void Creator::PlayVideo()
 {
-	emit modeChanged(ModeDetect);
+	emit modeChangedSignal(ModeDetect);
 }
 
 const char * CSettingFileName = "/settings.castler";

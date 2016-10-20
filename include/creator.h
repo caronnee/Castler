@@ -11,7 +11,7 @@ class Creator : public QWidget, public IReportFunction
 {
 	Q_OBJECT
 
-	
+
 	// application shorcuts
 	std::vector<QShortcut *> _shortcuts;
 
@@ -29,7 +29,7 @@ public:
 	~Creator();
 
 signals:
-	void modeChanged(int);
+	void modeChangedSignal(int);
 	void PreparePairSignal(int,int);
 
 private slots:
