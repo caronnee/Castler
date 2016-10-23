@@ -7,6 +7,8 @@
 #include <QOpenGLBuffer>
 #include <QBasicTimer>
 #include "model/Mesh.h"
+#include <QVector3D>
+#include <qmath.h>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
@@ -48,10 +50,10 @@ protected:
   void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
-  void CreateModels(QVector<GLfloat>& vertData);
+  void CreateModels(QVector<GLfloat>& vertData, QVector<GLfloat> & normlas);
 
   // TODO this might be array later
-  QPoint lightPosition;
+  QVector3D _lightPosition;
 
   // timer to change/animate according to movement flag
   QBasicTimer _movementTimer;
@@ -76,11 +78,12 @@ private:
   //QOpenGLTexture *textures[6];
   QOpenGLShaderProgram *program;
   
-  // buffer holding 
+  // buffers
   QOpenGLBuffer _vertexBuffer;
-  
-  // normal holding 
-  QOpenGLBuffer _indexBuffer;
+  QOpenGLBuffer _normalBuffer;
+
+  //locations
+  GLuint _vertexLocation, _normalLocation;
 
   // modes for animation of selected object
   enum RenderMovements

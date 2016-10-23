@@ -60,6 +60,7 @@ private:
 
 class Mesh
 {
+	float materialDiffuse[3];
 public:
 
   Mesh();
@@ -68,21 +69,13 @@ public:
   std::vector<std::vector<int> > getTrianglesList() const { return list_triangles_; }
   cv::Point3f getVertex(int pos) const { return list_vertex_[pos]; }
   int getNumVertices() const { return num_vertexs_; }
-
+  const float * Diffuse()const;
   void load(const std::string path_file);
-  int NIndices()
-  {
-	  return _indices.size();
-  }
-
   int NIndices()const;
   int NVertices()const;
   const cv::Point3f * Vertices();
-
   const int * Indices() const;
-
   void AddTriangle(int a, int b, int c);
-
   void ConvertToBB();
  
   // adds vertex to a mesh
@@ -112,6 +105,8 @@ private:
   /* The list of normals */
   std::vector<int> _indices;
 
+public:
+	cv::Point3f GetNormal(int i) const;
 };
 
 #endif /* OBJECTMESH_H_ */

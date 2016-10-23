@@ -52,7 +52,6 @@ const float AngleStep = 0.5;
 Renderer::Renderer(QWidget *parent)
   : QOpenGLWidget(parent),
   _background(Qt::black),
-	_indexBuffer(QOpenGLBuffer::IndexBuffer),
   program(0)
 {
 	setFocusPolicy(Qt::ClickFocus);
@@ -63,10 +62,6 @@ Renderer::Renderer(QWidget *parent)
 void Renderer::ChangeShaders()
 {
 	CleanShaders();
-#define PROGRAM_VERTEX_ATTRIBUTE 0
-#define PROGRAM_TEXCOORD_ATTRIBUTE 1
-#define PROGRAM_INDEX_LOCATION 2
-#define PROGRAM_NORMAL_BUFFER 3
 
 	QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
 	QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
@@ -122,22 +117,24 @@ void Renderer::ChangeShaders()
 	program->addShader(fshader);
 
 	QVector<GLfloat> vertData;
-	CreateModels(vertData);
-
-	program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
+	QVector<GLfloat> normalData;
+	CreateModels(vertData, normalData);
 
 	bool vbocreated = _vertexBuffer.create();
 	DoAssert(vbocreated);
 	bool vbobound = _vertexBuffer.bind();
 	DoAssert(vbobound);
-	//_vertexBuffer.allocate(_mesh.Vertices(), _mesh.NVertices() * sizeof(GLfloat));
 	_vertexBuffer.allocate(vertData.data(), vertData.count());
-	_indexBuffer.create();
-	_indexBuffer.allocate(_mesh.Indices(),_mesh.NIndices() * sizeof(GLfloat));
 
+	_normalBuffer.create();
+	_normalBuffer.bind();
+	_normalBuffer.allocate(normalData.data(), normalData.count());
 	program->link();
 
 	program->bind();
+
+	_vertexLocation = _vertexBuffer.bufferId();
+	_normalLocation = _normalBuffer.bufferId();
 
 }
 
@@ -147,6 +144,8 @@ void Renderer::InitPosition()
 	zPos = -20;
 	elevation = 0;
 	azimuth = 0;
+	// fixed so far
+	_lightPosition = QVector3D(0, 0, 0);
 }
 
 void Renderer::CleanShaders()
@@ -186,8 +185,6 @@ void Renderer::initializeGL()
   _movementTimer.start(10, this);
 }
 
-#include <qmath.h>
-
 void Renderer::paintGL()
 {
 	if (!program)
@@ -201,6 +198,7 @@ void Renderer::paintGL()
 	glClearColor(_background.redF(), _background.greenF(), _background.blueF(), _background.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// for each object that was split or loaded separately
 	QMatrix4x4 m;
 	m.perspective(3.14f/2, 1, 0.5f, 10000.0f);
 	m.translate(0.0f, 0.0f, zPos);
@@ -210,9 +208,37 @@ void Renderer::paintGL()
 	QVector3D axis = QVector3D::crossProduct(vec,vec2);
 	m.rotate(elevation, axis);
 
-	program->setUniformValue("matrix", m);
-	program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-	program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+	///////////////////////////////////////
+	/////////// setting uniforma values
+	///////////////////////////////////////
+
+	program->setUniformValue("modelToCamera", m);
+	program->setUniformValue("viewMatrix", m);
+
+	const float * df = _mesh.Diffuse();
+	program->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
+	// set light
+	program->setUniformValue("LightPosition_worldspace", _lightPosition );
+
+	// not use right now, prepared for future use
+	QMatrix4x4 id;
+	id.setToIdentity();
+	program->setUniformValue("modelMatrix", id);
+
+	///////////////////////////////////////
+	/////////// setting arrays
+	///////////////////////////////////////
+
+	// take vertex array from opengl context
+	program->enableAttributeArray(_vertexLocation);
+	program->setAttributeBuffer(_vertexLocation, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+
+	program->enableAttributeArray(_normalLocation);
+	program->setAttributeBuffer(_normalLocation, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+
+	///////////////////////////////////////
+	/////////// Actual drawing
+	///////////////////////////////////////
 	int total = _mesh.getTrianglesList().size();
 	for (int i = 0; i < total; ++i) {
 		//textures[i]->bind();
@@ -321,7 +347,7 @@ void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)
   emit clicked();
 }
 
-void Renderer::CreateModels(QVector<GLfloat> & vertData)
+void Renderer::CreateModels(QVector<GLfloat> & vertData, QVector<GLfloat> & normals)
 {
 	_mesh.Clear();
 	_mesh.load(_name.toStdString());
@@ -330,31 +356,30 @@ void Renderer::CreateModels(QVector<GLfloat> & vertData)
 		DoAssert(false);
 		return;
 	}
-  //for (int j = 0; j < 6; ++j)
-  //  textures[j] = new QOpenGLTexture(QImage(QString(":/images/side%1.png").arg(j + 1)).mirrored());
 
-  
+	auto triangles = _mesh.getTrianglesList();
+	for (int i = 0; i < triangles.size(); ++i) {
+		// vertex position
+		DoAssert(triangles[i].size() == 3);
 
-  auto triangles = _mesh.getTrianglesList();
-  cv::Point3f mn = _mesh.getVertex(0), mx = _mesh.getVertex(0);
-  for (int i = 0; i < triangles.size(); ++i) {
-	  // vertex position
-	  DoAssert(triangles[i].size() == 3);
-
-	  for (int j = 0; j < triangles[i].size(); j++)
-	  {
-		  cv::Point3f point = _mesh.getVertex(triangles[i][j]);
-		  vertData.append(point.x);
-		  vertData.append(point.y);
-		  vertData.append(point.z);
-		  // no textures yet
-	  }
-  }
+		for (int j = 0; j < triangles[i].size(); j++)
+		{
+			cv::Point3f point = _mesh.getVertex(triangles[i][j]);
+			cv::Point3f normal = _mesh.GetNormal(i);
+			normals.push_back(normal.x);
+			normals.push_back(normal.y);
+			normals.push_back(normal.z);
+			vertData.append(point.x);
+			vertData.append(point.y);
+			vertData.append(point.z);
+			// no textures yet
+		}
+	}
 }
 
 void Renderer::Load(QString & str)
 {
 	_name = str;
-	bool notimplemented = false;
-	DoAssert(notimplemented);
+	// TODO change to something that does not need to update shaders
+	ChangeShaders();
 }

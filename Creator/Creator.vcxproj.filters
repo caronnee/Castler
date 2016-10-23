@@ -66,6 +66,12 @@
     <Filter Include="Filename\External">
       <UniqueIdentifier>{b1db6d3a-f727-4eb2-aca6-0a840138e9d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Painters">
+      <UniqueIdentifier>{0f9c38a7-545c-4347-9788-99a9e267ef7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Gyro">
+      <UniqueIdentifier>{f1c9916e-d1f9-404e-ad73-dfc65b141738}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -99,9 +105,6 @@
       <Filter>Source Files\Source</Filter>
     </ClCompile>
     <ClCompile Include="../source/inputlist.cpp">
-      <Filter>Source Files\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="../source/renderer.cpp">
       <Filter>Source Files\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\source\videorenderer.cpp">
@@ -173,6 +176,18 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ExtractionWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="../source/renderer.cpp">
+      <Filter>Source Files\Painters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\rendercircle.cpp">
+      <Filter>Source Files\Painters</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_rendercircle.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_rendercircle.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -206,6 +221,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\include\ExtractionWorker.hpp">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\source\rendercircle.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -276,9 +294,6 @@
     <ClInclude Include="..\include\ReportFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\tangentspace.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -313,6 +328,12 @@
     </None>
     <None Include="bin\shaders\fragmentShader.ogl">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="bin\shaders\gyro\circleFragments.ogl">
+      <Filter>Shaders\Gyro</Filter>
+    </None>
+    <None Include="bin\shaders\gyro\circleVertex.ogl">
+      <Filter>Shaders\Gyro</Filter>
     </None>
   </ItemGroup>
 </Project>

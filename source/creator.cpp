@@ -13,6 +13,7 @@ Creator::Creator(QWidget *parent)
 	qRegisterMetaType<MessageLevel>("MessageLevel");
 	qRegisterMetaType<cv::Mat>("cv::Mat");
 	qRegisterMetaType<CalibrationSet>("CalibrationSet");
+	qRegisterMetaType<QMatrix4x4>("QMatrix4x4");
 
     ui.setupUi(this);
 
@@ -375,7 +376,10 @@ void Creator::SaveSettings()
 	QSettings settings(settingspath, QSettings::IniFormat);
 
 	settings.setValue("screen", ui.creatorTabs->currentIndex());
-	settings.setValue("calibrationInput", ui.calibrationLabel->text());
+	if (ui.calibrationLabel->text().isEmpty() == false)
+	{
+		settings.setValue("calibrationInput", ui.calibrationLabel->text());
+	}
 	settings.setValue("lastDir", InputList::_lastDirectory);
 	settings.setValue("lastOpened", "last");
 	settings.setValue("model", ui.modelName->text());
