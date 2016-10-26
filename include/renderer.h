@@ -50,7 +50,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
-  void CreateModels(QVector<GLfloat>& vertData, QVector<GLfloat> & normlas);
+  void CreateModels(QVector<GLfloat>& vertData);
 
   // TODO this might be array later
   QVector3D _lightPosition;
@@ -70,20 +70,13 @@ private:
   // last mouse position
   QPoint lastPos;
 
-  float zPos,xPos,yPos;
-
-  // rotation of the centered model
-  float elevation, azimuth;
+  float zPos,xPos,yPos,elevation, azimuth;
   
   //QOpenGLTexture *textures[6];
   QOpenGLShaderProgram *program;
   
   // buffers
   QOpenGLBuffer _vertexBuffer;
-  QOpenGLBuffer _normalBuffer;
-
-  //locations
-  GLuint _vertexLocation, _normalLocation;
 
   // modes for animation of selected object
   enum RenderMovements

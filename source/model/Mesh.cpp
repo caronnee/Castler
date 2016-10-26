@@ -52,9 +52,11 @@ Mesh::Mesh() : list_vertex_(0) , list_triangles_(0)
   id_ = 0;
   num_vertexs_ = 0;
   num_triangles_ = 0;
+  zPos = xPos = yPos = elevation = azimuth;
+
   materialDiffuse[0] = 0.33;
-  materialDiffuse[0] = 0.83;
-  materialDiffuse[0] = 0.01;
+  materialDiffuse[1] = 0.83;
+  materialDiffuse[2] = 0.01;
 }
 
 /** The default destructor of the ObjectMesh Class */
@@ -203,9 +205,9 @@ cv::Point3f Mesh::GetNormal(int i) const
 	cv::Point3f& first = getVertex(list_triangles_[i][0]);
 	cv::Point3f& second = getVertex(list_triangles_[i][1]);
 	cv::Point3f& third = getVertex(list_triangles_[i][2]);
-	cv::Point3f dir1;// = second - first;
+	cv::Point3f dir1 = second - first;
 	cv::Point3f dir2 = third - first;
 
-	cv::Point3f ret = dir1.cross(dir2);
+	cv::Point3f ret = dir2.cross(dir1);
 	return ret;
 }

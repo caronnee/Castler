@@ -9,6 +9,7 @@ RenderCircle::RenderCircle(QWidget * parent) : QOpenGLWidget(parent) {
 	_rotating = false;
 	_rotation.setToIdentity();
 	_background = QColor(0, 0, 0);
+	_gyroProgram = NULL;
 }
 
 RenderCircle::~RenderCircle() {

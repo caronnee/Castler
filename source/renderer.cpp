@@ -46,12 +46,12 @@
 #include <QMouseEvent>
 #include "Filename.h"
 
-#define ZSTEP 0.3f
-const float AngleStep = 0.5;
+#define ZSTEP 0.03f
+const float AngleStep = 0.05;
 
 Renderer::Renderer(QWidget *parent)
   : QOpenGLWidget(parent),
-  _background(Qt::black),
+  _background(Qt::white),
   program(0)
 {
 	setFocusPolicy(Qt::ClickFocus);
@@ -116,9 +116,12 @@ void Renderer::ChangeShaders()
 	program->addShader(vshader);
 	program->addShader(fshader);
 
+	program->bindAttributeLocation("vertexPosition_modelspace", 0);
+	program->bindAttributeLocation("vertexNormal_modelspace", 1);
+
+	// vertdata + normals
 	QVector<GLfloat> vertData;
-	QVector<GLfloat> normalData;
-	CreateModels(vertData, normalData);
+	CreateModels(vertData);
 
 	bool vbocreated = _vertexBuffer.create();
 	DoAssert(vbocreated);
@@ -126,26 +129,29 @@ void Renderer::ChangeShaders()
 	DoAssert(vbobound);
 	_vertexBuffer.allocate(vertData.data(), vertData.count());
 
-	_normalBuffer.create();
-	_normalBuffer.bind();
-	_normalBuffer.allocate(normalData.data(), normalData.count());
-	program->link();
+	bool linked = program->link();
 
+	if (!linked)
+	{
+		QString eeror = program->log();
+		emit reportSignal(MError, eeror);
+		delete program;
+		program = NULL;
+		return;
+	}
 	program->bind();
-
-	_vertexLocation = _vertexBuffer.bufferId();
-	_normalLocation = _normalBuffer.bufferId();
-
+	update();
 }
 
 void Renderer::InitPosition()
 {
+	_movementFlag = 0;
 	xPos = yPos = 0;
-	zPos = -20;
+	zPos = -10;
 	elevation = 0;
 	azimuth = 0;
 	// fixed so far
-	_lightPosition = QVector3D(0, 0, 0);
+	_lightPosition = QVector3D(0, 0, -15);
 }
 
 void Renderer::CleanShaders()
@@ -178,7 +184,7 @@ void Renderer::initializeGL()
   _name = GetFullPath("models\\cube.ply").c_str();
 
   glEnable(GL_DEPTH_TEST);
-//  glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
 
   ChangeShaders();
 
@@ -199,42 +205,48 @@ void Renderer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// for each object that was split or loaded separately
-	QMatrix4x4 m;
-	m.perspective(3.14f/2, 1, 0.5f, 10000.0f);
-	m.translate(0.0f, 0.0f, zPos);
-	m.rotate(azimuth, 0, 0, 1);
+	QMatrix4x4 cameraMatrix;
+	cameraMatrix.setToIdentity();
+	QVector3D position(xPos, yPos, zPos);
+	cameraMatrix.rotate(azimuth, 0, 0, 1);
 	QVector3D vec(0, 0, 1);
 	QVector3D vec2(cos(qDegreesToRadians(azimuth)), sin(qDegreesToRadians(azimuth)), 0);
-	QVector3D axis = QVector3D::crossProduct(vec,vec2);
-	m.rotate(elevation, axis);
+	QVector3D axis = QVector3D::crossProduct(vec, vec2);
+	cameraMatrix.rotate(elevation, axis);
+	cameraMatrix.translate(position);
+	qTan(3.14 / 2);
+	QMatrix4x4 m;
+	m.setToIdentity();
+	float ratio = size().width() / (float)size().height();
+	m.perspective(90, ratio, .5f, 10000.0f);
+	m *= cameraMatrix;	
+
+	QMatrix4x4 modelMatrix;
+	modelMatrix.setToIdentity();
 
 	///////////////////////////////////////
-	/////////// setting uniforma values
+	/////////// setting uniform values
 	///////////////////////////////////////
 
 	program->setUniformValue("modelToCamera", m);
-	program->setUniformValue("viewMatrix", m);
-
+	program->setUniformValue("viewMatrix", cameraMatrix);
+	program->setUniformValue("modelMatrix", modelMatrix);
+	program->setUniformValue("cameraPosition", position);
 	const float * df = _mesh.Diffuse();
 	program->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
 	// set light
 	program->setUniformValue("LightPosition_worldspace", _lightPosition );
-
-	// not use right now, prepared for future use
-	QMatrix4x4 id;
-	id.setToIdentity();
-	program->setUniformValue("modelMatrix", id);
-
+	
 	///////////////////////////////////////
 	/////////// setting arrays
 	///////////////////////////////////////
 
 	// take vertex array from opengl context
-	program->enableAttributeArray(_vertexLocation);
-	program->setAttributeBuffer(_vertexLocation, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+	program->enableAttributeArray(0);
+	program->enableAttributeArray(1);
 
-	program->enableAttributeArray(_normalLocation);
-	program->setAttributeBuffer(_normalLocation, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+	program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	program->setAttributeBuffer(1, GL_FLOAT, 3*sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
 
 	///////////////////////////////////////
 	/////////// Actual drawing
@@ -279,6 +291,7 @@ void Renderer::SwitchKeys(QKeyEvent *e)
 	case Qt::Key_Space:
 	{
 		InitPosition();
+		
 		update();
 		// initial position
 		break;
@@ -347,7 +360,7 @@ void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)
   emit clicked();
 }
 
-void Renderer::CreateModels(QVector<GLfloat> & vertData, QVector<GLfloat> & normals)
+void Renderer::CreateModels(QVector<GLfloat> & vertData)
 {
 	_mesh.Clear();
 	_mesh.load(_name.toStdString());
@@ -366,12 +379,12 @@ void Renderer::CreateModels(QVector<GLfloat> & vertData, QVector<GLfloat> & norm
 		{
 			cv::Point3f point = _mesh.getVertex(triangles[i][j]);
 			cv::Point3f normal = _mesh.GetNormal(i);
-			normals.push_back(normal.x);
-			normals.push_back(normal.y);
-			normals.push_back(normal.z);
 			vertData.append(point.x);
 			vertData.append(point.y);
 			vertData.append(point.z);
+			vertData.push_back(normal.x);
+			vertData.push_back(normal.y);
+			vertData.push_back(normal.z);
 			// no textures yet
 		}
 	}

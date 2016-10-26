@@ -63,9 +63,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{2fbf9788-5cc7-41de-bfc2-340d2bc619ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Filename\External">
-      <UniqueIdentifier>{b1db6d3a-f727-4eb2-aca6-0a840138e9d2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Painters">
       <UniqueIdentifier>{0f9c38a7-545c-4347-9788-99a9e267ef7b}</UniqueIdentifier>
     </Filter>

@@ -40,6 +40,10 @@ Creator::Creator(QWidget *parent)
 	connect(ui.renderer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
 	connect(ui.reloadShadersButton, SIGNAL(clicked()), ui.renderer, SLOT(ChangeShaders()));
 
+	// connect file
+	connect(ui.lightRotateWindow, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
+
+
 	// videorender connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));

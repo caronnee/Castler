@@ -13,25 +13,25 @@
 #include <opencv2/core/core.hpp>
 
 
-// --------------------------------------------------- //
-//                 TRIANGLE CLASS                      //
-// --------------------------------------------------- //
+ // --------------------------------------------------- //
+ //                 TRIANGLE CLASS                      //
+ // --------------------------------------------------- //
 
 class Triangle {
 public:
 
-  explicit Triangle(int id, cv::Point3f V0, cv::Point3f V1, cv::Point3f V2);
-  virtual ~Triangle();
+	explicit Triangle(int id, cv::Point3f V0, cv::Point3f V1, cv::Point3f V2);
+	virtual ~Triangle();
 
-  cv::Point3f getV0() const { return v0_; }
-  cv::Point3f getV1() const { return v1_; }
-  cv::Point3f getV2() const { return v2_; }
+	cv::Point3f getV0() const { return v0_; }
+	cv::Point3f getV1() const { return v1_; }
+	cv::Point3f getV2() const { return v2_; }
 
 private:
-  /** The identifier number of the triangle */
-  int id_;
-  /** The three vertices that defines the triangle */
-  cv::Point3f v0_, v1_, v2_;
+	/** The identifier number of the triangle */
+	int id_;
+	/** The three vertices that defines the triangle */
+	cv::Point3f v0_, v1_, v2_;
 };
 
 
@@ -42,15 +42,15 @@ private:
 class Ray {
 public:
 
-  explicit Ray(cv::Point3f P0, cv::Point3f P1);
-  virtual ~Ray();
+	explicit Ray(cv::Point3f P0, cv::Point3f P1);
+	virtual ~Ray();
 
-  cv::Point3f getP0() { return p0_; }
-  cv::Point3f getP1() { return p1_; }
+	cv::Point3f getP0() { return p0_; }
+	cv::Point3f getP1() { return p1_; }
 
 private:
-  /** The two points that defines the ray */
-  cv::Point3f p0_, p1_;
+	/** The two points that defines the ray */
+	cv::Point3f p0_, p1_;
 };
 
 
@@ -63,47 +63,48 @@ class Mesh
 	float materialDiffuse[3];
 public:
 
-  Mesh();
-  virtual ~Mesh();
+	float zPos, xPos, yPos, elevation, azimuth;
+	Mesh();
+	virtual ~Mesh();
 
-  std::vector<std::vector<int> > getTrianglesList() const { return list_triangles_; }
-  cv::Point3f getVertex(int pos) const { return list_vertex_[pos]; }
-  int getNumVertices() const { return num_vertexs_; }
-  const float * Diffuse()const;
-  void load(const std::string path_file);
-  int NIndices()const;
-  int NVertices()const;
-  const cv::Point3f * Vertices();
-  const int * Indices() const;
-  void AddTriangle(int a, int b, int c);
-  void ConvertToBB();
- 
-  // adds vertex to a mesh
-  void AddVertex(float x, float y, float z);
- 
-  // empty
-  void Clear();
+	std::vector<std::vector<int> > getTrianglesList() const { return list_triangles_; }
+	cv::Point3f getVertex(int pos) const { return list_vertex_[pos]; }
+	int getNumVertices() const { return num_vertexs_; }
+	const float * Diffuse()const;
+	void load(const std::string path_file);
+	int NIndices()const;
+	int NVertices()const;
+	const cv::Point3f * Vertices();
+	const int * Indices() const;
+	void AddTriangle(int a, int b, int c);
+	void ConvertToBB();
+
+	// adds vertex to a mesh
+	void AddVertex(float x, float y, float z);
+
+	// empty
+	void Clear();
 private:
-  /** The identification number of the mesh */
-  int id_;
+	/** The identification number of the mesh */
+	int id_;
 
-  /** The current number of vertices in the mesh */
-  int num_vertexs_;
+	/** The current number of vertices in the mesh */
+	int num_vertexs_;
 
-  /** The current number of triangles in the mesh */
-  int num_triangles_;
+	/** The current number of triangles in the mesh */
+	int num_triangles_;
 
-  /* The list of triangles of the mesh */
-  std::vector<cv::Point3f> list_vertex_;
+	/* The list of triangles of the mesh */
+	std::vector<cv::Point3f> list_vertex_;
 
-  /* The list of triangles of the mesh */
-  std::vector<std::vector<int> > list_triangles_;
+	/* The list of triangles of the mesh */
+	std::vector<std::vector<int> > list_triangles_;
 
-  /* The list of normals */
-  std::vector<cv::Point3f> list_normals_;
+	/* The list of normals */
+	std::vector<cv::Point3f> list_normals_;
 
-  /* The list of normals */
-  std::vector<int> _indices;
+	/* The list of normals */
+	std::vector<int> _indices;
 
 public:
 	cv::Point3f GetNormal(int i) const;
