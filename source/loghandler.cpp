@@ -31,6 +31,7 @@ void LogHandler::Report(MessageLevel level, const QString & str)
 	insertPlainText("\n");
 	QScrollBar *sb = verticalScrollBar();
 	sb->setValue(sb->maximum());
+	update();
 }
 #include <QMenu>
 

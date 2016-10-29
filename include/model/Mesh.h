@@ -53,25 +53,27 @@ private:
 	cv::Point3f p0_, p1_;
 };
 
-
+struct PositionDesc
+{
+	float _zPos, _xPos, _yPos, _elevation, _azimuth;
+};
 // --------------------------------------------------- //
 //                OBJECT MESH CLASS                    //
 // --------------------------------------------------- //
 
 class Mesh
 {
+	PositionDesc _desc;
 	float materialDiffuse[3];
 public:
 
-	float zPos, xPos, yPos, elevation, azimuth;
 	Mesh();
 	virtual ~Mesh();
 
-	std::vector<std::vector<int> > getTrianglesList() const { return list_triangles_; }
-	cv::Point3f getVertex(int pos) const { return list_vertex_[pos]; }
+	const cv::Point3f& getVertex(int pos) const;
 	int getNumVertices() const { return num_vertexs_; }
 	const float * Diffuse()const;
-	void load(const std::string path_file);
+	void load(const std::string path_file, bool repairNormals = true);
 	int NIndices()const;
 	int NVertices()const;
 	const cv::Point3f * Vertices();
@@ -84,6 +86,9 @@ public:
 
 	// empty
 	void Clear();
+	int Triangles();
+	const cv::Point3f& getTriangleVertex(int i, int j) const;
+
 private:
 	/** The identification number of the mesh */
 	int id_;
@@ -97,11 +102,8 @@ private:
 	/* The list of triangles of the mesh */
 	std::vector<cv::Point3f> list_vertex_;
 
-	/* The list of triangles of the mesh */
-	std::vector<std::vector<int> > list_triangles_;
-
 	/* The list of normals */
-	std::vector<cv::Point3f> list_normals_;
+	std::vector<cv::Point3f> _normals;
 
 	/* The list of normals */
 	std::vector<int> _indices;

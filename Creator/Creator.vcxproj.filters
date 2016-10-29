@@ -264,9 +264,6 @@
     <ClInclude Include="..\include\debug.h">
       <Filter>Debug</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\controls.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Filename.h">
       <Filter>Header Files</Filter>
     </ClInclude>

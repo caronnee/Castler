@@ -39,10 +39,12 @@ Creator::Creator(QWidget *parent)
 	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
 	connect(ui.renderer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
 	connect(ui.reloadShadersButton, SIGNAL(clicked()), ui.renderer, SLOT(ChangeShaders()));
-
-	// connect file
+	connect(ui.lockGroup, SIGNAL(buttonClicked(int)), ui.renderer, SLOT(ChangeActiveKeyPos(int)));
+	ui.lockGroup->setId(ui.cameraRadioButton, PositionCamera);
+	ui.lockGroup->setId(ui.modelRadioButton, PositionModel);
+	ui.lockGroup->setId(ui.lightRadioButton, PositionLight);
+	// connect file settings
 	connect(ui.lightRotateWindow, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
-
 
 	// videorender connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));

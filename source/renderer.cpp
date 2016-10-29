@@ -54,6 +54,7 @@ Renderer::Renderer(QWidget *parent)
   _background(Qt::white),
   program(0)
 {
+	_activeChange = 0;
 	setFocusPolicy(Qt::ClickFocus);
 	_movementFlag = 0;
 	InitPosition();
@@ -127,7 +128,7 @@ void Renderer::ChangeShaders()
 	DoAssert(vbocreated);
 	bool vbobound = _vertexBuffer.bind();
 	DoAssert(vbobound);
-	_vertexBuffer.allocate(vertData.data(), vertData.count());
+	_vertexBuffer.allocate(vertData.data(), vertData.count()*sizeof(GLfloat));
 
 	bool linked = program->link();
 
@@ -143,15 +144,18 @@ void Renderer::ChangeShaders()
 	update();
 }
 
+void Renderer::ChangeActiveKeyPos(int active)
+{
+	_activeChange = active;
+}
+
 void Renderer::InitPosition()
 {
 	_movementFlag = 0;
-	xPos = yPos = 0;
-	zPos = -10;
-	elevation = 0;
-	azimuth = 0;
+	memset(_desc, 0, sizeof(_desc));
+	_desc[PositionCamera]._zPos = -2;
+	_desc[PositionLight]._zPos = -15;
 	// fixed so far
-	_lightPosition = QVector3D(0, 0, -15);
 }
 
 void Renderer::CleanShaders()
@@ -185,10 +189,23 @@ void Renderer::initializeGL()
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-
   ChangeShaders();
 
   _movementTimer.start(10, this);
+}
+
+static QMatrix4x4 CreateMatrix(PositionDesc & desc)
+{
+	QMatrix4x4 cameraMatrix;
+	cameraMatrix.setToIdentity();
+	QVector3D position(desc._xPos, desc._yPos, desc._zPos);
+	cameraMatrix.rotate(desc._azimuth, 0, 0, 1);
+	QVector3D vec(0, 0, 1);
+	QVector3D vec2(cos(qDegreesToRadians(desc._azimuth)), sin(qDegreesToRadians(desc._azimuth)), 0);
+	QVector3D axis = QVector3D::crossProduct(vec, vec2);
+	cameraMatrix.rotate(desc._elevation, axis);
+	cameraMatrix.translate(position);
+	return cameraMatrix;
 }
 
 void Renderer::paintGL()
@@ -205,37 +222,27 @@ void Renderer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// for each object that was split or loaded separately
-	QMatrix4x4 cameraMatrix;
-	cameraMatrix.setToIdentity();
-	QVector3D position(xPos, yPos, zPos);
-	cameraMatrix.rotate(azimuth, 0, 0, 1);
-	QVector3D vec(0, 0, 1);
-	QVector3D vec2(cos(qDegreesToRadians(azimuth)), sin(qDegreesToRadians(azimuth)), 0);
-	QVector3D axis = QVector3D::crossProduct(vec, vec2);
-	cameraMatrix.rotate(elevation, axis);
-	cameraMatrix.translate(position);
-	qTan(3.14 / 2);
-	QMatrix4x4 m;
-	m.setToIdentity();
+	QMatrix4x4 modelMatrix = CreateMatrix(_desc[PositionModel]);
+	QMatrix4x4 cameraMatrix = CreateMatrix(_desc[PositionCamera]);
+	QMatrix4x4 perspectiveMatrix;
 	float ratio = size().width() / (float)size().height();
-	m.perspective(90, ratio, .5f, 10000.0f);
-	m *= cameraMatrix;	
-
-	QMatrix4x4 modelMatrix;
-	modelMatrix.setToIdentity();
+	perspectiveMatrix.setToIdentity();
+	perspectiveMatrix.perspective(90, ratio, .5f, 10000.0f);
+	QMatrix4x4 mvp = perspectiveMatrix * cameraMatrix * modelMatrix;
 
 	///////////////////////////////////////
 	/////////// setting uniform values
 	///////////////////////////////////////
-
-	program->setUniformValue("modelToCamera", m);
+	program->setUniformValue("modelToCamera", mvp);
 	program->setUniformValue("viewMatrix", cameraMatrix);
 	program->setUniformValue("modelMatrix", modelMatrix);
-	program->setUniformValue("cameraPosition", position);
+	QVector3D cameraPosition(_desc[PositionCamera]._xPos, _desc[PositionCamera]._yPos, _desc[PositionCamera]._zPos);
+	program->setUniformValue("cameraPosition", cameraPosition);
 	const float * df = _mesh.Diffuse();
 	program->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
-	// set light
-	program->setUniformValue("LightPosition_worldspace", _lightPosition );
+	// set 
+	QVector3D lightPos(_desc[PositionLight]._xPos, _desc[PositionLight]._yPos, _desc[PositionLight]._zPos);
+	program->setUniformValue("LightPosition_worldspace", lightPos);
 	
 	///////////////////////////////////////
 	/////////// setting arrays
@@ -251,7 +258,7 @@ void Renderer::paintGL()
 	///////////////////////////////////////
 	/////////// Actual drawing
 	///////////////////////////////////////
-	int total = _mesh.getTrianglesList().size();
+	int total = _mesh.Triangles();
 	for (int i = 0; i < total; ++i) {
 		//textures[i]->bind();
 		glDrawArrays(GL_TRIANGLE_FAN, i * 3, 3);
@@ -306,6 +313,26 @@ void Renderer::SwitchKeys(QKeyEvent *e)
 		_movementFlag ^= MovementPlusDepth;
 		break;
 	}
+	case Qt::Key_Left:
+	{
+		_movementFlag ^= MovementLeft;
+		break;
+	}
+	case Qt::Key_Right:
+	{
+		_movementFlag ^= MovementRight;
+		break;
+	}
+	case Qt::Key_Q:
+	{
+		_movementFlag ^= MovementUp;
+		break;
+	}
+	case Qt::Key_Z:
+	{
+		_movementFlag ^= MovementDown;
+		break;
+	}
 	}
 }
 
@@ -323,17 +350,25 @@ void Renderer::timerEvent(QTimerEvent *e)
 	}
 	emit reportSignal(MInfo, "Checking setting");
 	if (_movementFlag & MovementRotatePlusAzimuth)
-		azimuth += AngleStep;
+		_desc[_activeChange]._azimuth += AngleStep;
 	if (_movementFlag & MovementRotateMinusAzimuth)
-		azimuth -= AngleStep;
+		_desc[_activeChange]._azimuth -= AngleStep;
 	if (_movementFlag & MovementRotatePlusElevation)
-		elevation += AngleStep;
+		_desc[_activeChange]._elevation += AngleStep;
 	if (_movementFlag & MovementRotateMinusElevation)
-		elevation -= AngleStep;
+		_desc[_activeChange]._elevation -= AngleStep;
 	if (_movementFlag & MovementMinusDepth)
-		zPos -= ZSTEP;
+		_desc[_activeChange]._zPos -= ZSTEP;
 	if (_movementFlag & MovementPlusDepth)
-		zPos += ZSTEP;
+		_desc[_activeChange]._zPos += ZSTEP;
+	if (_movementFlag & MovementLeft)
+		_desc[_activeChange]._xPos -= ZSTEP;
+	if (_movementFlag & MovementRight)
+		_desc[_activeChange]._xPos += ZSTEP;
+	if (_movementFlag & MovementUp)
+		_desc[_activeChange]._yPos += ZSTEP;
+	if (_movementFlag & MovementDown)
+		_desc[_activeChange]._yPos -= ZSTEP;
 	update();
 }
 
@@ -348,9 +383,9 @@ void Renderer::mouseMoveEvent(QMouseEvent *event)
   int dy = event->y() - lastPos.y();
 
   if (event->buttons() & Qt::LeftButton) {
-    elevation += dy;
+	  _desc[_activeChange]._elevation += dy;
   } else if (event->buttons() & Qt::RightButton) {
-    azimuth += dx;
+	  _desc[_activeChange]._azimuth += dx;
   }
   lastPos = event->pos();
 }
@@ -370,14 +405,13 @@ void Renderer::CreateModels(QVector<GLfloat> & vertData)
 		return;
 	}
 
-	auto triangles = _mesh.getTrianglesList();
-	for (int i = 0; i < triangles.size(); ++i) {
-		// vertex position
-		DoAssert(triangles[i].size() == 3);
+	auto triangles = _mesh.Triangles();
 
-		for (int j = 0; j < triangles[i].size(); j++)
+	for (int i = 0; i < triangles;++i) {
+
+		for (int j = 0; j < 3; j++)
 		{
-			cv::Point3f point = _mesh.getVertex(triangles[i][j]);
+			cv::Point3f point = _mesh.getTriangleVertex(i, j);
 			cv::Point3f normal = _mesh.GetNormal(i);
 			vertData.append(point.x);
 			vertData.append(point.y);

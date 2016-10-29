@@ -13,11 +13,11 @@
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="creatorLayout" stretch="10,1">
+  <layout class="QVBoxLayout" name="creatorLayout" stretch="5,1">
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -119,32 +119,35 @@
                <widget class="QWidget" name="widget_2" native="true">
                 <layout class="QVBoxLayout" name="verticalLayout_7">
                  <item>
-                  <widget class="QRadioButton" name="radioButton">
+                  <widget class="QRadioButton" name="cameraRadioButton">
+                   <property name="text">
+                    <string>Lock camera</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">lockGroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="lightRadioButton">
                    <property name="text">
                     <string>Lock light</string>
                    </property>
                    <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup</string>
+                    <string notr="true">lockGroup</string>
                    </attribute>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="radioButton_2">
+                  <widget class="QRadioButton" name="modelRadioButton">
                    <property name="text">
                     <string>Lock model</string>
                    </property>
                    <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup</string>
-                   </attribute>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QRadioButton" name="radioButton_3">
-                   <property name="text">
-                    <string>Lock camera</string>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup</string>
+                    <string notr="true">lockGroup</string>
                    </attribute>
                   </widget>
                  </item>
@@ -692,7 +695,6 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>CompareWindow</class>
@@ -731,6 +733,6 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
+  <buttongroup name="lockGroup"/>
  </buttongroups>
 </ui>

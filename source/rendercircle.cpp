@@ -220,7 +220,7 @@ void RenderCircle::paintGL()
 	///////////////////////////////////////
 	/////////// Actual drawing
 	///////////////////////////////////////
-	int total = _mesh.getTrianglesList().size();
+	int total = _mesh.Triangles();
 	for (int i = 0; i < total; ++i) {
 		//textures[i]->bind();
 		glDrawArrays(GL_TRIANGLE_FAN, i * 3, 3);

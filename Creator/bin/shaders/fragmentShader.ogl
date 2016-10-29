@@ -35,6 +35,8 @@ void main(){
 	//  - light is behind the triangle -> 0
 	mediump float cosTheta = clamp( dot( n,l ), 0.0,1.0 );
 
+	gl_FragColor.rgb = normalize(vec3(distance,cosTheta,0));
+	return;
 	// Eye vector (towards the camera)
 	mediump vec3 E = normalize(EyeDirection_cameraspace);
 	// Direction in which the triangle reflects the light

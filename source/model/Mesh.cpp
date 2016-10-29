@@ -47,12 +47,12 @@ Ray::~Ray()
 // --------------------------------------------------- //
 
 /** The default constructor of the ObjectMesh Class */
-Mesh::Mesh() : list_vertex_(0) , list_triangles_(0)
+Mesh::Mesh() : list_vertex_(0) 
 {
   id_ = 0;
   num_vertexs_ = 0;
   num_triangles_ = 0;
-  zPos = xPos = yPos = elevation = azimuth;
+  memset(&_desc, 0, sizeof(_desc));
 
   materialDiffuse[0] = 0.33;
   materialDiffuse[1] = 0.83;
@@ -66,34 +66,37 @@ Mesh::~Mesh()
 }
 
 
+const cv::Point3f& Mesh::getVertex(int pos) const
+{
+	return list_vertex_[pos];
+}
+
 const float * Mesh::Diffuse() const
 {
 	return materialDiffuse;
 }
 
 /** Load a CSV with *.ply format **/
-void Mesh::load(const std::string path)
+void Mesh::load(const std::string path, bool repairNormals)
 {
   // Create the reader
   CsvReader csvReader(path);
 
   // Clear previous data
   list_vertex_.clear();
-  list_triangles_.clear();
 
   // Read from .ply file
-  csvReader.readPLY(list_vertex_, list_triangles_);
+  std::vector<PolyIndices> shapes;
+  csvReader.readPLY(list_vertex_, shapes);
 
   // Update mesh attributes
   num_vertexs_ = (int)list_vertex_.size();
-  num_triangles_ = (int)list_triangles_.size();
+  num_triangles_ = (int)shapes.size();
 
-  for (int i = 0; i < list_triangles_.size(); i++)
+  for (int i = 0; i < shapes.size(); i++)
   {
-	  PolyIndices &poly = list_triangles_[i];
-	  _indices.push_back(poly[0]);
-	  _indices.push_back(poly[1]);
-	  _indices.push_back(poly[2]);
+	  PolyIndices &poly = shapes[i];
+	  AddTriangle(poly[0], poly[1], poly[2]);
   }
 }
 
@@ -119,12 +122,6 @@ const int * Mesh::Indices() const
 
 void Mesh::AddTriangle(int a, int b, int c)
 {
-	PolyIndices poly;
-	poly.push_back(a);
-	poly.push_back(b);
-	poly.push_back(c);
-	list_triangles_.push_back(poly);
-
 	// lets hope this works
 	_indices.push_back(a);
 	_indices.push_back(b);
@@ -194,20 +191,30 @@ void Mesh::AddVertex(float x, float y, float z)
 void Mesh::Clear()
 {
 	list_vertex_.clear();
-	list_triangles_.clear();
-	list_normals_.clear();
+	_normals.clear();
 	num_triangles_ = 0;
 	num_vertexs_ = 0;
 }
 
+int Mesh::Triangles()
+{
+	return _indices.size() / 3;
+}
+
+const cv::Point3f& Mesh::getTriangleVertex(int i, int j) const
+{
+	int index = _indices[i * 3 + j];
+	return getVertex(index);
+}
+
 cv::Point3f Mesh::GetNormal(int i) const
 {
-	cv::Point3f& first = getVertex(list_triangles_[i][0]);
-	cv::Point3f& second = getVertex(list_triangles_[i][1]);
-	cv::Point3f& third = getVertex(list_triangles_[i][2]);
+	const cv::Point3f& first = getTriangleVertex(i, 0);
+	const cv::Point3f& second = getTriangleVertex(i, 1);
+	const cv::Point3f& third = getTriangleVertex(i, 2);
 	cv::Point3f dir1 = second - first;
 	cv::Point3f dir2 = third - first;
 
-	cv::Point3f ret = dir2.cross(dir1);
+	cv::Point3f ret = dir1.cross(dir2);
 	return ret;
 }
