@@ -1,8 +1,7 @@
-- load shader from some file
-- implement normals
+- implement current model/light properties
 - implementant flood vertices for showing - better performance
 - manually pick up point that might be similar. automated help
-- offect canny to set correspondece. POssible other detections
+- offect canny to set correspondece. Possible other detections
 - detect degradation from camera movement
 - use hughes transformation to calibrate
 - find if in the video there is movement degradation

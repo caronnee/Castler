@@ -33,6 +33,9 @@ signals:
 	void PreparePairSignal(int,int);
 
 private slots:
+void FillActive(PositionDesc & des);
+
+void ChangeActiveDesc();
 	void SetModifier();
 	void GetNextImagePair();
 	void SetCompare(cv::Mat left, cv::Mat right);

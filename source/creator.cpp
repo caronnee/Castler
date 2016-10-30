@@ -14,6 +14,7 @@ Creator::Creator(QWidget *parent)
 	qRegisterMetaType<cv::Mat>("cv::Mat");
 	qRegisterMetaType<CalibrationSet>("CalibrationSet");
 	qRegisterMetaType<QMatrix4x4>("QMatrix4x4");
+	qRegisterMetaType<PositionDesc>("PositionDesc");
 
     ui.setupUi(this);
 
@@ -34,6 +35,7 @@ Creator::Creator(QWidget *parent)
 
 	// worker connects
 	connect(this, SIGNAL(modeChangedSignal(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
+	connect(ui.renderer, SIGNAL( DescChangedSignal(PositionDesc&)), this, SLOT(FillActive(PositionDesc&)));
 
 	// rendered connects
 	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
@@ -43,8 +45,9 @@ Creator::Creator(QWidget *parent)
 	ui.lockGroup->setId(ui.cameraRadioButton, PositionCamera);
 	ui.lockGroup->setId(ui.modelRadioButton, PositionModel);
 	ui.lockGroup->setId(ui.lightRadioButton, PositionLight);
+
 	// connect file settings
-	connect(ui.lightRotateWindow, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
+	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
 
 	// videorender connections
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
@@ -85,6 +88,27 @@ Creator::Creator(QWidget *parent)
 
 	// rest of the initialization
 	LoadSettings();
+}
+
+void Creator::FillActive(PositionDesc & des)
+{
+	ui.azimuthValue->setValue(des._azimuth);
+	ui.elevationValue->setValue(des._elevation);
+	ui.xValue->setValue(des._xPos);
+	ui.yValue->setValue(des._yPos);
+	ui.zValue->setValue(des._zPos);
+
+}
+
+void Creator::ChangeActiveDesc()
+{
+	PositionDesc desc;
+	desc._azimuth = ui.azimuthValue->value();
+	desc._elevation = ui.elevationValue->value();
+	desc._xPos = ui.xValue->value();
+	desc._yPos = ui.yValue->value();
+	desc._zPos = ui.zValue->value();
+	ui.renderer->ApplyDesc(desc);
 }
 
 void Creator::SetModifier()

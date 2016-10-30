@@ -188,7 +188,7 @@ void Renderer::initializeGL()
   _name = GetFullPath("models\\cube.ply").c_str();
 
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
   ChangeShaders();
 
   _movementTimer.start(10, this);
@@ -369,6 +369,7 @@ void Renderer::timerEvent(QTimerEvent *e)
 		_desc[_activeChange]._yPos += ZSTEP;
 	if (_movementFlag & MovementDown)
 		_desc[_activeChange]._yPos -= ZSTEP;
+	emit DescChangedSignal(_desc[_activeChange]);
 	update();
 }
 
@@ -429,4 +430,9 @@ void Renderer::Load(QString & str)
 	_name = str;
 	// TODO change to something that does not need to update shaders
 	ChangeShaders();
+}
+
+void Renderer::ApplyDesc(const PositionDesc & desc)
+{
+	_desc[_activeChange] = desc;
 }

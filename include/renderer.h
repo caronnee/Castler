@@ -44,6 +44,7 @@ public:
 signals:
 	void clicked();
 	void reportSignal(MessageLevel, const QString& string);
+	void DescChangedSignal(PositionDesc&);
 
 	private slots:
 	void ChangeShaders();
@@ -107,6 +108,7 @@ private:
 
 public:
 	void Load(QString & str);
+	void ApplyDesc(const PositionDesc & desc);
 };
 
 #endif // RENDERER_H
