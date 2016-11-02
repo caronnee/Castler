@@ -64,7 +64,7 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
-	void CreateModels(QVector<GLfloat>& vertData);
+	void CreateModels();
 
 	// timer to change/animate according to movement flag
 	QBasicTimer _movementTimer;
@@ -82,10 +82,12 @@ private:
 	QPoint lastPos;
 
 	//QOpenGLTexture *textures[6];
-	QOpenGLShaderProgram *program;
+	QOpenGLShaderProgram *_shaderProgram;
 
 	// buffers
 	QOpenGLBuffer _vertexBuffer;
+
+	QOpenGLBuffer _indicesBuffer;
 
 	// modes for animation of selected object
 	enum RenderMovements

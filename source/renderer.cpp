@@ -46,13 +46,14 @@
 #include <QMouseEvent>
 #include "Filename.h"
 
-#define ZSTEP 0.03f
+#define ZSTEP 0.03
 const float AngleStep = 0.05;
 
 Renderer::Renderer(QWidget *parent)
-  : QOpenGLWidget(parent),
-  _background(Qt::white),
-  program(0)
+	: QOpenGLWidget(parent),
+	_background(Qt::white),
+	_shaderProgram(0),
+	_indicesBuffer(QOpenGLBuffer::IndexBuffer)
 {
 	_activeChange = 0;
 	setFocusPolicy(Qt::ClickFocus);
@@ -113,34 +114,36 @@ void Renderer::ChangeShaders()
 
 	makeCurrent();
 
-	program = new QOpenGLShaderProgram;
-	program->addShader(vshader);
-	program->addShader(fshader);
+	_shaderProgram = new QOpenGLShaderProgram;
+	_shaderProgram->addShader(vshader);
+	_shaderProgram->addShader(fshader);
 
-	program->bindAttributeLocation("vertexPosition_modelspace", 0);
-	program->bindAttributeLocation("vertexNormal_modelspace", 1);
+	_shaderProgram->bindAttributeLocation("vertexPosition_modelspace", 0);
+	_shaderProgram->bindAttributeLocation("vertexNormal_modelspace", 1);
 
 	// vertdata + normals
-	QVector<GLfloat> vertData;
-	CreateModels(vertData);
+	CreateModels();
 
 	bool vbocreated = _vertexBuffer.create();
 	DoAssert(vbocreated);
 	bool vbobound = _vertexBuffer.bind();
 	DoAssert(vbobound);
-	_vertexBuffer.allocate(vertData.data(), vertData.count()*sizeof(GLfloat));
+	std::vector<GLfloat> vertexNormal;
+	_mesh.GetVertexNormal(vertexNormal);
+	_vertexBuffer.allocate( vertexNormal.data(), vertexNormal.size()*sizeof(GLfloat));
+	_indicesBuffer.create();
+	_indicesBuffer.bind();
+	_indicesBuffer.allocate(_mesh.Indices(), _mesh.NIndices()*sizeof(GLint));
 
-	bool linked = program->link();
-
-	if (!linked)
+	if (!_shaderProgram->link())
 	{
-		QString eeror = program->log();
+		QString eeror = _shaderProgram->log();
 		emit reportSignal(MError, eeror);
-		delete program;
-		program = NULL;
+		delete _shaderProgram;
+		_shaderProgram = NULL;
 		return;
 	}
-	program->bind();
+	_shaderProgram->bind();
 	update();
 }
 
@@ -160,13 +163,14 @@ void Renderer::InitPosition()
 
 void Renderer::CleanShaders()
 {
-	if ( program )
+	if ( _shaderProgram )
 	{
 		makeCurrent();
 		_vertexBuffer.destroy();
-		delete program;
+		_indicesBuffer.destroy();
+		delete _shaderProgram;
 	}
-	program = 0;
+	_shaderProgram = 0;
 }
 
 Renderer::~Renderer()
@@ -191,7 +195,7 @@ void Renderer::initializeGL()
   //glEnable(GL_CULL_FACE);
   ChangeShaders();
 
-  _movementTimer.start(10, this);
+  _movementTimer.start(0, this);
 }
 
 static QMatrix4x4 CreateMatrix(PositionDesc & desc)
@@ -210,7 +214,7 @@ static QMatrix4x4 CreateMatrix(PositionDesc & desc)
 
 void Renderer::paintGL()
 {
-	if (!program)
+	if (!_shaderProgram)
 	{
 		glClearColor(0.5, 0.25, 0.4, _background.alphaF());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -233,36 +237,37 @@ void Renderer::paintGL()
 	///////////////////////////////////////
 	/////////// setting uniform values
 	///////////////////////////////////////
-	program->setUniformValue("modelToCamera", mvp);
-	program->setUniformValue("viewMatrix", cameraMatrix);
-	program->setUniformValue("modelMatrix", modelMatrix);
+	_shaderProgram->setUniformValue("modelToCamera", mvp);
+	_shaderProgram->setUniformValue("viewMatrix", cameraMatrix);
+	_shaderProgram->setUniformValue("modelMatrix", modelMatrix);
 	QVector3D cameraPosition(_desc[PositionCamera]._xPos, _desc[PositionCamera]._yPos, _desc[PositionCamera]._zPos);
-	program->setUniformValue("cameraPosition", cameraPosition);
+	_shaderProgram->setUniformValue("cameraPosition", cameraPosition);
 	const float * df = _mesh.Diffuse();
-	program->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
+	_shaderProgram->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
 	// set 
 	QVector3D lightPos(_desc[PositionLight]._xPos, _desc[PositionLight]._yPos, _desc[PositionLight]._zPos);
-	program->setUniformValue("LightPosition_worldspace", lightPos);
+	_shaderProgram->setUniformValue("LightPosition_worldspace", lightPos);
 	
 	///////////////////////////////////////
 	/////////// setting arrays
 	///////////////////////////////////////
 
 	// take vertex array from opengl context
-	program->enableAttributeArray(0);
-	program->enableAttributeArray(1);
+	_shaderProgram->enableAttributeArray(0);
+	_shaderProgram->enableAttributeArray(1);
 
-	program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	program->setAttributeBuffer(1, GL_FLOAT, 3*sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	_shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	_shaderProgram->setAttributeBuffer(1, GL_FLOAT, 3*sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
 
 	///////////////////////////////////////
 	/////////// Actual drawing
 	///////////////////////////////////////
 	int total = _mesh.Triangles();
-	for (int i = 0; i < total; ++i) {
-		//textures[i]->bind();
-		glDrawArrays(GL_TRIANGLE_FAN, i * 3, 3);
-	}
+	glDrawElements(GL_TRIANGLES, total*3, GL_UNSIGNED_INT, 0);
+	//for (int i = 0; i < total; ++i) {
+	//	//textures[i]->bind();
+	//	glDrawArrays(GL_TRIANGLE_STRIP, i * 3, 3);
+	//}
 }
 
 void Renderer::keyPressEvent(QKeyEvent * e)
@@ -298,8 +303,6 @@ void Renderer::SwitchKeys(QKeyEvent *e)
 	case Qt::Key_Space:
 	{
 		InitPosition();
-		
-		update();
 		// initial position
 		break;
 	}
@@ -396,33 +399,11 @@ void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)
   emit clicked();
 }
 
-void Renderer::CreateModels(QVector<GLfloat> & vertData)
+void Renderer::CreateModels()
 {
 	_mesh.Clear();
 	_mesh.load(_name.toStdString());
-	if (_mesh.getNumVertices() == 0)
-	{
-		DoAssert(false);
-		return;
-	}
-
-	auto triangles = _mesh.Triangles();
-
-	for (int i = 0; i < triangles;++i) {
-
-		for (int j = 0; j < 3; j++)
-		{
-			cv::Point3f point = _mesh.getTriangleVertex(i, j);
-			cv::Point3f normal = _mesh.GetNormal(i);
-			vertData.append(point.x);
-			vertData.append(point.y);
-			vertData.append(point.z);
-			vertData.push_back(normal.x);
-			vertData.push_back(normal.y);
-			vertData.push_back(normal.z);
-			// no textures yet
-		}
-	}
+	DoAssert(_mesh.getNumVertices() > 0);
 }
 
 void Renderer::Load(QString & str)
@@ -435,4 +416,5 @@ void Renderer::Load(QString & str)
 void Renderer::ApplyDesc(const PositionDesc & desc)
 {
 	_desc[_activeChange] = desc;
+	update();
 }

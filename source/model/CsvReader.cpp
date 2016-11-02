@@ -22,7 +22,7 @@ CsvReader::CsvReader(const string &path, const char &separator){
 }
 
 /* Read a plane text file with .ply format */
-void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list_triangles)
+void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list_triangles, Point3f& centerOffset)
 {
     std::string line, tmp_str, n;
     int num_vertex = 0, num_triangles = 0;
@@ -77,18 +77,50 @@ void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list
          {
              string num_pts_per_face, id0, id1, id2;
              getline(liness, num_pts_per_face, _separator);
+			 int vertices = StringToInt(num_pts_per_face);
              getline(liness, id0, _separator);
              getline(liness, id1, _separator);
-             getline(liness, id2);
+			 if (vertices == 3)
+			 {
+				 getline(liness, id2);
+			 }
+			 else
+			 {
+				 getline(liness, id2, _separator);
+			 }
 
              std::vector<int> tmp_triangle(3);
              tmp_triangle[0] = StringToInt(id0);
              tmp_triangle[1] = StringToInt(id1);
-             tmp_triangle[2] = StringToInt(id2);
+			 tmp_triangle[2] = StringToInt(id2);
+			 if (vertices == 4)
+			 {
+				 getline(liness, id2);
+				 tmp_triangle.push_back(StringToInt(id2));
+			 }
              list_triangles.push_back(tmp_triangle);
 
              count++;
       }
+		 cv::Point3f leftBottom=list_vertex[0], rightUp=list_vertex[0];
+		 for (int i = 1; i < list_vertex.size(); i++)
+		 {
+			 cv::Point3f& testPoint = list_vertex[i];
+			 if (leftBottom.x > testPoint.x)
+				 leftBottom.x = testPoint.x;
+			 if (leftBottom.y > testPoint.y)
+				 leftBottom.y = testPoint.y;
+			 if (leftBottom.z > testPoint.z)
+				 leftBottom.z = testPoint.z;
+
+			 if (rightUp.x > testPoint.x)
+				 rightUp.x = testPoint.x;
+			 if (rightUp.y > testPoint.y)
+				 rightUp.y = testPoint.y;
+			 if (rightUp.z > testPoint.z)
+				 rightUp.z = testPoint.z;
+		 }
+		 centerOffset = (rightUp + leftBottom) / 2;
     }
   }
 }

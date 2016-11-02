@@ -74,8 +74,8 @@
             <widget class="QWidget" name="lightPage">
              <property name="geometry">
               <rect>
-               <x>-2</x>
-               <y>-15</y>
+               <x>0</x>
+               <y>-63</y>
                <width>211</width>
                <height>358</height>
               </rect>
@@ -225,6 +225,13 @@
                       </property>
                      </widget>
                     </item>
+                    <item row="5" column="0">
+                     <widget class="QCheckBox" name="seamCheck">
+                      <property name="text">
+                       <string>Seamless</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -254,9 +261,6 @@
                       </attribute>
                      </widget>
                     </item>
-                    <item row="1" column="1">
-                     <widget class="QComboBox" name="comboBox"/>
-                    </item>
                     <item row="2" column="0">
                      <widget class="QRadioButton" name="lightRadioButton">
                       <property name="text">
@@ -268,7 +272,10 @@
                      </widget>
                     </item>
                     <item row="2" column="1">
-                     <widget class="QComboBox" name="comboBox_2"/>
+                     <widget class="QComboBox" name="lightsList"/>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QComboBox" name="modelsList"/>
                     </item>
                    </layout>
                   </widget>

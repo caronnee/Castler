@@ -71,7 +71,7 @@ public:
 	virtual ~Mesh();
 
 	const cv::Point3f& getVertex(int pos) const;
-	int getNumVertices() const { return num_vertexs_; }
+	int getNumVertices() const { return _vertices.size(); }
 	const float * Diffuse()const;
 	void load(const std::string path_file, bool repairNormals = true);
 	int NIndices()const;
@@ -79,7 +79,7 @@ public:
 	const cv::Point3f * Vertices();
 	const int * Indices() const;
 	void AddTriangle(int a, int b, int c);
-	void ConvertToBB();
+	void GetBB(cv::Point3f & leftBottom, cv::Point3f& rightUpper);
 
 	// adds vertex to a mesh
 	void AddVertex(float x, float y, float z);
@@ -93,14 +93,8 @@ private:
 	/** The identification number of the mesh */
 	int id_;
 
-	/** The current number of vertices in the mesh */
-	int num_vertexs_;
-
-	/** The current number of triangles in the mesh */
-	int num_triangles_;
-
 	/* The list of triangles of the mesh */
-	std::vector<cv::Point3f> list_vertex_;
+	std::vector<cv::Point3f> _vertices;
 
 	/* The list of normals */
 	std::vector<cv::Point3f> _normals;
@@ -110,6 +104,7 @@ private:
 
 public:
 	cv::Point3f GetNormal(int i) const;
+	void GetVertexNormal(std::vector<float>& vertexNormal);
 };
 
 #endif /* OBJECTMESH_H_ */

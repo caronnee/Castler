@@ -47,11 +47,9 @@ Ray::~Ray()
 // --------------------------------------------------- //
 
 /** The default constructor of the ObjectMesh Class */
-Mesh::Mesh() : list_vertex_(0) 
+Mesh::Mesh() : _vertices(0) 
 {
   id_ = 0;
-  num_vertexs_ = 0;
-  num_triangles_ = 0;
   memset(&_desc, 0, sizeof(_desc));
 
   materialDiffuse[0] = 0.33;
@@ -68,7 +66,7 @@ Mesh::~Mesh()
 
 const cv::Point3f& Mesh::getVertex(int pos) const
 {
-	return list_vertex_[pos];
+	return _vertices[pos];
 }
 
 const float * Mesh::Diffuse() const
@@ -83,21 +81,41 @@ void Mesh::load(const std::string path, bool repairNormals)
   CsvReader csvReader(path);
 
   // Clear previous data
-  list_vertex_.clear();
+  _vertices.clear();
+  _normals.clear();
 
   // Read from .ply file
   std::vector<PolyIndices> shapes;
-  csvReader.readPLY(list_vertex_, shapes);
-
+  cv::Point3f centerOffset;
+  csvReader.readPLY(_vertices, shapes, centerOffset);
+  for (int i = 0; i < _vertices.size(); i++)
+  {
+	  _normals.push_back(cv::Point3f(0, 0, 0));
+  }
   // Update mesh attributes
-  num_vertexs_ = (int)list_vertex_.size();
-  num_triangles_ = (int)shapes.size();
 
   for (int i = 0; i < shapes.size(); i++)
   {
 	  PolyIndices &poly = shapes[i];
 	  AddTriangle(poly[0], poly[1], poly[2]);
+	  if (poly.size() == 4)
+	  {
+		  AddTriangle(poly[0], poly[2], poly[3]);
+	  }
   }
+  for (int i = 0; i < _normals.size(); i++)
+  {
+	  _normals[i] /= _normals[i].dot(_normals[i]);
+  }
+  //cv::Point3f leftbottom, rightup;
+  //GetBB(leftbottom, rightup);
+  //cv::Point3f cent = (leftbottom + rightup) / 2;
+  //cent.z = 0;
+  //for (int i = 0; i < list_vertex_.size(); i++)
+  //{
+	 // list_vertex_[i] -= leftbottom; // leftbotom will now be at 0,0 at some point
+	 // list_vertex_[i] += cent;
+  //}
 }
 
 int Mesh::NIndices()const
@@ -107,12 +125,12 @@ int Mesh::NIndices()const
 
 int Mesh::NVertices() const
 {
-	return list_vertex_.size();
+	return _vertices.size();
 }
 
 const cv::Point3f * Mesh::Vertices()
 {
-	return list_vertex_.data();
+	return _vertices.data();
 }
 
 const int * Mesh::Indices() const
@@ -122,35 +140,40 @@ const int * Mesh::Indices() const
 
 void Mesh::AddTriangle(int a, int b, int c)
 {
+	int triangles = Triangles();
 	// lets hope this works
 	_indices.push_back(a);
 	_indices.push_back(b);
 	_indices.push_back(c);
+	cv::Point3f normal = GetNormal(triangles);
+	_normals[a] += normal;
+	_normals[b] += normal;
+	_normals[c] += normal;
 }
 
-void Mesh::ConvertToBB()
+void Mesh::GetBB(cv::Point3f & bottomLeft, cv::Point3f& upRight)
 {
-	cv::Point3f bottomLeft = list_vertex_[0];
-	cv::Point3f upRight = list_vertex_[0];
-	for (int i = 1; i < num_vertexs_; i++)
+	bottomLeft = _vertices[0];
+	upRight = _vertices[0];
+	for (int i = 1; i < _vertices.size(); i++)
 	{
 		///X
-		if (bottomLeft.x > list_vertex_[i].x)
-			bottomLeft.x = list_vertex_[i].x;
-		else if (upRight.x < list_vertex_[i].x)
-			upRight.x = list_vertex_[i].x;
+		if (bottomLeft.x > _vertices[i].x)
+			bottomLeft.x = _vertices[i].x;
+		else if (upRight.x < _vertices[i].x)
+			upRight.x = _vertices[i].x;
 
 		///y
-		if (bottomLeft.y > list_vertex_[i].y)
-			bottomLeft.y = list_vertex_[i].y;
-		else if (upRight.y < list_vertex_[i].y)
-			upRight.y = list_vertex_[i].y;
+		if (bottomLeft.y > _vertices[i].y)
+			bottomLeft.y = _vertices[i].y;
+		else if (upRight.y < _vertices[i].y)
+			upRight.y = _vertices[i].y;
 
 		///z
-		if (bottomLeft.z > list_vertex_[i].z)
-			bottomLeft.z = list_vertex_[i].z;
-		else if (upRight.z < list_vertex_[i].z)
-			upRight.z = list_vertex_[i].z;
+		if (bottomLeft.z > _vertices[i].z)
+			bottomLeft.z = _vertices[i].z;
+		else if (upRight.z < _vertices[i].z)
+			upRight.z = _vertices[i].z;
 
 	}
 	// clear all
@@ -184,16 +207,15 @@ void Mesh::ConvertToBB()
 void Mesh::AddVertex(float x, float y, float z)
 {
 	cv::Point3f p(x, y, z);
-	list_vertex_.push_back(p);
-	num_vertexs_++;
+	_vertices.push_back(p);
+	_normals.push_back(cv::Point3f(0, 0, 0));
 }
 
 void Mesh::Clear()
 {
-	list_vertex_.clear();
+	_vertices.clear();
 	_normals.clear();
-	num_triangles_ = 0;
-	num_vertexs_ = 0;
+	_indices.clear();
 }
 
 int Mesh::Triangles()
@@ -217,4 +239,19 @@ cv::Point3f Mesh::GetNormal(int i) const
 
 	cv::Point3f ret = dir1.cross(dir2);
 	return ret;
+}
+
+void Mesh::GetVertexNormal(std::vector<float>& vertexNormal)
+{
+	for (int i = 0; i < _vertices.size(); i++)
+	{
+		cv::Point3f& point = _vertices[i];
+		vertexNormal.push_back(point.x);
+		vertexNormal.push_back(point.y);
+		vertexNormal.push_back(point.z);
+		cv::Point3f& normal = _normals[i];
+		vertexNormal.push_back(normal.x);
+		vertexNormal.push_back(normal.y);
+		vertexNormal.push_back(normal.z);
+	}
 }
