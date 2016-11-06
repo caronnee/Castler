@@ -168,13 +168,13 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
   <ItemGroup>
     <ClCompile Include="../source/creator.cpp" />
     <ClCompile Include="..\source\FrameProcessor.cpp" />
-    <ClCompile Include="..\source\model\CsvReader.cpp" />
-    <ClCompile Include="..\source\model\CsvWriter.cpp" />
-    <ClCompile Include="..\source\model\Mesh.cpp" />
+    <ClCompile Include="..\source\CsvReader.cpp" />
+    <ClCompile Include="..\source\CsvWriter.cpp" />
+    <ClCompile Include="..\source\Mesh.cpp" />
     <ClCompile Include="..\source\rendercircle.cpp" />
     <ClCompile Include="..\source\videorenderer.cpp" />
-    <ClCompile Include="CompareWindow.cpp" />
-    <ClCompile Include="filename.cpp" />
+    <ClCompile Include="../source/CompareWindow.cpp" />
+    <ClCompile Include="../source/filename.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_CompareWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -261,12 +261,12 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="ImageProcessor.cpp" />
-    <ClCompile Include="ImageProvider.cpp" />
-    <ClCompile Include="ImagesProvider.cpp" />
-    <ClCompile Include="reportfunctions.cpp" />
-    <ClCompile Include="VideoProvider.cpp" />
-    <ClCompile Include="ExtractionWorker.cpp" />
+    <ClCompile Include="../source/ImageProcessor.cpp" />
+    <ClCompile Include="../source/ImageProvider.cpp" />
+    <ClCompile Include="../source/ImagesProvider.cpp" />
+    <ClCompile Include="../source/reportfunctions.cpp" />
+    <ClCompile Include="../source/VideoProvider.cpp" />
+    <ClCompile Include="../source/ExtractionWorker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="../include/creator.h">
@@ -351,7 +351,11 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <ClInclude Include="..\include\ImageProcessor.h" />
     <ClInclude Include="..\include\imageprovider.h" />
     <ClInclude Include="..\include\ImagesProvider.h" />
+    <ClInclude Include="..\include\Mics.h" />
     <ClInclude Include="..\include\Model.h" />
+    <ClInclude Include="..\include\model\CsvReader.h" />
+    <ClInclude Include="..\include\model\CsvWriter.h" />
+    <ClInclude Include="..\include\model\Mesh.h" />
     <ClInclude Include="..\include\objloader.hpp" />
     <ClInclude Include="..\include\quaternion_utils.hpp" />
     <ClInclude Include="..\include\ReportFunctions.h" />
@@ -361,9 +365,7 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <ClInclude Include="..\include\typedefs.h" />
     <ClInclude Include="..\include\vboindexer.hpp" />
     <ClInclude Include="..\include\VideoProvider.h" />
-    <ClInclude Include="..\source\model\CsvReader.h" />
-    <ClInclude Include="..\source\model\CsvWriter.h" />
-    <ClInclude Include="..\source\model\Mesh.h" />
+    <ClInclude Include="..\source\CsvWriter.h" />
     <CustomBuild Include="CompareWindow.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

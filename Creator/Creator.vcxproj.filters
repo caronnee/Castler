@@ -69,6 +69,9 @@
     <Filter Include="Shaders\Gyro">
       <UniqueIdentifier>{f1c9916e-d1f9-404e-ad73-dfc65b141738}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{94e2c6ff-eb77-4349-bbe6-b568b8bb86ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -128,44 +131,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_FrameProcessor.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="VideoProvider.cpp">
-      <Filter>Source Files\ImageProviders</Filter>
-    </ClCompile>
-    <ClCompile Include="ImagesProvider.cpp">
-      <Filter>Source Files\ImageProviders</Filter>
-    </ClCompile>
-    <ClCompile Include="reportfunctions.cpp">
-      <Filter>Source Files\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageProvider.cpp">
-      <Filter>Source Files\ImageProviders</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageProcessor.cpp">
-      <Filter>Source Files\ImageProcessor</Filter>
-    </ClCompile>
-    <ClCompile Include="ExtractionWorker.cpp">
-      <Filter>Source Files\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\model\CsvReader.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\model\CsvWriter.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\model\Mesh.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="filename.cpp">
-      <Filter>Filename</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_CompareWindow.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_CompareWindow.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="CompareWindow.cpp">
-      <Filter>Source Files\Source</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ExtractionWorker.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -184,6 +154,39 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_rendercircle.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/CompareWindow.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CsvReader.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CsvWriter.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/ExtractionWorker.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/filename.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/ImageProcessor.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/ImageProvider.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/ImagesProvider.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Mesh.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/reportfunctions.cpp">
+      <Filter>Source Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="../source/VideoProvider.cpp">
+      <Filter>Source Files\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -249,15 +252,6 @@
     <ClInclude Include="typedefs.h">
       <Filter>Source Files\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\model\CsvReader.h">
-      <Filter>Source Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\model\CsvWriter.h">
-      <Filter>Source Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\model\Mesh.h">
-      <Filter>Source Files\Model</Filter>
-    </ClInclude>
     <ClInclude Include="Filename.h">
       <Filter>Filename</Filter>
     </ClInclude>
@@ -305,6 +299,21 @@
     </ClInclude>
     <ClInclude Include="..\include\VideoProvider.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CsvWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\model\CsvReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\model\CsvWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\model\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Mics.h">
+      <Filter>Source Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

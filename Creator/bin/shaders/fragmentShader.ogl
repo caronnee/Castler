@@ -15,7 +15,7 @@ void main(){
 	// Light emission properties
 	// You probably want to put them as uniforms
 	mediump vec3 LightColor = vec3(1,1,1);
-	mediump float LightPower = 50.0;
+	mediump float LightPower = 150.0;
 	
 	// Material properties
 	mediump vec3 MaterialAmbientColor = vec3(0.1,0.1,0.1) * MaterialDiffuseColor;

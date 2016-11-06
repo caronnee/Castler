@@ -150,6 +150,7 @@ void Renderer::ChangeShaders()
 void Renderer::ChangeActiveKeyPos(int active)
 {
 	_activeChange = active;
+	emit DescChangedSignal(_desc[_activeChange]);
 }
 
 void Renderer::InitPosition()
@@ -158,6 +159,7 @@ void Renderer::InitPosition()
 	memset(_desc, 0, sizeof(_desc));
 	_desc[PositionCamera]._zPos = -2;
 	_desc[PositionLight]._zPos = -15;
+	update();
 	// fixed so far
 }
 
@@ -192,7 +194,8 @@ void Renderer::initializeGL()
   _name = GetFullPath("models\\cube.ply").c_str();
 
   glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CW);
   ChangeShaders();
 
   _movementTimer.start(0, this);
@@ -234,6 +237,8 @@ void Renderer::paintGL()
 	perspectiveMatrix.perspective(90, ratio, .5f, 10000.0f);
 	QMatrix4x4 mvp = perspectiveMatrix * cameraMatrix * modelMatrix;
 
+	auto test1 = mvp*QVector3D(0, 0, 0);
+	auto test2 = mvp*QVector3D(0, 0, 0.5);
 	///////////////////////////////////////
 	/////////// setting uniform values
 	///////////////////////////////////////
@@ -383,15 +388,16 @@ void Renderer::mousePressEvent(QMouseEvent *event)
 
 void Renderer::mouseMoveEvent(QMouseEvent *event)
 {
-  int dx = event->x() - lastPos.x();
-  int dy = event->y() - lastPos.y();
+  QPoint dx = event->pos() - lastPos;
 
   if (event->buttons() & Qt::LeftButton) {
-	  _desc[_activeChange]._elevation += dy;
+	  _desc[_activeChange]._elevation += dx.x()/10.0;
   } else if (event->buttons() & Qt::RightButton) {
-	  _desc[_activeChange]._azimuth += dx;
+	  _desc[_activeChange]._azimuth += dx.y()/10.0;
   }
   lastPos = event->pos();
+  emit DescChangedSignal(_desc[_activeChange]);
+  update();
 }
 
 void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)

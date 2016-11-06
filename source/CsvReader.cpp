@@ -22,7 +22,7 @@ CsvReader::CsvReader(const string &path, const char &separator){
 }
 
 /* Read a plane text file with .ply format */
-void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list_triangles, Point3f& centerOffset)
+void CsvReader::readPLY(vector<Vertex> &list_vertex, vector<vector<int> > &list_triangles, Point3f& centerOffset)
 {
     std::string line, tmp_str, n;
     int num_vertex = 0, num_triangles = 0;
@@ -63,7 +63,9 @@ void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list
              tmp_p.x = (float)StringToFloat(x);
              tmp_p.y = (float)StringToFloat(y);
              tmp_p.z = (float)StringToFloat(z);
-             list_vertex.push_back(tmp_p);
+			 Vertex vert;
+			 vert._vertex = tmp_p;
+             list_vertex.push_back(vert);
 
              count++;
              if(count == num_vertex)
@@ -102,10 +104,10 @@ void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list
 
              count++;
       }
-		 cv::Point3f leftBottom=list_vertex[0], rightUp=list_vertex[0];
+		 cv::Point3f leftBottom=list_vertex[0]._vertex, rightUp=list_vertex[0]._vertex;
 		 for (int i = 1; i < list_vertex.size(); i++)
 		 {
-			 cv::Point3f& testPoint = list_vertex[i];
+			 cv::Point3f& testPoint = list_vertex[i]._vertex;
 			 if (leftBottom.x > testPoint.x)
 				 leftBottom.x = testPoint.x;
 			 if (leftBottom.y > testPoint.y)
