@@ -23,14 +23,32 @@ enum PositionOnKeys
 	NKeyPositions
 };
 
+struct RenderData
+{
+	QString _name;
+
+	// mesh to show - TODo later to replace
+	Mesh _mesh;
+
+	RenderData(const QString & name);
+
+	void Load();
+};
+
 class Renderer : public QOpenGLWidget, protected QOpenGLFunctions
 {
 	Q_OBJECT
 		;
 
 	int _activeChange;
-
+	int _indices;
 	PositionDesc _desc[NKeyPositions];
+
+	// buffers
+	QOpenGLBuffer _vertexBuffer;
+
+	QOpenGLBuffer _indicesBuffer;
+	
 public:
 
 	explicit Renderer(QWidget *parent = 0);
@@ -69,11 +87,7 @@ private:
 	// timer to change/animate according to movement flag
 	QBasicTimer _movementTimer;
 
-	// mesh to show - TODo later to replace
-	Mesh _mesh;
-
-	// name of the model shown
-	QString _name;
+	std::vector<RenderData> _renderData;
 
 	// color outside detected model
 	QColor _background;
@@ -83,11 +97,6 @@ private:
 
 	//QOpenGLTexture *textures[6];
 	QOpenGLShaderProgram *_shaderProgram;
-
-	// buffers
-	QOpenGLBuffer _vertexBuffer;
-
-	QOpenGLBuffer _indicesBuffer;
 
 	// modes for animation of selected object
 	enum RenderMovements

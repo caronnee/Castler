@@ -194,6 +194,11 @@ const cv::Point3f& Mesh::getTriangleVertex(int i, int j) const
 	return getVertex(index);
 }
 
+void Mesh::GetIndices(std::vector<int>& indices)
+{
+	indices.insert(indices.end(), _indices.begin(), _indices.end());
+}
+
 cv::Point3f Mesh::GetNormal(int a,int b, int c) const
 {
 	const cv::Point3f& first = getVertex(a);

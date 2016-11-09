@@ -113,6 +113,7 @@ void Renderer::ChangeShaders()
 
 
 	makeCurrent();
+	CreateModels();
 
 	_shaderProgram = new QOpenGLShaderProgram;
 	_shaderProgram->addShader(vshader);
@@ -122,19 +123,24 @@ void Renderer::ChangeShaders()
 	_shaderProgram->bindAttributeLocation("vertexNormal_modelspace", 1);
 
 	// vertdata + normals
-	CreateModels();
 
 	bool vbocreated = _vertexBuffer.create();
+	int vbSize = 0;
 	DoAssert(vbocreated);
 	bool vbobound = _vertexBuffer.bind();
 	DoAssert(vbobound);
-	std::vector<GLfloat> vertexNormal;
-	_mesh.GetVertexNormal(vertexNormal);
-	_vertexBuffer.allocate( vertexNormal.data(), vertexNormal.size()*sizeof(GLfloat));
 	_indicesBuffer.create();
+	std::vector<GLfloat> vertexNormal;
+	std::vector<int> indices;
+	for (int i = 0; i < _renderData.size(); i++)
+	{
+		_renderData[i]._mesh.GetVertexNormal(vertexNormal);
+		_renderData[i]._mesh.GetIndices(indices);
+	}
+	_vertexBuffer.allocate(vertexNormal.data(), vertexNormal.size() * sizeof(GLfloat));
 	_indicesBuffer.bind();
-	_indicesBuffer.allocate(_mesh.Indices(), _mesh.NIndices()*sizeof(GLint));
-
+	_indicesBuffer.allocate(indices.data(), indices.size() * sizeof(GLint));
+	_indices = indices.size();
 	if (!_shaderProgram->link())
 	{
 		QString eeror = _shaderProgram->log();
@@ -170,6 +176,7 @@ void Renderer::CleanShaders()
 		makeCurrent();
 		_vertexBuffer.destroy();
 		_indicesBuffer.destroy();
+		
 		delete _shaderProgram;
 	}
 	_shaderProgram = 0;
@@ -191,8 +198,10 @@ void Renderer::initializeGL()
 {
   initializeOpenGLFunctions();
 
-  _name = GetFullPath("models\\cube.ply").c_str();
+  Load(QString(GetFullPath("models\\cube.ply").c_str()));
+  Load(QString(GetFullPath("models\\torus.ply").c_str()));
 
+  ChangeShaders();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CW);
@@ -247,8 +256,8 @@ void Renderer::paintGL()
 	_shaderProgram->setUniformValue("modelMatrix", modelMatrix);
 	QVector3D cameraPosition(_desc[PositionCamera]._xPos, _desc[PositionCamera]._yPos, _desc[PositionCamera]._zPos);
 	_shaderProgram->setUniformValue("cameraPosition", cameraPosition);
-	const float * df = _mesh.Diffuse();
-	_shaderProgram->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
+	//const float * df = _mesh.Diffuse();
+	//_shaderProgram->setUniformValue("MaterialDiffuseColor", QVector3D(df[0],df[1],df[2]) );
 	// set 
 	QVector3D lightPos(_desc[PositionLight]._xPos, _desc[PositionLight]._yPos, _desc[PositionLight]._zPos);
 	_shaderProgram->setUniformValue("LightPosition_worldspace", lightPos);
@@ -267,8 +276,7 @@ void Renderer::paintGL()
 	///////////////////////////////////////
 	/////////// Actual drawing
 	///////////////////////////////////////
-	int total = _mesh.Triangles();
-	glDrawElements(GL_TRIANGLES, total*3, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
 	//for (int i = 0; i < total; ++i) {
 	//	//textures[i]->bind();
 	//	glDrawArrays(GL_TRIANGLE_STRIP, i * 3, 3);
@@ -407,20 +415,31 @@ void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)
 
 void Renderer::CreateModels()
 {
-	_mesh.Clear();
-	_mesh.load(_name.toStdString());
-	DoAssert(_mesh.getNumVertices() > 0);
+	CleanShaders();
+	for (int i = 0; i < _renderData.size(); i++)
+	{
+		_renderData[i].Load();
+	}	
 }
 
 void Renderer::Load(QString & str)
 {
-	_name = str;
-	// TODO change to something that does not need to update shaders
-	ChangeShaders();
+	_renderData.push_back(str);
 }
 
 void Renderer::ApplyDesc(const PositionDesc & desc)
 {
 	_desc[_activeChange] = desc;
 	update();
+}
+
+RenderData::RenderData(const QString & name)
+{
+	_name = name;
+}
+
+void RenderData::Load()
+{
+	_mesh.load(_name.toStdString());
+	DoAssert(_mesh.getNumVertices() > 0);
 }

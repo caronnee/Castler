@@ -75,7 +75,7 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>0</y>
+               <y>-19</y>
                <width>203</width>
                <height>331</height>
               </rect>
@@ -296,7 +296,17 @@
                      <widget class="QComboBox" name="lightsList"/>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QComboBox" name="modelsList"/>
+                     <widget class="QComboBox" name="modelsList">
+                      <property name="currentText">
+                       <string/>
+                      </property>
+                      <property name="maxVisibleItems">
+                       <number>20</number>
+                      </property>
+                      <property name="modelColumn">
+                       <number>0</number>
+                      </property>
+                     </widget>
                     </item>
                    </layout>
                   </widget>

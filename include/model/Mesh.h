@@ -53,6 +53,7 @@ public:
 	int Triangles();
 	const cv::Point3f& getTriangleVertex(int i, int j) const;
 
+	void GetIndices(std::vector<int>& indices);
 private:
 	/** The identification number of the mesh */
 	int id_;
