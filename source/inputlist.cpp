@@ -17,7 +17,7 @@ void InputList::deleteVideo()
 	delete item;
 }
 
-void InputList::addVideo(const QString & str)
+void InputList::AddInputItem(const QString & str)
 {
 	QStringList lst = str.split('/');
 	QString display = lst[lst.size() - 1];
@@ -28,7 +28,7 @@ void InputList::addVideo(const QString & str)
 	this->setItemSelected(item, true);
 }
 
-void InputList::addVideo()
+void InputList::AddInputItem()
 {
 	QStringList files = QFileDialog::getOpenFileNames(
 		this,
@@ -40,18 +40,50 @@ void InputList::addVideo()
 	_lastDirectory = files[0];
 	for (int i = 0; i < files.size(); i++)
 	{
-		addVideo(files[i]);		
+		AddInputItem(files[i]);		
 	}
+}
+
+void InputList::AddDir(const QString & name)
+{
+	QDir dir(name);
+	QFileInfoList list = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+	foreach(QFileInfo finfo, list) {
+		if (finfo.isDir())
+			continue;
+		AddInputItem(finfo.absoluteFilePath());
+	}
+}
+
+void InputList::addFolderSlot()
+{
+	QString directory = QFileDialog::getExistingDirectory(
+		this, "Select directory",
+		_lastDirectory
+	);
+	if (directory.isEmpty())
+		return;
+	//for each file in directory ( non-recursive, add it do thelist )
+	AddDir(directory);
 }
 
 void InputList::createActions()
 {
-	newAct[ActionNewVideo] = new QAction(tr("New video"), this);
-	newAct[ActionNewVideo]->setStatusTip(tr("Add a video to the list"));
-	newAct[ActionDeleteVideo] = new QAction(tr("Delete video"), this);
-	newAct[ActionDeleteVideo]->setStatusTip(tr("Remove video from list"));
-	connect(newAct[ActionNewVideo], SIGNAL(triggered(void)), this, SLOT(addVideo(void)));
-	connect(newAct[ActionDeleteVideo], &QAction::triggered, this, &InputList::deleteVideo);
+	_inputActions[ActionNewVideo] = new QAction(tr("New video"), this);
+	_inputActions[ActionNewVideo]->setStatusTip(tr("Add a video to the list"));
+	connect(_inputActions[ActionNewVideo], SIGNAL(triggered(void)), this, SLOT(AddInputItem(void)));
+
+	_inputActions[ActionNewFolder] = new QAction(tr("Add directory"), this);
+	_inputActions[ActionNewFolder]->setStatusTip(tr("Add directory content to the list"));
+	connect(_inputActions[ActionNewFolder], SIGNAL(triggered(void)), this, SLOT(addFolderSlot(void)));
+
+
+	_inputActions[ActionRefresh] = new QAction(tr("Refresh"), this);
+	_inputActions[ActionRefresh]->setStatusTip(tr("Refresh"));
+	
+	_inputActions[ActionDeleteVideo] = new QAction(tr("Delete video"), this);
+	_inputActions[ActionDeleteVideo]->setStatusTip(tr("Remove video from list"));
+	connect(_inputActions[ActionDeleteVideo], &QAction::triggered, this, &InputList::deleteVideo);
 }
 
 void InputList::contextMenuEvent(QContextMenuEvent *event)
@@ -59,7 +91,7 @@ void InputList::contextMenuEvent(QContextMenuEvent *event)
 	QMenu menu(this);
 	for (int i = 0; i < NActions; i++)
 	{
-		menu.addAction(newAct[i]);
+		menu.addAction(_inputActions[i]);
 	}
 	menu.exec(event->globalPos());
 	event->accept();
@@ -67,5 +99,5 @@ void InputList::contextMenuEvent(QContextMenuEvent *event)
 void InputList::clearActions()
 {
 	for (int i = 0; i < NActions; i++)
-		delete newAct[i];
+		delete _inputActions[i];
 }

@@ -1,4 +1,5 @@
 #include "Filename.h"
+#include <Windows.h>
 
 std::string GetFullPath(const std::string & relativeName)
 {

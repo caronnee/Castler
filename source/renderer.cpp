@@ -440,6 +440,6 @@ RenderData::RenderData(const QString & name)
 
 void RenderData::Load()
 {
-	_mesh.load(_name.toStdString());
+	_mesh.Load(_name.toStdString());
 	DoAssert(_mesh.getNumVertices() > 0);
 }

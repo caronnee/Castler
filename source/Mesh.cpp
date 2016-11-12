@@ -10,6 +10,7 @@
 #include "typedefs.h"
 #include "debug.h"
 #include "Mics.h"
+#include "Filename.h"
 
  // --------------------------------------------------- //
  //                 OBJECT MESH CLASS                   //
@@ -21,9 +22,9 @@ Mesh::Mesh() : _vertices(0)
 	id_ = 0;
 	memset(&_desc, 0, sizeof(_desc));
 
-	materialDiffuse[0] = 0.33;
-	materialDiffuse[1] = 0.83;
-	materialDiffuse[2] = 0.01;
+	_materialDiffuse[0] = 0.33;
+	_materialDiffuse[1] = 0.83;
+	_materialDiffuse[2] = 0.01;
 }
 
 /** The default destructor of the ObjectMesh Class */
@@ -32,6 +33,96 @@ Mesh::~Mesh()
 	// TODO Auto-generated destructor stub
 }
 
+void SavePoint(FILE * file, cv::Point3f&point)
+{
+	fprintf(file, "%f %f %f\n", point.x, point.y, point.z);
+}
+void LoadPoint(FILE * file, cv::Point3f&point)
+{
+	float x, y, z;
+	fscanf(file, "%f %f %f\n", &x, &y, &z);
+	point = cv::Point3f(x, y, z);
+}
+
+void SaveArrayPoint(FILE * file, std::vector<Vertex> &point)
+{
+	fprintf(file, "%d", (int)point.size());
+	for (int i = 0; i < point.size(); i++)
+	{
+		SavePoint(file, point[i]._vertex);
+		SavePoint(file, point[i]._normal);
+	}
+}
+void LoadArrayPoint(FILE * file, std::vector<Vertex> &point)
+{
+	int sz;
+	fscanf(file, "%d", &sz);
+	point.resize(sz);
+	for (int i = 0; i < sz; i++)
+	{
+		LoadPoint(file, point[i]._vertex);
+		LoadPoint(file, point[i]._normal);
+	}
+}
+void SaveArrayint(FILE * file, std::vector<int> &point)
+{
+	fprintf(file, "%d ", (int)point.size());
+	for (int i = 0; i < point.size(); i++)
+	{
+		fprintf(file, "%d ", point[i]);
+	}
+}
+void LoadArrayint(FILE * file, std::vector<int> &point)
+{
+	int sz;
+	fscanf(file, "%d ", &sz);
+	point.resize(sz);
+	for (int i = 0; i < point.size(); i++)
+	{
+		fscanf(file, "%d ", &point[i]);
+	}
+}
+void SaveDesc(FILE * file, PositionDesc & desc)
+{
+	fprintf(file, "%f %f %f %f %f\n", desc._azimuth, desc._elevation, desc._xPos, desc._yPos, desc._zPos);
+}
+void LoadDesc(FILE * file, PositionDesc & desc)
+{
+	fscanf(file, "%f %f %f %f %f\n", &desc._azimuth, &desc._elevation, &desc._xPos, &desc._yPos, &desc._zPos);
+}
+
+void Mesh::LoadCastle(const char * name)
+{
+	std::string sname = GetFullPath(name).c_str();
+	FILE * file = fopen(sname.c_str(), "r");
+	SerializeCallback LoadCallback;
+	LoadCallback.serializeArrayInt = LoadArrayint;
+	LoadCallback.serializeArrayPoint = LoadArrayPoint;
+	LoadCallback.serializePoint = LoadPoint;
+	LoadCallback.serializeDesc = LoadDesc;
+	Serialize(file, LoadCallback);
+	fclose(file);
+}
+void Mesh::Save(const char * name)
+{
+	std::string sname = GetFullPath(name).c_str();
+	FILE * file = fopen(sname.c_str(), "w");
+	SerializeCallback SaveCallback;
+	SaveCallback.serializeArrayInt = SaveArrayint;
+	SaveCallback.serializeArrayPoint = SaveArrayPoint;
+	SaveCallback.serializePoint = SavePoint;
+	SaveCallback.serializeDesc = SaveDesc;
+	Serialize(file, SaveCallback);
+	fclose(file);
+}
+
+void Mesh::Serialize(FILE * file, SerializeCallback context)
+{
+	context.serializeArrayPoint(file,_vertices);
+	context.serializeArrayInt(file,_indices);
+	context.serializePoint(file,cv::Point3f(_materialDiffuse[0], _materialDiffuse[1], _materialDiffuse[2]));
+	context.serializeDesc(file,_desc);
+}
 
 const cv::Point3f& Mesh::getVertex(int pos) const
 {
@@ -40,11 +131,11 @@ const cv::Point3f& Mesh::getVertex(int pos) const
 
 const float * Mesh::Diffuse() const
 {
-	return materialDiffuse;
+	return _materialDiffuse;
 }
 
 /** Load a CSV with *.ply format **/
-void Mesh::load(const std::string path, bool repairNormals)
+void Mesh::Load(const std::string path, bool repairNormals)
 {
 	Clear();
 	// Create the reader

@@ -26,19 +26,37 @@ struct PositionDesc
 //                OBJECT MESH CLASS                    //
 // --------------------------------------------------- //
 
+typedef void(*SerializePoint)(FILE * file, cv::Point3f&point);
+typedef void(*SerializeArrayPoint)(FILE * file, std::vector<Vertex> &point);
+typedef void(*SerializeArraySize)(FILE * file, std::vector<int> &point);
+typedef void(*SerializeDesc)(FILE * file, PositionDesc& desc);
+
+struct SerializeCallback
+{
+	SerializePoint serializePoint;
+	SerializeArrayPoint serializeArrayPoint;
+	SerializeArraySize serializeArrayInt;
+	SerializeDesc serializeDesc;
+};
+
 class Mesh
 {
 	PositionDesc _desc;
-	float materialDiffuse[3];
+	float _materialDiffuse[3];
+
+	void LoadCastle(const char * name);
+
 public:
 	 
 	Mesh();
-	virtual ~Mesh();
+	~Mesh();
 
+	void Save(const char * name);
+	void Serialize(FILE * file, SerializeCallback context);
 	const cv::Point3f& getVertex(int pos) const;
 	int getNumVertices() const { return _vertices.size(); }
 	const float * Diffuse()const;
-	void load(const std::string path_file, bool repairNormals = true);
+	void Load(const std::string path_file, bool repairNormals = true);
 	int NIndices()const;
 	int NVertices()const;
 	const int * Indices() const;

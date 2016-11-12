@@ -13,11 +13,11 @@
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="creatorLayout" stretch="5,1">
+  <layout class="QVBoxLayout" name="appLayout" stretch="0,1">
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -40,14 +40,14 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>220</width>
-               <height>312</height>
+               <width>100</width>
+               <height>99</height>
               </rect>
              </property>
              <attribute name="label">
               <string>File</string>
              </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
+             <layout class="QVBoxLayout" name="loaderLayout">
               <item>
                <widget class="QPushButton" name="loadButton">
                 <property name="text">
@@ -75,7 +75,7 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>-19</y>
+               <y>0</y>
                <width>203</width>
                <height>331</height>
               </rect>
@@ -347,13 +347,17 @@
       <attribute name="title">
        <string>Creator</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="InputList" name="inputList"/>
+        <widget class="InputList" name="inputList">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,10,0">
+         <layout class="QVBoxLayout" name="creatorLayout" stretch="0,10,0">
           <item>
            <widget class="QLabel" name="creatorLabel">
             <property name="text">
@@ -362,89 +366,74 @@
            </widget>
           </item>
           <item>
-           <widget class="VideoRenderer" name="cloudPoints">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>100</height>
-             </size>
-            </property>
-           </widget>
+           <widget class="VideoRenderer" name="cloudPoints"/>
           </item>
           <item>
-           <widget class="QFrame" name="frame">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QPushButton" name="loadSetButton">
-               <property name="text">
-                <string>Load set</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="saveSettingsButton">
-               <property name="text">
-                <string>Save set</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="playButton">
-               <property name="text">
-                <string>Play</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="featuresButton">
-               <property name="text">
-                <string>Features</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pauseButton">
-               <property name="text">
-                <string>Pause</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="stopButton">
-               <property name="text">
-                <string>Stop</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="nextFrameButton">
-               <property name="text">
-                <string>Next frame</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="prevFrameButton">
-               <property name="text">
-                <string>Previous frame</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="greyButton">
-               <property name="text">
-                <string>To grey</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="loadSetButton">
+              <property name="text">
+               <string>Load set</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="saveSettingsButton">
+              <property name="text">
+               <string>Save set</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="playButton">
+              <property name="text">
+               <string>Play</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="featuresButton">
+              <property name="text">
+               <string>Features</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pauseButton">
+              <property name="text">
+               <string>Pause</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="stopButton">
+              <property name="text">
+               <string>Stop</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="nextFrameButton">
+              <property name="text">
+               <string>Next frame</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="prevFrameButton">
+              <property name="text">
+               <string>Previous frame</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="greyButton">
+              <property name="text">
+               <string>To grey</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

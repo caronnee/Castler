@@ -5,7 +5,7 @@
 #include <qmath.h>
 
 RenderCircle::RenderCircle(QWidget * parent) : QOpenGLWidget(parent) {
-	_mesh.load(GetFullPath("models\\cube.ply").c_str());
+	_mesh.Load(GetFullPath("models\\cube.ply").c_str());
 	_rotating = false;
 	_rotation.setToIdentity();
 	_background = QColor(0, 0, 0);

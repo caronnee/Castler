@@ -74,7 +74,24 @@ int index = 0;
 
 #include <windows.h>
 
-int main()
+int GetFromFolder(const char * name) {
+	
+	//generate pointcloud
+
+
+	// make the features
+
+
+	//save the pointcoud
+	//
+	return 0;
+}
+int GetFromVideo()
+{
+	return 0;
+}
+
+int CheckCalibration()
 {
 	char bf[1024];
 	GetModuleFileNameA(NULL, bf, 1024);
@@ -152,4 +169,10 @@ int main()
 	}
 	
 	return 0;
+}
+
+
+int main()
+{
+	return CheckCalibration();
 }

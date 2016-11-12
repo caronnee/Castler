@@ -347,11 +347,11 @@ void Creator::LoadSettings()
 	QString last = settings.value("lastOpened").toString();
 	QString settingLastName = QApplication::applicationDirPath() + "\\" + last;
 	QSettings settingsLast(settingLastName, QSettings::IniFormat);
-	int size = settingsLast.beginReadArray("input");
+	int size = settingsLast.beginReadArray("models");
 	for (int i = 0; i<size ; i++)
 	{
 		settingsLast.setArrayIndex(i);
-		ui.inputList->addVideo(settingsLast.value("input").toString());
+		ui.inputList->AddInputItem(settingsLast.value("model").toString());
 	}
 	settingsLast.endArray();
 }
@@ -421,17 +421,16 @@ void Creator::SaveSettings()
 	}
 	QString model = QApplication::applicationDirPath() + "\\" + name;
 	QSettings modelSettings(model, QSettings::IniFormat);
-	modelSettings.beginWriteArray("input");
+	modelSettings.beginWriteArray("models");
 	
 	for (int i = 0; i < ui.inputList->count(); i++)
 	{
 		modelSettings.setArrayIndex(i);
 		QVariant str = ui.inputList->item(i)->data(Qt::UserRole);
-		modelSettings.setValue("input", str);
+		modelSettings.setValue("model", str);
 	}
 	modelSettings.endArray();
 
-	
 	modelSettings.sync();
 	settings.sync();
 	//InputList * list = ui.inputList;

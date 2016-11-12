@@ -19,22 +19,26 @@ protected:
 	enum Actions
 	{
 		ActionNewVideo,
+		ActionNewFolder,
+		ActionRefresh,
 		ActionDeleteVideo,
 		NActions
 	};
-	QAction *newAct[NActions];
+	QAction *_inputActions[NActions];
 	void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
-
-public:
-	void addVideo(const QString & str);
-
+	
 public slots:
-	void addVideo();
+	void AddInputItem();
+	void addFolderSlot();
 	void deleteVideo();
 
 private:
 	void createActions();
 	void clearActions();
+	void AddDir(const QString & name);
+
+public:
+	void AddInputItem(const QString & str);
 
 };
 #endif // INPUTLIST_H
