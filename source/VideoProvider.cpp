@@ -20,6 +20,16 @@ IImageProvider * VideoProvider::create(const QString & source)
 	return nullptr;
 }
 
+bool VideoProvider::IsSupported(const QString & source)
+{
+	for (int i = 0; i < NImages; i++)
+	{
+		if (source.endsWith(videoExts[i]))
+			return true;
+	}
+	return false;
+}
+
 VideoProvider::VideoProvider(const QString & source)
 {
 	_capture.reset(new cv::VideoCapture(source.toStdString()));

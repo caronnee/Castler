@@ -14,6 +14,7 @@ class ImagesProvider : public IImageProvider
 	std::vector<FImage> _images;
 public:
 	static IImageProvider * create(const QString & source);
+	static bool IsSupported(const QString & source);
 
 	ImagesProvider(const QString & source);
 

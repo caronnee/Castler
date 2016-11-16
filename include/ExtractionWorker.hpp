@@ -36,7 +36,7 @@ class ExtractionWorker : public QObject, public IReportFunction
 	CalibrationSet _calibrationSet;
 
 	// provider for the images
-	IImageProvider * _provider;
+	Providers _provider;
 
 	ImageProcessor processor;
 private:

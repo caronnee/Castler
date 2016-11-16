@@ -7,11 +7,12 @@
 enum CaptureModes
 {
 	ModeIdle = 1, // do nothing
-	ModeFeatures = 1 << 1,
+	ModePlay = 1 << 1,
 	ModeGrey = 1 << 2,
 	ModeCalibrate = 1 << 3,
 	ModeDetect = 1 << 4,
 	ModeUndistort = 1 << 5,
+	ModeFeatures = 1 << 6
 };
 
 struct CalibrationSet
@@ -36,4 +37,33 @@ public:
 	virtual double Step() = 0;
 };
 
-IImageProvider * CreateProvider(const QString & source);
+struct Providers
+{
+	std::vector<IImageProvider *> _providers;
+	int _currentProvider = 0;
+	bool Next(cv::Mat&frame)
+	{
+		while (_currentProvider < _providers.size())
+		{
+			if (_providers[_currentProvider]->NextFrame(frame))
+				return true;
+			_currentProvider++;
+		}
+		return false;
+	}
+	int Step()
+	{
+		return _providers[_currentProvider]->Step();
+	}
+	void Clear();
+	void Create(QString & str);
+	bool IsValid() const;
+	IImageProvider * Get()
+	{
+		return _providers[_currentProvider];
+	}
+};
+
+
+IImageProvider * CreateProvider(const QString & source); 
+bool IsSupportedFile(const QString & source);

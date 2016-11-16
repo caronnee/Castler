@@ -50,7 +50,6 @@ FrameProcessor::FrameProcessor()
 	connect(this, SIGNAL(cleanupSignal()), &_worker, SLOT(Cleanup()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(deleteLater()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(Terminate()));
-	connect(&_thread, SIGNAL(finished()), &_thread, SLOT(deleteLater()));
 	connect(&_worker, SIGNAL(imageProcessed(cv::Mat, double)), this, SLOT( ImageReported( cv::Mat,double )));
 	_thread.start();
 }
@@ -68,7 +67,7 @@ FrameProcessor::~FrameProcessor()
 	DoAssert(!_timer.isActive());
 	emit cleanupSignal();
 	_thread.disconnect();
-	_thread.terminate();
+//	_thread.wait();
 }
 
 void FrameProcessor::Pause()

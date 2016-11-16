@@ -7,17 +7,14 @@ ExtractionWorker::ExtractionWorker()
 	_mode = ModeIdle;
 	_chesspoints.clear();
 	_foundCoords.clear();
-	_provider = NULL;
+	_mode = ModeIdle;
 }
 
 void ExtractionWorker::Cleanup()
 {
 	_timer.stop();
-	_mode = ModeIdle;
 	_chesspoints.clear();
-	if (_provider)
-		delete _provider;
-	_provider = NULL;
+	_provider.Clear();
 
 #define COEF 10
 	for (int i = 0; i < _chessH; i++)
@@ -53,15 +50,17 @@ void ExtractionWorker::Report(MessageLevel level, const QString & str)
 
 void ExtractionWorker::OpenSlot(QString str)
 {
+	if ( _timer.isActive())
+		_timer.stop();
 	Cleanup();
-	_provider = CreateProvider(str);
+	 
+	_provider.Create(str);
 	
-	DoAssert(_provider != false && _provider->IsValid());
-	processor.Init(_provider);
-	_mode = ModeIdle;
-	_timer.start(10,this);
+	DoAssert( _provider.IsValid() );
+	processor.Init(&_provider);
+	_timer.start(0,this);
+	_mode |= ModePlay;
 }
-
 void ExtractionWorker::timerEvent(QTimerEvent * ev)
 {
 	if (_timer.timerId() != ev->timerId()|| (_mode <= ModeIdle ))
@@ -69,15 +68,14 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 		// nothing to do
 		return;
 	}
-	// one step
-	_timer.stop();
-	bool cont = RunExtractionStep(processor);
-	if (!cont)
+	if (!RunExtractionStep(processor))
 	{
-		_timer.start(5, this);
+		//nothing more to process
 		return;
 	}
-	if (cont && (_mode & ModeCalibrate))
+	_timer.stop();
+	//last step for calibration
+	if (_mode & ModeCalibrate)
 	{
 		// last calibration step
 
@@ -115,11 +113,11 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 
 void ExtractionWorker::PreparePair(int start, int modifier)
 {
-	if (!_provider)
+	if (_provider.IsValid()==false)
 		return;
 	cv::Mat m1, m2;
-	_provider->NextFrame(m1);
-	_provider->NextFrame(m2);
+	_provider.Next(m1);
+	_provider.Next(m2);
 	if (modifier == CannyModifier)
 	{
 		cv::Mat blurred;
@@ -150,7 +148,7 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 			return true;
 		}
 
-		QString str = QString::asprintf("Processing image %d", _provider->Position());
+		QString str = QString::asprintf("Processing image %d", _provider.Get()->Position());
 
 		emit workerReportSignal(MInfo, str);
 
@@ -199,7 +197,7 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		
 		if (found)
 		{
-			QString str = QString::asprintf("Found at %d", _provider->Position());
+			QString str = QString::asprintf("Found at %d", _provider.Get()->Position());
 			emit workerReportSignal(MInfo, str.toStdString().c_str());
 			cv::drawChessboardCorners(mat, patternSize, cv::Mat(_foundCoords.back()), found);
 		}
@@ -207,8 +205,9 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		// emit result
 		emit workerReportSignal(MInfo, "Emitting result");
 	
-		emit imageProcessed(mat, _provider->Step()/1000);
+		emit imageProcessed(mat, _provider.Step()/1000);
 	}
 	return false;
 
 }
+

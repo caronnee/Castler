@@ -20,7 +20,6 @@ signals:
 	void setCalibrationSignal(CalibrationSet set);
 
 public slots:
-
 	void setImage(cv::Mat img);
 	void Report(MessageLevel level, const QString & message);
 	void ShowParameters(cv::Mat camera, cv::Mat dist);
@@ -29,6 +28,5 @@ public:
 	
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
 	~VideoRenderer();
-
 	void SetParameters(CalibrationSet calibration);
 };

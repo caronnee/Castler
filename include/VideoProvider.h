@@ -16,6 +16,7 @@ class VideoProvider : public IImageProvider
 public:
 
 	static IImageProvider * create(const QString & source);
+	static bool IsSupported(const QString & source);
 
 	VideoProvider(const QString & source);
 

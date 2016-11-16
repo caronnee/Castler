@@ -74,23 +74,68 @@ int index = 0;
 
 #include <windows.h>
 
-int GetFromFolder(const char * name) {
-	
-	//generate pointcloud
-
-
-	// make the features
-
-
-	//save the pointcoud
-	//
-	return 0;
-}
-int GetFromVideo()
+cv::Mat MakeCanny(cv::Mat image)
 {
-	return 0;
+	//// move to grey
+	cv::Mat grey;
+	cv::cvtColor(image, grey, CV_BGR2GRAY);
+	//// adaptive thresholding
+	cv::Mat ret = image;
+	cv::Mat resized;
+
+	std::vector<cv::Point2f> crns;
+	/*
+	bool chess = cv::findChessboardCorners(grey, cv::Size(7, 7), crns, 11);
+
+	if (chess)
+	__debugbreak();
+	*/
+	//normalize image
+	cv::Mat equalized;
+	cv::equalizeHist(grey, equalized);
+	imshow("equalized", equalized);
+	cv::adaptiveThreshold(equalized, ret, 255, cv::THRESH_BINARY, cv::ADAPTIVE_THRESH_GAUSSIAN_C, 11, 2);
+
+	cv::imshow("test", ret);
+	// find chessboard according to openCV
+	std::vector<cv::Point2f> corners;
+
+	// use canny
+	cv::Mat blurred;
+
+	/// Reduce noise with a kernel 3x3
+	cv::blur(grey, blurred, cv::Size(15, 15));
+
+	cv::Canny(blurred, ret, 10, 20, 3);
+
+	cv::imshow("canny", ret);
+
+	return ret;
 }
 
+int GetFromVideo(const char*source)
+{
+	cv::VideoCapture video(source);
+	cv::Mat image;
+
+	if (video.isOpened())
+	{
+		video.read(image);
+		cv::imshow("original", image);
+	}
+	else
+	{
+		cv::imread(source, CV_LOAD_IMAGE_COLOR);
+	}
+
+	cv::Mat ret,re2 = MakeCanny(image);
+	cv::resize(re2, ret, cv::Size(600, 600));
+	cv::imshow("returned", ret);
+	cv::resize(image, ret, cv::Size(600, 600));
+	cv::imshow("resized", ret);
+	cv::waitKey(0);
+	return 0;
+}
 int CheckCalibration()
 {
 	char bf[1024];
@@ -105,21 +150,9 @@ int CheckCalibration()
 		////opencv load image		
 		cv::Mat image = cv::imread( (appPath + names[i]).c_str(), CV_LOAD_IMAGE_COLOR);
 
-		//// move to grey
-		cv::Mat grey;
-		cv::cvtColor(image, grey, CV_BGR2GRAY);
-		//// adaptive thresholding
-		cv::Mat ret = image;
-		cv::Mat resized;
+		cv::Mat ret = MakeCanny(image);
+		
 		cv::Size size = image.size();
-
-		std::vector<cv::Point2f> crns;
-		/*
-		bool chess = cv::findChessboardCorners(grey, cv::Size(7, 7), crns, 11);
-
-		if (chess)
-			__debugbreak();
-			*/
 
 		double ratio1 = 800.0 / size.width;
 		double ratio2 = 600.0 / size.height;
@@ -128,22 +161,6 @@ int CheckCalibration()
 
 		size.width *= ratio1;
 		size.height *= ratio1;
-
-		cv::adaptiveThreshold(grey, ret, 255, cv::THRESH_BINARY, cv::ADAPTIVE_THRESH_GAUSSIAN_C, 11, 2);
-
-		cv::imshow("test", ret);
-		// find chessboard according to openCV
-		std::vector<cv::Point2f> corners;
-
-		// use canny
-		cv::Mat blurred;
-
-		/// Reduce noise with a kernel 3x3
-		cv::blur(grey, blurred, cv::Size(15, 15));
-
-		cv::Canny(blurred, ret, 20, 60, 3);
-		
-		cv::imshow("canny", ret);
 
 
 		std::vector<std::vector<cv::Point> > contours;
@@ -171,8 +188,11 @@ int CheckCalibration()
 	return 0;
 }
 
+#define INPUT_NAME "c:\\work\\DP1\\Data\\video\\gitara.3gp"
+//#define INPUT_NAME "c:\\work\\DP1\\Data\\letiskoFoto\\IMAGE00013.jpg"
 
 int main()
 {
+	return GetFromVideo(INPUT_NAME);
 	return CheckCalibration();
 }

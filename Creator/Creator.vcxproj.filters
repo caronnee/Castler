@@ -42,9 +42,6 @@
     <Filter Include="Source Files\MemoryManagement">
       <UniqueIdentifier>{dd4fac29-95c1-4f2f-998d-113eb5db36f8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ImageProviders">
-      <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\ImageProcessor">
       <UniqueIdentifier>{b0ddf950-7de2-4086-8db6-0aae3216416c}</UniqueIdentifier>
     </Filter>
@@ -71,6 +68,9 @@
     </Filter>
     <Filter Include="Source Files\Helper">
       <UniqueIdentifier>{94e2c6ff-eb77-4349-bbe6-b568b8bb86ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ImageProviders">
+      <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

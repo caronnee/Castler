@@ -10,9 +10,9 @@
 class Creator : public QWidget, public IReportFunction
 {
 	Q_OBJECT
+		;
 
-
-	// application shorcuts
+	// application shortcuts
 	std::vector<QShortcut *> _shortcuts;
 
 	// one common processor for images
@@ -33,19 +33,20 @@ signals:
 	void PreparePairSignal(int,int);
 
 private slots:
-void FillActive(PositionDesc & des);
-
-void ChangeActiveDesc();
+	void FillActive(PositionDesc & des);
+	void ChangeActiveDesc();
 	void SetModifier();
 	void GetNextImagePair();
 	void SetCompare(cv::Mat left, cv::Mat right);
 	void FeaturesFromFrame();
+	void CreateNew();
 	void ShowGreyFrame();
 	void Stop();
 	void Pause();
 	void SendParameters();
 	void SaveCalibration();
 	void EnablePlay();
+	void CreateMesh();
 	void PlayVideo();
 	void LoadSettings();
 	void LoadModel();

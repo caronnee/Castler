@@ -11,16 +11,13 @@ ImageProcessor::ImageProcessor()
 {
 	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
-	_ffd = nullptr;
 }
 
-bool ImageProcessor::Init(IImageProvider * provider, bool ffd /*= false*/)
+bool ImageProcessor::Init(Providers * provider, bool ffd /*= false*/)
 {
 	_provider = provider;
-	if (ffd)
-	{
-		_ffd = cv::FastFeatureDetector::create();
-	}
+	_ffd = cv::GFTTDetector::create();
+	//_ffd = cv::GFTTDetector::create();
 	return true;
 }
 
@@ -31,7 +28,7 @@ cv::Size ImageProcessor::GetSize()
 
 bool ImageProcessor::Prepare( cv::Mat& frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points)
 {
-	if (!_provider || _provider->NextFrame(frame) == false)
+	if (!_provider || _provider->Get()->NextFrame(frame) == false)
 		return false;
 
 	_frameSize = frame.size();
@@ -170,12 +167,13 @@ void ImageProcessor::UseGrey()
 
 bool ImageProcessor::DrawFeatures()
 {
+	std::vector<cv::Point2f> points;
+	cv::KeyPoint::convert(_keypoints,points);
+	for (int i = 0; i < points.size(); i++)
+	{
+		cv::circle(_ret, points[i], 18, cv::Scalar(0.4, 200, 150),3);
+	}
 	return true;
-}
-
-void ImageProcessor::ToGrey()
-{
-	_ret = _gr;
 }
 
 cv::Mat ImageProcessor::GetResult()

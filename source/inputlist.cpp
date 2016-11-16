@@ -44,6 +44,8 @@ void InputList::AddInputItem()
 	}
 }
 
+#include "imageprovider.h"
+
 void InputList::AddDir(const QString & name)
 {
 	QDir dir(name);
@@ -51,7 +53,8 @@ void InputList::AddDir(const QString & name)
 	foreach(QFileInfo finfo, list) {
 		if (finfo.isDir())
 			continue;
-		AddInputItem(finfo.absoluteFilePath());
+		if ( IsSupportedFile(name) )
+			AddInputItem(finfo.absoluteFilePath());
 	}
 }
 

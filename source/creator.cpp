@@ -46,38 +46,37 @@ Creator::Creator(QWidget *parent)
 	ui.lockGroup->setId(ui.modelRadioButton, PositionModel);
 	ui.lockGroup->setId(ui.lightRadioButton, PositionLight);
 
-	// connect file settings
-	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
-
 	// videorender connections
+	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
 	connect(ui.pauseButton, SIGNAL(clicked(void)), this, SLOT(Pause(void)));
 	connect(ui.cloudPoints, SIGNAL(Finished(void)), this, SLOT(EnablePlay()));
 	connect(ui.cloudPoints, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
+	connect(ui.createMeshButton, SIGNAL(clicked()), _capturer.GetWorker(), SLOT(StartCreating()));
 	//connect(ui.nextFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestNextFrame()));
 	//connect(ui.prevFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestPrevFrame()));
+	ui.nextFrameButton->setDisabled(true);
+	ui.prevFrameButton->setDisabled(true);
 	connect(ui.stopButton, SIGNAL(clicked(void)), this, SLOT(Stop(void)));
-	connect(ui.featuresButton, SIGNAL(clicked(void)), this, SLOT(FeaturesFromFrame()));
+	connect(ui.featuresCheckbox, SIGNAL(clicked(void)), this, SLOT(FeaturesFromFrame()));
 	connect(ui.stopButton, SIGNAL(clicked(void)), this, SLOT(Stop()));
-	connect(ui.greyButton, SIGNAL(clicked(void)), this, SLOT(ShowGreyFrame(void)));
-
+	connect(ui.greyCheckBox, SIGNAL(clicked(void)), this, SLOT(ShowGreyFrame(void)));
+	connect(ui.newButton, SIGNAL(clicked(void)), this, SLOT(CreateNew(void)));
 
 	//calibration connects
 	connect(ui.loadCalibrationButton, SIGNAL(clicked()), this, SLOT(LoadCalibration(void)));
 	connect(ui.runCalibrationButton, SIGNAL(clicked()), this, SLOT(RunCalibration(void)));
 	connect(ui.calibrationFolderButton, SIGNAL(clicked()), this, SLOT(LoadCalibrationImages()));
-	connect(ui.calibrationVideo, SIGNAL(reportSignal(MessageLevel, const QString & )), ui.infobox, SLOT(Report(MessageLevel,const QString&)));
-	connect(ui.stopCalibrationButton, SIGNAL(clicked()), this, SLOT(Stop()));
-	connect(ui.calibrationVideo, SIGNAL(setCameraSignal(cv::Mat,int)), this, SLOT(SetCalibCamera(cv::Mat,int)));
 	connect(ui.applyCalibrationButton, SIGNAL(clicked()), this, SLOT(SendParameters()));
 	connect(ui.playUndistortedButton, SIGNAL(clicked()), this, SLOT(ShowUndistorted()));
 	connect(ui.saveCalibrationButton, SIGNAL(clicked()), this, SLOT(SaveCalibration()));
 
-	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat)), ui.calibrationVideo, SLOT(setImage(cv::Mat)));
-	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.calibrationVideo, SLOT(Report(MessageLevel, const QString &)));
-	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), ui.calibrationVideo, SLOT(ShowParameters(cv::Mat, cv::Mat)));
-	connect(ui.calibrationVideo, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
+	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat)), ui.cloudPoints, SLOT(setImage(cv::Mat)));
+
+	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.cloudPoints, SLOT(Report(MessageLevel, const QString &)));
+	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), ui.cloudPoints, SLOT(ShowParameters(cv::Mat, cv::Mat)));
+	connect(ui.cloudPoints, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
 
 	// comparer connects
 	connect(ui.compareNext, SIGNAL(clicked()), this, SLOT(GetNextImagePair()));
@@ -133,6 +132,11 @@ void Creator::FeaturesFromFrame()
 	emit modeChangedSignal(ModeFeatures);
 }
 
+void Creator::CreateNew()
+{
+	ui.inputList->clear();
+}
+
 void Creator::ShowGreyFrame()
 {
 	emit modeChangedSignal(ModeGrey);
@@ -175,7 +179,7 @@ void Creator::SendParameters()
 	}
 #endif
 
-	ui.calibrationVideo->SetParameters( calibration );
+	ui.cloudPoints->SetParameters( calibration );
 }
 
 void Creator::SetCalibCamera(cv::Mat camera, int type)
@@ -320,9 +324,24 @@ void Creator::EnablePlay()
 	ui.playButton->setDisabled(false);
 }
 
+void Creator::CreateMesh()
+{
+	// create mesh from all inputs
+	int size = ui.inputList->count();
+	std::string compl;
+	for (int i = 0; i < size; i++)
+	{
+		auto input = ui.inputList->item(i);
+		compl += input->data(Qt::UserRole).toString().toStdString() + ";";
+	}
+	_capturer.Load(&compl.c_str()[1]);
+}
 void Creator::PlayVideo()
 {
-	emit modeChangedSignal(ModeDetect);
+	// there is always something selected;set
+	// if nothing is selected, return
+	QString actualString = ui.inputList->selectedItems()[0]->data(Qt::UserRole).toString();
+	_capturer.Load(actualString);
 }
 
 const char * CSettingFileName = "/settings.castler";

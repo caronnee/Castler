@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>887</width>
-    <height>578</height>
+    <width>934</width>
+    <height>654</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="appLayout" stretch="0,1">
+  <layout class="QVBoxLayout" name="appLayout" stretch="0,0">
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
@@ -40,8 +40,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>100</width>
-               <height>99</height>
+               <width>220</width>
+               <height>333</height>
               </rect>
              </property>
              <attribute name="label">
@@ -76,7 +76,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>203</width>
+               <width>216</width>
                <height>331</height>
               </rect>
              </property>
@@ -347,17 +347,20 @@
       <attribute name="title">
        <string>Creator</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
+      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0" columnstretch="1,6,3">
+       <item row="2" column="1">
+        <widget class="VideoRenderer" name="cloudPoints"/>
+       </item>
+       <item row="2" column="0">
         <widget class="InputList" name="inputList">
          <property name="sortingEnabled">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="2" column="2">
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="creatorLayout" stretch="0,10,0">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <widget class="QLabel" name="creatorLabel">
             <property name="text">
@@ -366,74 +369,360 @@
            </widget>
           </item>
           <item>
-           <widget class="VideoRenderer" name="cloudPoints"/>
+           <widget class="QToolBox" name="detectorTools">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="page">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>246</width>
+               <height>268</height>
+              </rect>
+             </property>
+             <attribute name="label">
+              <string>Cloud set</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QPushButton" name="createMeshButton">
+                <property name="text">
+                 <string>Create Mesh</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="saveSettingsButton">
+                <property name="text">
+                 <string>Save set</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="loadSetButton">
+                <property name="text">
+                 <string>Load set</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="calibrationToolGroup">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>-115</y>
+               <width>229</width>
+               <height>383</height>
+              </rect>
+             </property>
+             <attribute name="label">
+              <string>Calibration tool</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_7" columnstretch="0">
+              <item row="0" column="0">
+               <widget class="QLabel" name="calibrationLabel">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Sunken</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>3</number>
+                </property>
+                <property name="text">
+                 <string>&lt;none&gt;</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::PlainText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QPushButton" name="loadCalibrationButton">
+                <property name="text">
+                 <string>Load calibration</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QPushButton" name="playUndistortedButton">
+                <property name="text">
+                 <string>Play undistorted</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QPushButton" name="runCalibrationButton">
+                <property name="text">
+                 <string>runCalibration</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QPushButton" name="saveCalibrationButton">
+                <property name="text">
+                 <string>Save calibration</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QPushButton" name="calibrationFolderButton">
+                <property name="text">
+                 <string>Load calibration images</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QFrame" name="parametersFrame">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1,1,1,1,1">
+                 <item row="0" column="3">
+                  <widget class="QDoubleSpinBox" name="principalXValue">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-1000.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="3">
+                  <widget class="QDoubleSpinBox" name="k3">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-10000.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>10000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="pPointLabel">
+                   <property name="text">
+                    <string>Principal point</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="3">
+                  <widget class="QDoubleSpinBox" name="focusValue">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="maximum">
+                    <double>1000000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0" colspan="2">
+                  <widget class="QLabel" name="label_4">
+                   <property name="text">
+                    <string>Radial distortion</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="3">
+                  <widget class="QDoubleSpinBox" name="k1">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-10000.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>10000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="label">
+                   <property name="text">
+                    <string>X:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="3">
+                  <widget class="QDoubleSpinBox" name="k2">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-10000.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>10000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Focus:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="7" column="3">
+                  <widget class="QPushButton" name="applyCalibrationButton">
+                   <property name="text">
+                    <string>Apply</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Y:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QDoubleSpinBox" name="principalYValue">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-1000.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3">
+        <widget class="QWidget" name="widget_4" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="newButton">
+            <property name="text">
+             <string>New</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <widget class="QPushButton" name="playButton">
+            <property name="text">
+             <string>Play</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stopButton">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="nextFrameButton">
+            <property name="text">
+             <string>Next frame</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="prevFrameButton">
+            <property name="text">
+             <string>Previous frame</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pauseButton">
+            <property name="text">
+             <string>Pause</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox">
             <item>
-             <widget class="QPushButton" name="loadSetButton">
-              <property name="text">
-               <string>Load set</string>
-              </property>
-             </widget>
+             <property name="text">
+              <string>None</string>
+             </property>
             </item>
             <item>
-             <widget class="QPushButton" name="saveSettingsButton">
-              <property name="text">
-               <string>Save set</string>
-              </property>
-             </widget>
+             <property name="text">
+              <string>Canny</string>
+             </property>
             </item>
             <item>
-             <widget class="QPushButton" name="playButton">
-              <property name="text">
-               <string>Play</string>
-              </property>
-             </widget>
+             <property name="text">
+              <string>Harris</string>
+             </property>
             </item>
-            <item>
-             <widget class="QPushButton" name="featuresButton">
-              <property name="text">
-               <string>Features</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pauseButton">
-              <property name="text">
-               <string>Pause</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="stopButton">
-              <property name="text">
-               <string>Stop</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="nextFrameButton">
-              <property name="text">
-               <string>Next frame</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="prevFrameButton">
-              <property name="text">
-               <string>Previous frame</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="greyButton">
-              <property name="text">
-               <string>To grey</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="insideCheckBox">
+            <property name="text">
+             <string>modelIsInside</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="greyCheckBox">
+            <property name="text">
+             <string>Grey</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="featuresCheckbox">
+            <property name="text">
+             <string>Features</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -562,278 +851,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="calibTab">
-      <attribute name="title">
-       <string>Calibration</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,10,0">
-       <item>
-        <widget class="QLabel" name="calibrationLabel">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-         <property name="lineWidth">
-          <number>3</number>
-         </property>
-         <property name="text">
-          <string>&lt;none&gt;</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="displayFrame" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <widget class="QFrame" name="frame_2">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,1">
-             <item>
-              <widget class="VideoRenderer" name="calibrationVideo">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>100</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QFrame" name="parametersFrame">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QGridLayout" name="gridLayout">
-                <item row="4" column="4">
-                 <widget class="QDoubleSpinBox" name="focusValue">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="maximum">
-                   <double>1000000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="6">
-                 <widget class="QDoubleSpinBox" name="principalYValue">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-1000.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>1000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="4">
-                 <widget class="QDoubleSpinBox" name="principalXValue">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-1000.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>1000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0" colspan="3">
-                 <widget class="QLabel" name="pPointLabel">
-                  <property name="text">
-                   <string>Principal point</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="7">
-                 <widget class="QPushButton" name="applyCalibrationButton">
-                  <property name="text">
-                   <string>Apply</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="7">
-                 <widget class="QDoubleSpinBox" name="k3">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-10000.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>10000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0" colspan="2">
-                 <widget class="QLabel" name="label_4">
-                  <property name="text">
-                   <string>Radial distortion</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="3">
-                 <widget class="QLabel" name="label">
-                  <property name="text">
-                   <string>X:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="4">
-                 <widget class="QDoubleSpinBox" name="k1">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-10000.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>10000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QCheckBox" name="showGreyMode">
-                  <property name="text">
-                   <string>ShowGrey</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="6">
-                 <widget class="QDoubleSpinBox" name="k2">
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-10000.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>10000.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="5">
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Y:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="label_3">
-                  <property name="text">
-                   <string>Focus:</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="controlsFrame" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QPushButton" name="loadCalibrationButton">
-            <property name="text">
-             <string>Load calibration</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="calibrationFolderButton">
-            <property name="text">
-             <string>Load calibration images</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="runCalibrationButton">
-            <property name="text">
-             <string>runCalibration</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="stopCalibrationButton">
-            <property name="text">
-             <string>Stop</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="saveCalibrationButton">
-            <property name="text">
-             <string>Save calibration</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="playUndistortedButton">
-            <property name="text">
-             <string>Play undistorted</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
        </item>
       </layout>
      </widget>
