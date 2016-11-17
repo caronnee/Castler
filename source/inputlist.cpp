@@ -53,7 +53,7 @@ void InputList::AddDir(const QString & name)
 	foreach(QFileInfo finfo, list) {
 		if (finfo.isDir())
 			continue;
-		if ( IsSupportedFile(name) )
+		if ( IsSupportedFile(finfo.absoluteFilePath()) )
 			AddInputItem(finfo.absoluteFilePath());
 	}
 }

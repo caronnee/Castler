@@ -6,7 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-static QStringList imagesExts = { "*.jpg","*.png","*.jpeg","*.tga","*.tif", "*.tiff" };
+static QStringList imagesExts = { ".jpg",".png",".jpeg",".tga",".tif", ".tiff" };
 
 IImageProvider * ImagesProvider::create(const QString & source)
 {
@@ -21,7 +21,7 @@ bool ImagesProvider::IsSupported(const QString & source)
 	int size = sizeof(imagesExts) / sizeof(imagesExts[0]);
 	for (int i = 0; i < size; i++)
 	{
-		if (source.contains(QRegExp(imagesExts[0])))
+		if (source.endsWith(imagesExts[i]))
 			return true;
 	}
 	return false;
@@ -31,12 +31,13 @@ bool ImagesProvider::IsSupported(const QString & source)
 ImagesProvider::ImagesProvider(const QString & source)
 {
 	_pos = 0;
-	QDirIterator it(source, imagesExts, QDir::Files, QDirIterator::Subdirectories);
+	QDirIterator it(source, QDir::Files, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{
 		it.next();
 		FImage image = { false,it.filePath() };
-		_images.push_back(image);
+		if ( IsSupported( image.name ))
+			_images.push_back(image);
 	}
 }
 
