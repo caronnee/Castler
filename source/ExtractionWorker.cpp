@@ -59,56 +59,27 @@ void ExtractionWorker::OpenSlot(QString str)
 	DoAssert( _provider.IsValid() );
 	processor.Init(&_provider);
 	_timer.start(0,this);
-	_mode |= ModePlay;
 }
+
+static int actionMask = ModeCreate | ModeUndistort | ModePlay;
+
 void ExtractionWorker::timerEvent(QTimerEvent * ev)
 {
-	if (_timer.timerId() != ev->timerId()|| (_mode <= ModeIdle ))
+	if (_timer.timerId() != ev->timerId()|| (_mode & actionMask ) == 0)
 	{
 		// nothing to do
 		return;
 	}
+
 	if (!RunExtractionStep(processor))
 	{
 		//nothing more to process
 		return;
 	}
 	_timer.stop();
+	emit finished();
 	//last step for calibration
-	if (_mode & ModeCalibrate)
-	{
-		// last calibration step
-
-		emit workerReportSignal(MInfo, "Calculating parameters");
-
-		// finish when all images are processed
-		if (_mode & ModeCalibrate)
-		{
-			int nFrames = _foundCoords.size();
-			PointsArray2 chesses;
-
-			chesses.resize(nFrames, _chesspoints);
-			cv::Mat cameraMatrix, distCoeffs, rvecs, tvecs;
-			cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
-			cameraMatrix.at<double>(0, 0) = 1;
-			distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
-			cv::Size size = processor.GetSize();
-
-			int flags = cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5 ;
-			bool calibrated = _foundCoords.size() && cv::calibrateCamera(chesses, _foundCoords, size, cameraMatrix, distCoeffs,
-				rvecs, tvecs, flags );
-
-			if (calibrated)
-			{
-				emit workerReportSignal(MInfo, "Calibration successful");
-				emit camParametersSignal(cameraMatrix, distCoeffs);
-			}
-			else
-			{
-				emit workerReportSignal(MError, "Calibration not successfull");
-			}
-		}
-	}
+	
 }
 
 void ExtractionWorker::PreparePair(int start, int modifier)
@@ -134,8 +105,38 @@ void ExtractionWorker::PreparePair(int start, int modifier)
 void ExtractionWorker::Process()
 {
 	emit workerReportSignal(MInfo, "Starting thread process");
-	// already loaded 
-	//_timer.start(5, this);
+}
+
+void ExtractionWorker::FinishCalibration()
+{
+	// last calibration step
+	emit workerReportSignal(MInfo, "Calculating parameters");
+
+	// finish when all images are processed
+	
+		int nFrames = _foundCoords.size();
+		PointsArray2 chesses;
+
+		chesses.resize(nFrames, _chesspoints);
+		cv::Mat cameraMatrix, distCoeffs, rvecs, tvecs;
+		cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+		cameraMatrix.at<double>(0, 0) = 1;
+		distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+
+		cv::Size size = processor.GetSize();
+		int flags = cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5;
+		bool calibrated = _foundCoords.size() && cv::calibrateCamera(chesses, _foundCoords, size, cameraMatrix, distCoeffs,
+			rvecs, tvecs, flags);
+
+		if (calibrated)
+		{
+			emit workerReportSignal(MInfo, "Calibration successful");
+			emit camParametersSignal(cameraMatrix, distCoeffs);
+		}
+		else
+		{
+			emit workerReportSignal(MError, "Calibration not successfull");
+		}	
 }
 
 bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
@@ -144,7 +145,14 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 	{
 		if (!processor.Next())
 		{
-			//gf_report(MInfo, "No more frames to use");
+			if (_mode & ModeCalibrate)
+			{
+				FinishCalibration();
+			}
+			if (_mode & ModeCreate)
+			{
+				//FinishCreation();
+			}
 			return true;
 		}
 
@@ -184,6 +192,7 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 
 		if (_mode & ModeFeatures)
 		{	
+			processor.ApplyFeatureDetector();
 			processor.DrawFeatures();
 		}
 		

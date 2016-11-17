@@ -12,7 +12,8 @@ enum CaptureModes
 	ModeCalibrate = 1 << 3,
 	ModeDetect = 1 << 4,
 	ModeUndistort = 1 << 5,
-	ModeFeatures = 1 << 6
+	ModeFeatures = 1 << 6,
+	ModeCreate = 1 << 7
 };
 
 struct CalibrationSet

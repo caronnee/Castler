@@ -53,7 +53,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.pauseButton, SIGNAL(clicked(void)), this, SLOT(Pause(void)));
 	connect(ui.cloudPoints, SIGNAL(Finished(void)), this, SLOT(EnablePlay()));
 	connect(ui.cloudPoints, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
-	connect(ui.createMeshButton, SIGNAL(clicked()), _capturer.GetWorker(), SLOT(StartCreating()));
+	connect(ui.createMeshButton, SIGNAL(clicked()),this, SLOT(StartCreating()));
 	//connect(ui.nextFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestNextFrame()));
 	//connect(ui.prevFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestPrevFrame()));
 	ui.nextFrameButton->setDisabled(true);
@@ -324,7 +324,7 @@ void Creator::EnablePlay()
 	ui.playButton->setDisabled(false);
 }
 
-void Creator::CreateMesh()
+void Creator::StartCreating()
 {
 	// create mesh from all inputs
 	int size = ui.inputList->count();
@@ -335,13 +335,16 @@ void Creator::CreateMesh()
 		compl += input->data(Qt::UserRole).toString().toStdString() + ";";
 	}
 	_capturer.Load(&compl.c_str()[1]);
+	emit modeChangedSignal(ModeCreate);
 }
+
 void Creator::PlayVideo()
 {
 	// there is always something selected;set
 	// if nothing is selected, return
 	QString actualString = ui.inputList->selectedItems()[0]->data(Qt::UserRole).toString();
 	_capturer.Load(actualString);
+	emit modeChangedSignal(ModePlay);
 }
 
 const char * CSettingFileName = "/settings.castler";

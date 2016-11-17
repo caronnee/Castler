@@ -9,6 +9,7 @@
 #define TEST( provider, str, variable ) if ( provider::IsSupported(str)) return true;
 #define TEST_CREATE( provider, str, variable ) if ( variable = provider::create(str)) return variable;
 
+
 bool IsSupportedFile(const QString& str)
 {
 	IImageProvider * provider;

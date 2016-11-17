@@ -41,12 +41,11 @@ class ExtractionWorker : public QObject, public IReportFunction
 	ImageProcessor processor;
 private:
 	bool RunExtractionStep( ImageProcessor& processor );
+	void FinishCalibration();
 
 public:
 	// constructor
 	ExtractionWorker();
-
-
 	void Report(MessageLevel level, const QString & str);
 	
 signals:

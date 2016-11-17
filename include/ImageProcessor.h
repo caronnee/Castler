@@ -16,8 +16,7 @@ class ImageProcessor
 	Providers * _provider;
 	cv::Mat _ret;
 	cv::Size _frameSize;
-
-
+	
 public:
 
 	// handler for the messages
@@ -28,6 +27,7 @@ public:
 	cv::Size GetSize();
 	bool Prepare(cv::Mat& frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points);
 	bool PerformCalibration(int chessWidth, int chessHeight, std::vector<cv::Point2f>& corners);
+	void ApplyFeatureDetector();
 	bool PerformDetection();
 	void UseGrey();
 	bool DrawFeatures();

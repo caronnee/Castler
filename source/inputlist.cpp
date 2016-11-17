@@ -48,14 +48,15 @@ void InputList::AddInputItem()
 
 void InputList::AddDir(const QString & name)
 {
-	QDir dir(name);
+	AddInputItem(name);
+	/*QDir dir(name);
 	QFileInfoList list = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 	foreach(QFileInfo finfo, list) {
 		if (finfo.isDir())
 			continue;
 		if ( IsSupportedFile(finfo.absoluteFilePath()) )
 			AddInputItem(finfo.absoluteFilePath());
-	}
+	}*/
 }
 
 void InputList::addFolderSlot()

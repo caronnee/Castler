@@ -27,7 +27,6 @@ bool ImagesProvider::IsSupported(const QString & source)
 	return false;
 }
 
-
 ImagesProvider::ImagesProvider(const QString & source)
 {
 	_pos = 0;

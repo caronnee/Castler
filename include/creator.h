@@ -46,7 +46,7 @@ private slots:
 	void SendParameters();
 	void SaveCalibration();
 	void EnablePlay();
-	void CreateMesh();
+	void StartCreating();
 	void PlayVideo();
 	void LoadSettings();
 	void LoadModel();

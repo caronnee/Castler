@@ -62,7 +62,7 @@ size=28
 28\model=c:\\work\\DP1\\Data\\Arenberg\\castle.027.jpg
 
 [Models]
-1\model=C:/work/DP1/Data/Arenberg/castle.000.jpg
+1\model=C:/work/DP1/Data/Arenberg
 2\model=C:/work/DP1/Data/Arenberg/castle.001.jpg
 3\model=C:/work/DP1/Data/Arenberg/castle.002.jpg
 4\model=C:/work/DP1/Data/Arenberg/castle.003.jpg
@@ -90,4 +90,4 @@ size=28
 26\model=C:/work/DP1/Data/Arenberg/castle.025.jpg
 27\model=C:/work/DP1/Data/Arenberg/castle.026.jpg
 28\model=C:/work/DP1/Data/Arenberg/castle.027.jpg
-size=28
+size=1

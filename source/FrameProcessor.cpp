@@ -6,6 +6,8 @@
 
 bool FrameProcessor::Load(const QString & str)
 {
+	if ( !_thread.isRunning())
+		_thread.start();
 	QString s(str);
 	emit inputChangedSignal(s);
 	return true;
@@ -51,7 +53,6 @@ FrameProcessor::FrameProcessor()
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(deleteLater()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(Terminate()));
 	connect(&_worker, SIGNAL(imageProcessed(cv::Mat, double)), this, SLOT( ImageReported( cv::Mat,double )));
-	_thread.start();
 }
 
 void FrameProcessor::ImageReported(cv::Mat image, double seconds)

@@ -17,7 +17,6 @@ bool ImageProcessor::Init(Providers * provider, bool ffd /*= false*/)
 {
 	_provider = provider;
 	_ffd = cv::GFTTDetector::create();
-	//_ffd = cv::GFTTDetector::create();
 	return true;
 }
 
@@ -33,12 +32,7 @@ bool ImageProcessor::Prepare( cv::Mat& frame, std::vector<cv::KeyPoint>& corners
 
 	_frameSize = frame.size();
 	cv::cvtColor(frame, gr, CV_RGB2GRAY);
-
-	if (_ffd)
-	{
-		_ffd->detect(gr, corners);
-		cv::KeyPoint::convert(corners, points);
-	}
+	
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
 	frame.copyTo(_ret);
 	return true;
@@ -62,8 +56,12 @@ bool ImageProcessor::PerformCalibration(int chessWidth, int chessHeight, std::ve
 		corners.clear();
 	}
 
-	
 	return true;
+}
+
+void ImageProcessor::ApplyFeatureDetector()
+{
+	_ffd->detect(_gr, _keypoints);
 }
 
 bool ImageProcessor::PerformDetection()
