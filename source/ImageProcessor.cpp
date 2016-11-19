@@ -1,16 +1,12 @@
 #include "ImageProcessor.h"
 
-bool ImageProcessor::Next()
-{
-	return Prepare(_frame, _keypoints, _gr, _currentPoints);
-}
-
 IReportFunction * ImageProcessor::_reporter = NULL;
 
 ImageProcessor::ImageProcessor()
 {
 	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
+	_lastImageIndex = 0;
 }
 
 bool ImageProcessor::Init(Providers * provider, bool ffd /*= false*/)
@@ -25,16 +21,17 @@ cv::Size ImageProcessor::GetSize()
 	return _frameSize;
 }
 
-bool ImageProcessor::Prepare( cv::Mat& frame, std::vector<cv::KeyPoint>& corners, cv::Mat& gr, std::vector<cv::Point2f>&points)
+bool ImageProcessor::Next( )
 {
-	if (!_provider || _provider->Get()->NextFrame(frame) == false)
+	if (!_provider || _provider->Get()->NextFrame(_frame) == false)
 		return false;
 
-	_frameSize = frame.size();
-	cv::cvtColor(frame, gr, CV_RGB2GRAY);
+	_lastImageIndex++;
+	_frameSize = _frame.size();
+	cv::cvtColor(_frame, _gr, CV_RGB2GRAY);
 	
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
-	frame.copyTo(_ret);
+	_frame.copyTo(_ret);
 	return true;
 }
 
@@ -49,7 +46,7 @@ bool ImageProcessor::PerformCalibration(int chessWidth, int chessHeight, std::ve
 		cornerSubPix(_gr, corners, cv::Size(11, 11),
 			cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.1));
 		//emit EMessage(MInfo, "%d : FOUND", _provider->Position());
-		cv::KeyPoint::convert(corners, _keypoints);
+
 	}
 	else
 	{
@@ -61,7 +58,10 @@ bool ImageProcessor::PerformCalibration(int chessWidth, int chessHeight, std::ve
 
 void ImageProcessor::ApplyFeatureDetector()
 {
-	_ffd->detect(_gr, _keypoints);
+	KeypointsArray arr;
+	_ffd->detect(_gr, arr);
+
+	_foundCoords.push_back(arr);
 }
 
 bool ImageProcessor::PerformDetection()
@@ -78,7 +78,7 @@ bool ImageProcessor::PerformDetection()
 	std::vector<float> err;
 	cv::TermCriteria crit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 10, 0.03);
 	DoAssert(newKeypoints.size() > 0);
-	cv::calcOpticalFlowPyrLK(_gr, newgr, _currentPoints, convertedKeypoints, status, err);
+	cv::calcOpticalFlowPyrLK(_gr, newgr, _foundCoords[_lastImageIndex-1], convertedKeypoints, status, err);
 
 	// First, filter out the points with high error
 	std::vector<cv::Point2f> right_points_to_find;
@@ -101,8 +101,8 @@ bool ImageProcessor::PerformDetection()
 		reshape(1, right_points_to_find.size()); //flatten array
 
 												 // feature from the next frame
-	std::vector<cv::Point2f> right_features; // detected features
-	cv::KeyPoint::convert(_keypoints, right_features);
+	std::vector<cv::Point2f> right_features;
+
 	cv::Mat right_features_flat = cv::Mat(right_features).reshape(1, right_features.size());
 	// Look around each OF point in the right image
 	// for any features that were detected in its area
@@ -154,7 +154,7 @@ bool ImageProcessor::PerformDetection()
 	_reporter->Report(MInfo, str);
 
 	_gr = newgr;
-	_keypoints = newKeypoints;
+	_foundCoords.push_back( newKeypoints );
 	return true;
 }
 
@@ -166,7 +166,7 @@ void ImageProcessor::UseGrey()
 bool ImageProcessor::DrawFeatures()
 {
 	std::vector<cv::Point2f> points;
-	cv::KeyPoint::convert(_keypoints,points);
+	cv::KeyPoint::convert(_foundCoords[_lastImageIndex],points);
 	for (int i = 0; i < points.size(); i++)
 	{
 		cv::circle(_ret, points[i], 18, cv::Scalar(0.4, 200, 150),3);
@@ -224,4 +224,16 @@ void ImageProcessor::ApplyCalibration(CalibrationSet & calibrationSet)
 	imshow("Second", _ret);
 	cv::waitKey();
 #endif
+}
+
+bool ImageProcessor::FinishCalibration(PointsArray & chesspoints, cv::Mat& cameraMatrix, cv::Mat& distCoeffs)
+{
+	int flags = cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5;
+
+	cv::Mat rvecs, tvecs;
+
+	PointsArray2 chesses;
+	chesses.resize(_foundCoords.size(), chesspoints);
+	bool calibrated = _foundCoords.size() && cv::calibrateCamera(chesses, _foundCoords, _ret.size(), cameraMatrix, distCoeffs,rvecs, tvecs, flags);
+	return calibrated;
 }

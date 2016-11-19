@@ -6,7 +6,6 @@ ExtractionWorker::ExtractionWorker()
 	ImageProcessor::_reporter = this;
 	_mode = ModeIdle;
 	_chesspoints.clear();
-	_foundCoords.clear();
 	_mode = ModeIdle;
 }
 
@@ -113,30 +112,21 @@ void ExtractionWorker::FinishCalibration()
 	emit workerReportSignal(MInfo, "Calculating parameters");
 
 	// finish when all images are processed
-	
-		int nFrames = _foundCoords.size();
-		PointsArray2 chesses;
 
-		chesses.resize(nFrames, _chesspoints);
-		cv::Mat cameraMatrix, distCoeffs, rvecs, tvecs;
-		cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
-		cameraMatrix.at<double>(0, 0) = 1;
-		distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+	cv::Mat cameraMatrix, distCoeffs, rvecs, tvecs;
+	cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+	cameraMatrix.at<double>(0, 0) = 1;
+	distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 
-		cv::Size size = processor.GetSize();
-		int flags = cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5;
-		bool calibrated = _foundCoords.size() && cv::calibrateCamera(chesses, _foundCoords, size, cameraMatrix, distCoeffs,
-			rvecs, tvecs, flags);
-
-		if (calibrated)
-		{
-			emit workerReportSignal(MInfo, "Calibration successful");
-			emit camParametersSignal(cameraMatrix, distCoeffs);
-		}
-		else
-		{
-			emit workerReportSignal(MError, "Calibration not successfull");
-		}	
+	if (processor.FinishCalibration(_chesspoints, cameraMatrix, distCoeffs))
+	{
+		emit workerReportSignal(MInfo, "Calibration successful");
+		emit camParametersSignal(cameraMatrix, distCoeffs);
+	}
+	else
+	{
+		emit workerReportSignal(MError, "Calibration not successful");
+	}
 }
 
 bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
@@ -166,11 +156,6 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		{
 			CoordsArray corners;
 			processor.PerformCalibration(_chessW,_chessH, corners);
-			if (corners.size())
-			{
-				found = true;
-				_foundCoords.push_back(corners);
-			}
 		}
 		
 		if (_mode & ModeDetect)
@@ -208,7 +193,7 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		{
 			QString str = QString::asprintf("Found at %d", _provider.Get()->Position());
 			emit workerReportSignal(MInfo, str.toStdString().c_str());
-			cv::drawChessboardCorners(mat, patternSize, cv::Mat(_foundCoords.back()), found);
+			//cv::drawChessboardCorners(mat, patternSize, cv::Mat(), found);
 		}
 		
 		// emit result

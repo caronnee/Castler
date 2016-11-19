@@ -24,12 +24,14 @@ class ExtractionWorker : public QObject, public IReportFunction
 	Q_OBJECT
 		;
 	int _mode;
+
+	//TODO  this should be later autodetected
 	int _chessW = 7, _chessH=7;
+	
 	// time to check for input
 	QBasicTimer _timer;
-
-	CoordsArray2 _foundCoords;
-
+	
+	// checkpoints to detect for calibration purposes
 	std::vector<cv::Point3f> _chesspoints;
 
 	//used calibration
@@ -38,6 +40,7 @@ class ExtractionWorker : public QObject, public IReportFunction
 	// provider for the images
 	Providers _provider;
 
+	// main class for detection
 	ImageProcessor processor;
 private:
 	bool RunExtractionStep( ImageProcessor& processor );
@@ -49,6 +52,7 @@ public:
 	void Report(MessageLevel level, const QString & str);
 	
 signals:
+	void pointDetectedSignal(int id, cv::Point3f point);
 	void imagePairSignal(cv::Mat left, cv::Mat right);
 	void started(int optimalseconds);
 	void workerReportSignal(MessageLevel level, const QString & str);
