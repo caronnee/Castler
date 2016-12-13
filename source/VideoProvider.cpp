@@ -85,3 +85,8 @@ double VideoProvider::Step()
 {
 	return _fps;
 }
+
+int VideoProvider::Count()
+{
+	return _numFrames;
+}

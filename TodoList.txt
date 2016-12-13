@@ -1,3 +1,12 @@
+- motion estimator
+- implement memory controlling
+- C:\work\DP1\opencv_src\samples\cpp\stitching_detailed.cpp
+- Detect points from images, different ways. Find the most corresponding
+- using autofocus?
+- KD TREE exists in cv
+- what is MSER?
+- shape comparison
+-image segmentation
 - detect degradation from camera movement
 - Why is drawchessboard separate function? - draws lines1		
 - manually pick up point that might be similar. automated help

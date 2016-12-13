@@ -188,6 +188,9 @@
     <ClCompile Include="../source/VideoProvider.cpp">
       <Filter>Source Files\Source</Filter>
     </ClCompile>
+    <ClCompile Include="misc.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -312,7 +315,7 @@
     <ClInclude Include="..\include\model\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Mics.h">
+    <ClInclude Include="..\include\Misc.h">
       <Filter>Source Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>

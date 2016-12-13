@@ -53,28 +53,4 @@ void VideoRenderer::ShowParameters(cv::Mat camera, cv::Mat dist)
 {
 	emit setCameraSignal(camera,0);
 	emit setCameraSignal(dist,1);
-
 }
-
-/*bool VideoRenderer::Start(const QString & str, VideoAction action)
-{
-	switch (action)
-	{
-		case ActionUndistort:
-		{
-			return _capturer.Load(str, ModeUndistort);
-		}
-		case ActionCalibrate:
-		{
-			return _capturer.Load(str, ModeCalibrate);
-		}
-		case ActionDetect:
-		{
-			return _capturer.Load(str, ModeDetect);
-		}
-	}
-	return true;
-}
-*/
-//void SetLogging(IReportFunction * handler);
-//void gf_report(MessageLevel level, const char * format, ...);

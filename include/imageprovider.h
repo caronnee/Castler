@@ -36,12 +36,25 @@ public:
 	virtual void SetPosition(const int & position) = 0;
 	virtual int Position() = 0;
 	virtual double Step() = 0;
+	virtual int Count() = 0;
 };
 
 struct Providers
 {
 	std::vector<IImageProvider *> _providers;
 	int _currentProvider = 0;
+	
+	//number of frames this provides
+	int Count()
+	{
+		int ret = 0;
+		for (int i = 0; i < _providers.size(); i++)
+		{
+			ret += _providers[i]->Count();
+		}
+		return ret;
+	}
+
 	bool Next(cv::Mat&frame)
 	{
 		while (_currentProvider < _providers.size())

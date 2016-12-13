@@ -129,19 +129,20 @@ void ExtractionWorker::FinishCalibration()
 	}
 }
 
-bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
+bool ExtractionWorker::RunExtractionStep(ImageProcessor& _processor )
 {
 	cv::Size patternSize(_chessW, _chessH);
 	{
-		if (!processor.Next())
+		if (!_processor.Next())
 		{
-			if (_mode & ModeCalibrate)
+			if (_mode & (ModeCalibrate | ModeCreate))
 			{
 				FinishCalibration();
 			}
+
 			if (_mode & ModeCreate)
 			{
-				//FinishCreation();
+				_processor.FinishCreation();
 			}
 			return true;
 		}
@@ -155,13 +156,18 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		if (_mode & ModeCalibrate)
 		{
 			CoordsArray corners;
-			processor.PerformCalibration(_chessW,_chessH, corners);
+			_processor.PerformCalibration(_chessW,_chessH, corners);
 		}
 		
+		if (_mode & ModeCreate)
+		{
+			_processor.ApplyFeatureDetector();
+			_processor.CreateMatches();
+		}
 		if (_mode & ModeDetect)
 		{
 			emit workerReportSignal(MInfo, "Detecting features in next image");
-			processor.PerformDetection();
+			_processor.PerformDetection();
 		}
 
 		//////////////////////////////////////////////////////
@@ -172,22 +178,22 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& processor )
 		if (_mode & ModeGrey)
 		{
 			format = QImage::Format_Grayscale8;
-			processor.UseGrey();
+			_processor.UseGrey();
 		}
 
 		if (_mode & ModeFeatures)
 		{	
-			processor.ApplyFeatureDetector();
-			processor.DrawFeatures();
+			_processor.ApplyFeatureDetector();
+			_processor.DrawFeatures();
 		}
 		
 		if (_mode & ModeUndistort)
 		{
 			// show undistorted model according to parameters
-			processor.ApplyCalibration(_calibrationSet);
+			_processor.ApplyCalibration(_calibrationSet);
 		}
 
-		cv::Mat mat =  processor.GetResult();
+		cv::Mat mat =  _processor.GetResult();
 		
 		if (found)
 		{

@@ -267,6 +267,7 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <ClCompile Include="../source/reportfunctions.cpp" />
     <ClCompile Include="../source/VideoProvider.cpp" />
     <ClCompile Include="../source/ExtractionWorker.cpp" />
+    <ClCompile Include="misc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="../include/creator.h">
@@ -351,7 +352,7 @@ xcopy $(ProjectDir)..\..\opencv_src\gen\bin\Debug\opencv*.dll $(TargetDir) /D /Y
     <ClInclude Include="..\include\ImageProcessor.h" />
     <ClInclude Include="..\include\imageprovider.h" />
     <ClInclude Include="..\include\ImagesProvider.h" />
-    <ClInclude Include="..\include\Mics.h" />
+    <ClInclude Include="..\include\Misc.h" />
     <ClInclude Include="..\include\Model.h" />
     <ClInclude Include="..\include\model\CsvReader.h" />
     <ClInclude Include="..\include\model\CsvWriter.h" />

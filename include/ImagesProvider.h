@@ -28,4 +28,5 @@ public:
 	virtual void PreviousFrame(cv::Mat & frame);
 	virtual void SetPosition(const int & position);
 	virtual int Position();
+	virtual int Count();
 };

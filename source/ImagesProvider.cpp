@@ -89,3 +89,8 @@ int ImagesProvider::Position()
 	return _pos;
 }
 
+int ImagesProvider::Count()
+{
+	return _images.size();
+}
+

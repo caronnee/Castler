@@ -27,5 +27,6 @@ public:
 	int Position();
 	virtual void PreviousFrame(cv::Mat& frame);
 	virtual double Step();
+	virtual int Count();
 };
 
