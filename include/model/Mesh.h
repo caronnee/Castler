@@ -14,6 +14,14 @@
 #include "CsvReader.h"
 #include "typedefs.h" 
 
+enum VBO_Entries
+{
+	EntryVertex,
+	EntryNormal,
+	EntryBarycentric,
+	NEntries
+};
+
  // --------------------------------------------------- //
  //                 TRIANGLE CLASS                      //
  // --------------------------------------------------- //

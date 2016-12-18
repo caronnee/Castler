@@ -38,6 +38,11 @@ Creator::Creator(QWidget *parent)
 	connect(ui.renderer, SIGNAL( DescChangedSignal(PositionDesc&)), this, SLOT(FillActive(PositionDesc&)));
 
 	// rendered connects
+	connect(ui.renderGroup, SIGNAL(buttonClicked(int)), ui.renderer, SLOT(ChangeRenderStyle(int)));
+	ui.renderGroup->setId(ui.renderPointsButton, RenderPoints);
+	ui.renderGroup->setId(ui.renderWireframeButton, RenderWireframe);
+	ui.renderGroup->setId(ui.renderFullButton, RenderComplete);
+
 	connect(ui.loadButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
 	connect(ui.renderer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
 	connect(ui.reloadShadersButton, SIGNAL(clicked()), ui.renderer, SLOT(ChangeShaders()));

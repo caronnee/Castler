@@ -302,17 +302,38 @@ cv::Point3f Mesh::GetNormal(int a,int b, int c) const
 	return ret;
 }
 
+static cv::Point3f barycentric[3] = {
+	cv::Point3f(1,0,0),
+	cv::Point3f(0,1,0),
+	cv::Point3f(0,0,1),
+};
+
 void Mesh::GetVertexNormal(std::vector<float>& vertexNormal)
 {
+	const int stride = NEntries * 3;
+	vertexNormal.resize(stride * _vertices.size());
 	for (int i = 0; i < _vertices.size(); i++)
 	{
+		//  vertex - zero location
 		cv::Point3f& point = _vertices[i]._vertex;
-		vertexNormal.push_back(point.x);
-		vertexNormal.push_back(point.y);
-		vertexNormal.push_back(point.z);
+		vertexNormal[i*stride] = (point.x);
+		vertexNormal[i*stride+1] = (point.y);
+		vertexNormal[i*stride+2] = (point.z);
+
+		//
 		cv::Point3f& normal = _vertices[i]._normal;
-		vertexNormal.push_back(normal.x);
-		vertexNormal.push_back(normal.y);
-		vertexNormal.push_back(normal.z);
+		vertexNormal[i*stride+3] = (normal.x);
+		vertexNormal[i*stride+4] = (normal.y);
+		vertexNormal[i*stride+5] = (normal.z);
+	}
+	
+	for (int i = 0; i < _indices.size(); i++)
+	{
+		// barycentric
+		cv::Point3f& bc = barycentric[i % 3];
+		int t = _indices[i];
+		vertexNormal[t*stride +6] = (bc.x);
+		vertexNormal[t*stride + 7] = (bc.y);
+		vertexNormal[t*stride + 8] = (bc.z);
 	}
 }

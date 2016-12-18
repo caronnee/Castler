@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -40,8 +40,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>220</width>
-               <height>333</height>
+               <width>233</width>
+               <height>300</height>
               </rect>
              </property>
              <attribute name="label">
@@ -75,9 +75,9 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>0</y>
+               <y>-31</y>
                <width>216</width>
-               <height>331</height>
+               <height>377</height>
               </rect>
              </property>
              <attribute name="label">
@@ -139,26 +139,43 @@
                  <item>
                   <widget class="QWidget" name="widget_3" native="true">
                    <layout class="QGridLayout" name="gridLayout_2">
-                    <item row="2" column="1">
-                     <widget class="QDoubleSpinBox" name="zValue">
-                      <property name="minimum">
-                       <double>-100.000000000000000</double>
+                    <item row="6" column="1">
+                     <widget class="QRadioButton" name="renderWireframeButton">
+                      <property name="text">
+                       <string>Wireframe</string>
                       </property>
-                      <property name="maximum">
-                       <double>100.000000000000000</double>
+                      <attribute name="buttonGroup">
+                       <string notr="true">renderGroup</string>
+                      </attribute>
+                     </widget>
+                    </item>
+                    <item row="6" column="0">
+                     <widget class="QRadioButton" name="renderFullButton">
+                      <property name="text">
+                       <string>Full</string>
                       </property>
-                      <property name="singleStep">
-                       <double>0.100000000000000</double>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                      <attribute name="buttonGroup">
+                       <string notr="true">renderGroup</string>
+                      </attribute>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="label_5">
+                      <property name="text">
+                       <string>X</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="1">
-                     <widget class="QDoubleSpinBox" name="yValue">
+                    <item row="4" column="1">
+                     <widget class="QDoubleSpinBox" name="elevationValue">
                       <property name="minimum">
-                       <double>-100.000000000000000</double>
+                       <double>-1000.000000000000000</double>
                       </property>
                       <property name="maximum">
-                       <double>100.000000000000000</double>
+                       <double>1000.000000000000000</double>
                       </property>
                       <property name="singleStep">
                        <double>0.100000000000000</double>
@@ -172,47 +189,13 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="1">
-                     <widget class="QDoubleSpinBox" name="xValue">
+                    <item row="2" column="1">
+                     <widget class="QDoubleSpinBox" name="zValue">
                       <property name="minimum">
                        <double>-100.000000000000000</double>
                       </property>
                       <property name="maximum">
                        <double>100.000000000000000</double>
-                      </property>
-                      <property name="singleStep">
-                       <double>0.100000000000000</double>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_5">
-                      <property name="text">
-                       <string>X</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="label_7">
-                      <property name="text">
-                       <string>Z</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QLabel" name="label_8">
-                      <property name="text">
-                       <string>Azimuth</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="4" column="1">
-                     <widget class="QDoubleSpinBox" name="elevationValue">
-                      <property name="minimum">
-                       <double>-1000.000000000000000</double>
-                      </property>
-                      <property name="maximum">
-                       <double>1000.000000000000000</double>
                       </property>
                       <property name="singleStep">
                        <double>0.100000000000000</double>
@@ -232,13 +215,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="4" column="0">
-                     <widget class="QLabel" name="label_9">
-                      <property name="text">
-                       <string>Elevation</string>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="5" column="1">
                      <widget class="QPushButton" name="applyDescButton">
                       <property name="text">
@@ -251,6 +227,63 @@
                       <property name="text">
                        <string>Seamless</string>
                       </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QDoubleSpinBox" name="yValue">
+                      <property name="minimum">
+                       <double>-100.000000000000000</double>
+                      </property>
+                      <property name="maximum">
+                       <double>100.000000000000000</double>
+                      </property>
+                      <property name="singleStep">
+                       <double>0.100000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QDoubleSpinBox" name="xValue">
+                      <property name="minimum">
+                       <double>-100.000000000000000</double>
+                      </property>
+                      <property name="maximum">
+                       <double>100.000000000000000</double>
+                      </property>
+                      <property name="singleStep">
+                       <double>0.100000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="label_7">
+                      <property name="text">
+                       <string>Z</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="label_8">
+                      <property name="text">
+                       <string>Azimuth</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="0">
+                     <widget class="QLabel" name="label_9">
+                      <property name="text">
+                       <string>Elevation</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="7" column="0">
+                     <widget class="QRadioButton" name="renderPointsButton">
+                      <property name="text">
+                       <string>Points</string>
+                      </property>
+                      <attribute name="buttonGroup">
+                       <string notr="true">renderGroup</string>
+                      </attribute>
                      </widget>
                     </item>
                    </layout>
@@ -347,7 +380,7 @@
       <attribute name="title">
        <string>Creator</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0" columnstretch="1,6,3">
+      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0" columnstretch="1,0,0">
        <item row="2" column="1">
         <widget class="VideoRenderer" name="cloudPoints"/>
        </item>
@@ -378,7 +411,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>246</width>
+               <width>93</width>
                <height>268</height>
               </rect>
              </property>
@@ -413,8 +446,8 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>-115</y>
-               <width>229</width>
+               <y>0</y>
+               <width>226</width>
                <height>383</height>
               </rect>
              </property>
@@ -487,7 +520,7 @@
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
                 </property>
-                <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1,1,1,1,1">
+                <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1,1">
                  <item row="0" column="3">
                   <widget class="QDoubleSpinBox" name="principalXValue">
                    <property name="decimals">
@@ -895,5 +928,6 @@
  <connections/>
  <buttongroups>
   <buttongroup name="lockGroup"/>
+  <buttongroup name="renderGroup"/>
  </buttongroups>
 </ui>

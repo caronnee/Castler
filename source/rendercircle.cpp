@@ -146,7 +146,6 @@ void RenderCircle::LoadShaders()
 	}
 
 	makeCurrent();
-
 	_gyroProgram = new QOpenGLShaderProgram;
 	_gyroProgram->addShader(vshader);
 	_gyroProgram->addShader(fshader);

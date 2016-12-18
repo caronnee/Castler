@@ -41,7 +41,6 @@
 #include "renderer.h"
 #include "loghandler.h"
 #include "debug.h"
-#include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
 #include "Filename.h"
@@ -53,7 +52,8 @@ Renderer::Renderer(QWidget *parent)
 	: QOpenGLWidget(parent),
 	_background(Qt::white),
 	_shaderProgram(0),
-	_indicesBuffer(QOpenGLBuffer::IndexBuffer)
+	_indicesBuffer(QOpenGLBuffer::IndexBuffer),
+	_renderStyle(RenderComplete)
 {
 	_activeChange = 0;
 	setFocusPolicy(Qt::ClickFocus);
@@ -61,69 +61,58 @@ Renderer::Renderer(QWidget *parent)
 	InitPosition();
 }
 
+bool Renderer::ReadShader(QOpenGLShader * shader, const char * name)
+{
+	std::string str = GetFullPath(name);
+	QFile file(str.c_str());
+	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	QByteArray content = file.readAll();
+
+	const char * vertexShader = content.constData();
+	bool compiled = shader->compileSourceCode(vertexShader);
+	file.close();
+	if ( !compiled )
+	{
+		GLint maxLength = 0;
+		QString ret = QString("Name :") + QString(name) + shader->log();
+		bool shaderDidNotCompile = false;
+		emit reportSignal(MError, ret);
+	}
+	return compiled;
+}
+
+#define VERTEX_LOCATION 0
+#define NORMAL_LOCATION 1
+#define BARYCENTRIC_LOCATION 2
+
 void Renderer::ChangeShaders()
 {
 	CleanShaders();
-
+	
 	QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
 	QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
+	//QOpenGLShader *gshader = new QOpenGLShader(QOpenGLShader::Geometry, this);
 
-	bool compiled;
-	{
-		std::string str = GetFullPath("shaders\\vertexShader.ogl");
-		QFile file(str.c_str());
-		file.open(QIODevice::ReadOnly | QIODevice::Text);
-		QByteArray content = file.readAll();
-
-		const char * vertexShader = content.constData();
-		compiled = vshader->compileSourceCode(vertexShader);
-		file.close();
-	}
+	bool compiled = ReadShader(vshader, "shaders\\vertexShader.ogl");
+	//compiled &= ReadShader(gshader, "shaders\\geometryShader.ogl");
+	compiled &= ReadShader(fshader, "shaders\\fragmentShader.ogl");
 
 	if (!compiled)
-	{
-		GLint maxLength = 0;
-		QString ret = "VertexShader +" + vshader->log();
-		bool shaderDidNotCompile = false;
-		emit reportSignal(MError, ret);
 		return;
-	}
-
-	{
-		std::string str = GetFullPath("shaders\\fragmentShader.ogl");
-		QFile file(str.c_str());
-		file.open(QIODevice::ReadOnly | QIODevice::Text);
-
-		QByteArray content = file.readAll();
-
-		const char * fragmentShader = content.constData();
-		compiled &= fshader->compileSourceCode(fragmentShader);
-		const GLubyte * xstr = glGetString(GL_VERSION);
-		file.close();
-	}
-
-	if (!compiled)
-	{
-		GLint maxLength = 0;
-		QString ret = "Fragment shader:" + fshader->log();
-		bool shaderDidNotCompile = false;
-		emit reportSignal(MError, ret);
-		return;
-	}
-
 
 	makeCurrent();
 	CreateModels();
 
 	_shaderProgram = new QOpenGLShaderProgram;
 	_shaderProgram->addShader(vshader);
+	//_shaderProgram->addShader(gshader);
 	_shaderProgram->addShader(fshader);
 
-	_shaderProgram->bindAttributeLocation("vertexPosition_modelspace", 0);
-	_shaderProgram->bindAttributeLocation("vertexNormal_modelspace", 1);
+	_shaderProgram->bindAttributeLocation("vertexPosition_modelspace", VERTEX_LOCATION);
+	_shaderProgram->bindAttributeLocation("vertexNormal_modelspace", NORMAL_LOCATION);
+	_shaderProgram->bindAttributeLocation("barycentric", BARYCENTRIC_LOCATION);
 
 	// vertdata + normals
-
 	bool vbocreated = _vertexBuffer.create();
 	int vbSize = 0;
 	DoAssert(vbocreated);
@@ -141,6 +130,7 @@ void Renderer::ChangeShaders()
 	_indicesBuffer.bind();
 	_indicesBuffer.allocate(indices.data(), indices.size() * sizeof(GLint));
 	_indices = indices.size();
+
 	if (!_shaderProgram->link())
 	{
 		QString eeror = _shaderProgram->log();
@@ -157,6 +147,11 @@ void Renderer::ChangeActiveKeyPos(int active)
 {
 	_activeChange = active;
 	emit DescChangedSignal(_desc[_activeChange]);
+}
+
+void Renderer::ChangeRenderStyle(int style)
+{
+	_renderStyle = style;
 }
 
 void Renderer::InitPosition()
@@ -198,13 +193,16 @@ void Renderer::initializeGL()
 {
   initializeOpenGLFunctions();
 
-  Load(QString(GetFullPath("models\\cube.ply").c_str()));
-  Load(QString(GetFullPath("models\\torus.ply").c_str()));
-
-  ChangeShaders();
+ Load(QString(GetFullPath("models\\cube.ply").c_str()));
+  /* Load(QString(GetFullPath("models\\torus.ply").c_str()));
+*/
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CW);
+  glEnable(GL_PROGRAM_POINT_SIZE);
+  glLineWidth(3);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   ChangeShaders();
 
   _movementTimer.start(0, this);
@@ -267,16 +265,47 @@ void Renderer::paintGL()
 	///////////////////////////////////////
 
 	// take vertex array from opengl context
-	_shaderProgram->enableAttributeArray(0);
-	_shaderProgram->enableAttributeArray(1);
+	_shaderProgram->enableAttributeArray(VERTEX_LOCATION);
+	_shaderProgram->enableAttributeArray(NORMAL_LOCATION);
+	_shaderProgram->enableAttributeArray(BARYCENTRIC_LOCATION);
 
-	_shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	_shaderProgram->setAttributeBuffer(1, GL_FLOAT, 3*sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	_shaderProgram->setAttributeBuffer(VERTEX_LOCATION, GL_FLOAT, 3*VERTEX_LOCATION * sizeof(GLfloat), 3, 3 * NEntries * sizeof(GLfloat));
 
+	_shaderProgram->setAttributeBuffer(NORMAL_LOCATION, GL_FLOAT, 3*NORMAL_LOCATION * sizeof(GLfloat), 3, 3 * NEntries * sizeof(GLfloat));
+
+	_shaderProgram->setAttributeBuffer(BARYCENTRIC_LOCATION, GL_FLOAT, 3*BARYCENTRIC_LOCATION * sizeof(GLfloat), 3, 3 * NEntries * sizeof(GLfloat));
+
+	_shaderProgram->setUniformValue("wireframe", 0);
 	///////////////////////////////////////
 	/////////// Actual drawing
 	///////////////////////////////////////
-	glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
+	switch (_renderStyle)
+	{
+	case RenderPoints:
+	{
+		int size = 0;
+		for (int i = 0; i < _renderData.size(); i++)
+		{
+			size += _renderData[i]._mesh.NVertices();
+		}
+		glDrawArrays(GL_POINTS, 0, size );
+		break;
+	}
+	case RenderWireframe:
+	{
+		_shaderProgram->setUniformValue("wireframe", 1);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
+		break;
+	}
+	default:
+	{
+		auto test = glGetString(GL_VERSION);
+		glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
+		break;
+	}
+	}
+
 	//for (int i = 0; i < total; ++i) {
 	//	//textures[i]->bind();
 	//	glDrawArrays(GL_TRIANGLE_STRIP, i * 3, 3);
@@ -400,12 +429,12 @@ void Renderer::mouseMoveEvent(QMouseEvent *event)
 
   if (event->buttons() & Qt::LeftButton) {
 	  _desc[_activeChange]._elevation += dx.x()/10.0;
-  } else if (event->buttons() & Qt::RightButton) {
 	  _desc[_activeChange]._azimuth += dx.y()/10.0;
+	  emit DescChangedSignal(_desc[_activeChange]);
+	  update();
   }
+
   lastPos = event->pos();
-  emit DescChangedSignal(_desc[_activeChange]);
-  update();
 }
 
 void Renderer::mouseReleaseEvent(QMouseEvent * /* event */)

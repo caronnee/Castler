@@ -1,7 +1,9 @@
+- show wireframe or points only, button check
+- implement calibration
+- Detect points from images, different ways. Find the most corresponding
 - motion estimator
 - implement memory controlling
 - C:\work\DP1\opencv_src\samples\cpp\stitching_detailed.cpp
-- Detect points from images, different ways. Find the most corresponding
 - using autofocus?
 - KD TREE exists in cv
 - what is MSER?
@@ -25,6 +27,7 @@
 - najst kameru so zmenenym focusom vo videu
 - runcalibration sa zmeit na stop, aby bool jasne, ze sa kliklo
 - reconstructon from one photo / painting
+- make wireframe working
 
 // use standard calibration code [Tsai87]
 – use view correlation [Bogart91]

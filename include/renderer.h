@@ -8,6 +8,7 @@
 #include <QBasicTimer>
 #include "model/Mesh.h"
 #include <QVector3D>
+#include <QOpenGLShaderProgram>
 #include <qmath.h>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
@@ -25,14 +26,26 @@ enum PositionOnKeys
 
 struct RenderData
 {
+	//name of the filename / mesh
 	QString _name;
 
 	// mesh to show - TODo later to replace
 	Mesh _mesh;
 
+	// constructor. Just initialize the name for later loading
 	RenderData(const QString & name);
 
+	// physical load data to mesh
 	void Load();
+};
+
+// how the mesh should be displayed
+enum RenderStyle
+{
+	RenderPoints,
+	RenderWireframe,
+	RenderComplete,
+	NRenders
 };
 
 class Renderer : public QOpenGLWidget, protected QOpenGLFunctions
@@ -40,15 +53,24 @@ class Renderer : public QOpenGLWidget, protected QOpenGLFunctions
 	Q_OBJECT
 		;
 
+	// index of the change
 	int _activeChange;
-	int _indices;
+
+	// description of the extrinsic parameters of the meshes
 	PositionDesc _desc[NKeyPositions];
+
+	int _indices;
+
+	// style that should be used for rendering
+	int _renderStyle;
 
 	// buffers
 	QOpenGLBuffer _vertexBuffer;
 
 	QOpenGLBuffer _indicesBuffer;
-	
+
+	bool ReadShader(QOpenGLShader * shader, const char * name);
+
 public:
 
 	explicit Renderer(QWidget *parent = 0);
@@ -64,9 +86,10 @@ signals:
 	void reportSignal(MessageLevel, const QString& string);
 	void DescChangedSignal(PositionDesc&);
 
-	private slots:
+private slots:
 	void ChangeShaders();
 	void ChangeActiveKeyPos(int);
+	void ChangeRenderStyle(int);
 protected:
 	void initializeGL() Q_DECL_OVERRIDE;
 	void paintGL() Q_DECL_OVERRIDE;

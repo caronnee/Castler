@@ -1,5 +1,14 @@
 #version 100
 
+varying mediump vec3 vBC;
+
+#extension GL_OES_standard_derivatives : enable
+mediump float edgeFactor(){
+	mediump vec3 d = fwidth(vBC);
+	mediump vec3 a3 = smoothstep(vec3(0.0), d*1.5, vBC);
+	return min(min(a3.x, a3.y), a3.z);
+} 
+	
 // Interpolated values from the vertex shaders
 varying mediump vec3 Position_worldspace;
 varying mediump vec3 Normal_cameraspace;
@@ -8,8 +17,17 @@ varying mediump vec3 LightDirection_cameraspace;
 
 // Values that stay constant for the whole mesh.
 uniform mediump vec3 LightPosition_worldspace;
+uniform mediump int wireframe;
 
 void main(){
+	if ( wireframe > 0 )
+		{
+		gl_FragColor.rgb = mix(vec3(0.0), vec3(0.5), edgeFactor());
+
+		gl_FragColor.a = 1.0;
+		return;
+	}
+	
 	// Light emission properties
 	// You probably want to put them as uniforms
 	mediump vec3 LightColor = vec3(1,1,1);
