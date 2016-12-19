@@ -381,6 +381,30 @@ void Creator::LoadSettings()
 		ui.inputList->AddInputItem(settingsLast.value("model").toString());
 	}
 	settingsLast.endArray();
+	QVariant s = settings.value("renderMode");
+	int selectedButton = s.toInt();
+	auto buttons = ui.renderGroup->buttons();
+	for (int i = 0; i < buttons.size(); i++)
+	{
+		if (ui.renderGroup->id(buttons[i]) == selectedButton)
+		{
+			buttons[i]->setChecked(true);
+			ui.renderer->ChangeRenderStyle(selectedButton);
+			break;
+		}
+	}
+	selectedButton = settings.value("lockMode").toInt();
+	buttons = ui.lockGroup->buttons();
+	for (int i = 0; i < buttons.size(); i++)
+	{
+		if (ui.lockGroup->id(buttons[i]) == selectedButton)
+		{
+			buttons[i]->setChecked(true);
+			ui.renderer->ChangeActiveKeyPos(selectedButton);
+			break;
+		}
+	}
+	settingsLast.value("lockMode", ui.lockGroup->checkedId());
 }
 
 void Creator::LoadModel()
@@ -437,6 +461,8 @@ void Creator::SaveSettings()
 	{
 		settings.setValue("calibrationInput", ui.calibrationLabel->text());
 	}
+	settings.setValue("renderMode", ui.renderGroup->checkedId());
+	settings.setValue("lockMode", ui.lockGroup->checkedId());
 	settings.setValue("lastDir", InputList::_lastDirectory);
 	settings.setValue("lastOpened", "last");
 	settings.setValue("model", ui.modelName->text());

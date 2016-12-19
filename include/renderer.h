@@ -88,8 +88,11 @@ signals:
 
 private slots:
 	void ChangeShaders();
-	void ChangeActiveKeyPos(int);
+
+public slots:
 	void ChangeRenderStyle(int);
+	void ChangeActiveKeyPos(int);
+
 protected:
 	void initializeGL() Q_DECL_OVERRIDE;
 	void paintGL() Q_DECL_OVERRIDE;

@@ -3,6 +3,8 @@ screen=0
 lastDir=C:/work/DP1/Data/video/gitara.3gp
 lastOpened=last
 model=<model>
+renderMode=1
+lockMode=2
 
 [models]
 1\model=c:\\work\\DP1\\Data\\Arenberg\\castle.000.jpg
