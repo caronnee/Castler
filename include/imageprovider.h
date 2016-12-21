@@ -70,7 +70,7 @@ struct Providers
 		return _providers[_currentProvider]->Step();
 	}
 	void Clear();
-	void Create(QString & str);
+	void Create(const QString & str);
 	bool IsValid() const;
 	IImageProvider * Get()
 	{

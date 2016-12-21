@@ -1,5 +1,6 @@
 #include "Misc.h"
 #include "opencv2/opencv.hpp"
+#include <windows.h>
 
 cv::Point3f GetEpipoles(cv::Mat F, cv::Point3f& fe,cv::Point3f& fe2)
 {

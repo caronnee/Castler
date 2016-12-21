@@ -39,7 +39,7 @@ bool Providers::IsValid() const
 }
 
 
-void Providers::Create(QString & str)
+void Providers::Create(const QString & str)
 {
 	QStringList list = str.split(";", QString::SkipEmptyParts);
 	for (int i = 0; i < list.size(); i++)

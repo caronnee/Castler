@@ -3,6 +3,8 @@
 
 std::string GetFullPath(const std::string & relativeName)
 {
+	if (relativeName[1] == ':')
+		return relativeName;
 	// find Exe directory
 	char buffer[2048];
 	GetModuleFileNameA(NULL, buffer, 2048);

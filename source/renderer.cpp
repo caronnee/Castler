@@ -200,8 +200,6 @@ void Renderer::initializeGL()
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CW);
   glEnable(GL_PROGRAM_POINT_SIZE);
-  glLineWidth(3);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   ChangeShaders();
 
@@ -275,35 +273,35 @@ void Renderer::paintGL()
 
 	_shaderProgram->setAttributeBuffer(BARYCENTRIC_LOCATION, GL_FLOAT, 3*BARYCENTRIC_LOCATION * sizeof(GLfloat), 3, 3 * NEntries * sizeof(GLfloat));
 
-	_shaderProgram->setUniformValue("wireframe", 0);
+	_shaderProgram->setUniformValue("wireframe", -1);
 	///////////////////////////////////////
 	/////////// Actual drawing
 	///////////////////////////////////////
 	switch (_renderStyle)
 	{
-	case RenderPoints:
-	{
-		int size = 0;
-		for (int i = 0; i < _renderData.size(); i++)
+		case RenderPoints:
 		{
-			size += _renderData[i]._mesh.NVertices();
+			int size = 0;
+			for (int i = 0; i < _renderData.size(); i++)
+			{
+				size += _renderData[i]._mesh.NVertices();
+			}
+			glDrawArrays(GL_POINTS, 0, size );
+			break;
 		}
-		glDrawArrays(GL_POINTS, 0, size );
-		break;
-	}
-	case RenderWireframe:
-	{
-		_shaderProgram->setUniformValue("wireframe", 1);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
-		break;
-	}
-	default:
-	{
-		auto test = glGetString(GL_VERSION);
-		glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
-		break;
-	}
+		case RenderWireframe:
+		{
+			_shaderProgram->setUniformValue("wireframe", 1);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
+			break;
+		}
+		default:
+		{
+			auto test = glGetString(GL_VERSION);
+			glDrawElements(GL_TRIANGLES, _indices, GL_UNSIGNED_INT, 0);
+			break;
+		}
 	}
 
 	//for (int i = 0; i < total; ++i) {

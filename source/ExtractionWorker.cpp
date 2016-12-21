@@ -47,7 +47,7 @@ void ExtractionWorker::Report(MessageLevel level, const QString & str)
 	emit workerReportSignal(level, str);
 }
 
-void ExtractionWorker::OpenSlot(QString str)
+void ExtractionWorker::OpenSlot(const QString & str)
 {
 	if ( _timer.isActive())
 		_timer.stop();

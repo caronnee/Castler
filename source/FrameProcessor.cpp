@@ -8,8 +8,7 @@ bool FrameProcessor::Load(const QString & str)
 {
 	if ( !_thread.isRunning())
 		_thread.start();
-	QString s(str);
-	emit inputChangedSignal(s);
+	emit inputChangedSignal(str);
 	return true;
 }
 
@@ -46,7 +45,7 @@ FrameProcessor::FrameProcessor()
 
 	_worker.moveToThread(&_thread);
 
-	connect(this, SIGNAL(inputChangedSignal(QString)), &_worker, SLOT(OpenSlot(QString)));
+	connect(this, SIGNAL(inputChangedSignal(const &QString)), &_worker, SLOT(OpenSlot(const & QString)));
 	connect(&_thread, SIGNAL(started()), &_worker, SLOT(Process()));
 	connect(&_thread, SIGNAL(finished()), this, SLOT(ThreadStopped()));
 	connect(this, SIGNAL(cleanupSignal()), &_worker, SLOT(Cleanup()));

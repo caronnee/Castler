@@ -43,12 +43,16 @@ class ExtractionWorker : public QObject, public IReportFunction
 	// main class for detection
 	ImageProcessor processor;
 private:
+	
 	bool RunExtractionStep( ImageProcessor& processor );
+
 	void FinishCalibration();
 
 public:
 	// constructor
 	ExtractionWorker();
+
+	// main report function 
 	void Report(MessageLevel level, const QString & str);
 	
 signals:
@@ -65,7 +69,7 @@ public slots:
 	// main thread loop
 	void PreparePair(int start, int modifier);
 	void Process();
-	void OpenSlot(QString str);
+	void OpenSlot(const QString& str);
 	void Cleanup();
 	void Terminate();
 	void ChangeCalibration(CalibrationSet );

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -40,8 +40,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>233</width>
-               <height>300</height>
+               <width>100</width>
+               <height>99</height>
               </rect>
              </property>
              <attribute name="label">
@@ -75,7 +75,7 @@
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>-31</y>
+               <y>0</y>
                <width>216</width>
                <height>377</height>
               </rect>
@@ -380,27 +380,27 @@
       <attribute name="title">
        <string>Creator</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0" columnstretch="1,0,0">
-       <item row="2" column="1">
+      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="1,1,2,0">
+       <item row="3" column="2">
         <widget class="VideoRenderer" name="cloudPoints"/>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="1">
         <widget class="InputList" name="inputList">
          <property name="sortingEnabled">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
+       <item row="2" column="1" colspan="3">
+        <widget class="QLabel" name="creatorLabel">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
         <widget class="QWidget" name="widget" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <widget class="QLabel" name="creatorLabel">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QToolBox" name="detectorTools">
             <property name="currentIndex">
@@ -411,7 +411,7 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>93</width>
+               <width>201</width>
                <height>268</height>
               </rect>
              </property>
@@ -666,7 +666,7 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0" colspan="3">
+       <item row="1" column="0" colspan="4">
         <widget class="QWidget" name="widget_4" native="true">
          <property name="minimumSize">
           <size>

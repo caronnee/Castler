@@ -329,6 +329,8 @@ void Creator::EnablePlay()
 	ui.playButton->setDisabled(false);
 }
 
+#include "Filename.h"
+
 void Creator::StartCreating()
 {
 	// create mesh from all inputs
@@ -337,9 +339,10 @@ void Creator::StartCreating()
 	for (int i = 0; i < size; i++)
 	{
 		auto input = ui.inputList->item(i);
-		compl += input->data(Qt::UserRole).toString().toStdString() + ";";
+		std::string str = GetFullPath(input->data(Qt::UserRole).toString().toStdString().c_str());
+		compl += str + ";";
 	}
-	_capturer.Load(&compl.c_str()[1]);
+	_capturer.Load(compl.c_str());
 	emit modeChangedSignal(ModeCreate);
 }
 
@@ -354,34 +357,45 @@ void Creator::PlayVideo()
 
 const char * CSettingFileName = "/settings.castler";
 
+// SETTINGSTRINGS
+
+const char * calibrationInputStr = "calibrationInput";
+const char * lastDirStr = "lastDir";
+const char * screenStr = "screen";
+const char * lastOpenedStr = "lastOpened";
+const char * modelsStr = "models";
+const char * singleModelStr = "model";
+const char * renderModeStr = "renderMode";
+const char * lockModeStr = "lockMode";
+
 
 void Creator::LoadSettings()
 {
 	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
 	QSettings settings(settingspath, QSettings::IniFormat);
 
-	QVariant str = settings.value("calibrationInput");
+	QVariant str = settings.value(calibrationInputStr);
 	ui.calibrationLabel->setText(str.toString());
 	if (!str.isNull())
 	{
 		LoadCalibration(str.toString());		
 	}
-	str = settings.value("lastDir").toString();
+	str = settings.value(lastDirStr).toString();
 	InputList::_lastDirectory = str.toString();
 
-	str = settings.value("screen");
+	str = settings.value(screenStr);
 	ui.creatorTabs->setCurrentIndex(str.toInt());
-	QString last = settings.value("lastOpened").toString();
+	QString last = settings.value(lastOpenedStr).toString();
 	QString settingLastName = QApplication::applicationDirPath() + "\\" + last;
 	QSettings settingsLast(settingLastName, QSettings::IniFormat);
-	int size = settingsLast.beginReadArray("models");
+	int size = settingsLast.beginReadArray(modelsStr);
 	for (int i = 0; i<size ; i++)
 	{
 		settingsLast.setArrayIndex(i);
-		ui.inputList->AddInputItem(settingsLast.value("model").toString());
+		ui.inputList->AddInputItem(settingsLast.value(singleModelStr).toString());
 	}
 	settingsLast.endArray();
-	QVariant s = settings.value("renderMode");
+	QVariant s = settings.value(renderModeStr);
 	int selectedButton = s.toInt();
 	auto buttons = ui.renderGroup->buttons();
 	for (int i = 0; i < buttons.size(); i++)
@@ -393,7 +407,7 @@ void Creator::LoadSettings()
 			break;
 		}
 	}
-	selectedButton = settings.value("lockMode").toInt();
+	selectedButton = settings.value(lockModeStr).toInt();
 	buttons = ui.lockGroup->buttons();
 	for (int i = 0; i < buttons.size(); i++)
 	{
@@ -404,7 +418,6 @@ void Creator::LoadSettings()
 			break;
 		}
 	}
-	settingsLast.value("lockMode", ui.lockGroup->checkedId());
 }
 
 void Creator::LoadModel()
@@ -456,16 +469,16 @@ void Creator::SaveSettings()
 	QString settingspath = QApplication::applicationDirPath() + CSettingFileName;
 	QSettings settings(settingspath, QSettings::IniFormat);
 
-	settings.setValue("screen", ui.creatorTabs->currentIndex());
+	settings.setValue(screenStr, ui.creatorTabs->currentIndex());
 	if (ui.calibrationLabel->text().isEmpty() == false)
 	{
-		settings.setValue("calibrationInput", ui.calibrationLabel->text());
+		settings.setValue(calibrationInputStr, ui.calibrationLabel->text());
 	}
-	settings.setValue("renderMode", ui.renderGroup->checkedId());
-	settings.setValue("lockMode", ui.lockGroup->checkedId());
-	settings.setValue("lastDir", InputList::_lastDirectory);
-	settings.setValue("lastOpened", "last");
-	settings.setValue("model", ui.modelName->text());
+	settings.setValue(renderModeStr, ui.renderGroup->checkedId());
+	settings.setValue(lockModeStr, ui.lockGroup->checkedId());
+	settings.setValue(lastDirStr, InputList::_lastDirectory);
+	settings.setValue(lastOpenedStr, "last");
+	settings.setValue(singleModelStr, ui.modelName->text());
 
 	QString name = "last";
 	if (ui.creatorLabel->text().size())
@@ -474,24 +487,16 @@ void Creator::SaveSettings()
 	}
 	QString model = QApplication::applicationDirPath() + "\\" + name;
 	QSettings modelSettings(model, QSettings::IniFormat);
-	modelSettings.beginWriteArray("models");
+	modelSettings.beginWriteArray(modelsStr);
 	
 	for (int i = 0; i < ui.inputList->count(); i++)
 	{
 		modelSettings.setArrayIndex(i);
 		QVariant str = ui.inputList->item(i)->data(Qt::UserRole);
-		modelSettings.setValue("model", str);
+		modelSettings.setValue(singleModelStr, str);
 	}
 	modelSettings.endArray();
 
 	modelSettings.sync();
 	settings.sync();
-	//InputList * list = ui.inputList;
-	//QFile file("settings.cfg");
-	//if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-	//{
-	//	ui.infobox->Report(MError,"Unable to open setting file");
-	//	return;
-	//}
-	//list->Save(file);
 }

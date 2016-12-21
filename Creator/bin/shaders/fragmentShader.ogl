@@ -1,7 +1,6 @@
-#version 100
+#version 120
 
 varying mediump vec3 vBC;
-
 #extension GL_OES_standard_derivatives : enable
 mediump float edgeFactor(){
 	mediump vec3 d = fwidth(vBC);
