@@ -1,18 +1,18 @@
-- show wireframe or points only, button check
-- implement calibration
+- Groebnbner essential matrix??!
+- implement autocalibration
 - Detect points from images, different ways. Find the most corresponding
 - motion estimator
 - implement memory controlling
 - C:\work\DP1\opencv_src\samples\cpp\stitching_detailed.cpp
-- using autofocus?
+- using autofocus? How to detect autofocus? autofocus in cameras?
 - KD TREE exists in cv
 - what is MSER?
 - shape comparison
--image segmentation
+- image segmentation
 - detect degradation from camera movement
 - Why is drawchessboard separate function? - draws lines1		
 - manually pick up point that might be similar. automated help
-- offect canny to set correspondece. Possible other detections
+- offer canny to set correspondece. Possible other detections
 - use hughes transformation to calibrate
 - find if in the video there is movement degradation
 - find chessboard in the videos tried with my camera / drone
@@ -42,3 +42,50 @@ Scattered data interpolation - sparse 3D to surface
 //holes, furniture
 //pictures on walls
 // filling up holes
+
+Possible features detectors:
+/** @brief Class implementing the BRISK keypoint detector and descriptor extractor, described in @cite LCS11 .
+ */
+class CV_EXPORTS_W BRISK : public Feature2D
+
+/** @brief Class implementing the ORB (*oriented BRIEF*) keypoint detector and descriptor extractor
+
+described in @cite RRKB11 . The algorithm uses FAST in pyramids to detect stable keypoints, selects
+the strongest features using FAST or Harris response, finds their orientation using first-order
+moments and computes the descriptors using BRIEF (where the coordinates of random point pairs (or
+k-tuples) are rotated according to the measured orientation).
+ */
+class CV_EXPORTS_W ORB : public Feature2D
+/** @brief Maximally stable extremal region extractor
+
+The class encapsulates all the parameters of the %MSER extraction algorithm (see [wiki
+article](http://en.wikipedia.org/wiki/Maximally_stable_extremal_regions)).
+
+- there are two different implementation of %MSER: one for grey image, one for color image
+
+- the grey image algorithm is taken from: @cite nister2008linear ;  the paper claims to be faster
+than union-find method; it actually get 1.5~2m/s on my centrino L7200 1.2GHz laptop.
+
+- the color image algorithm is taken from: @cite forssen2007maximally ; it should be much slower
+than grey image method ( 3~4 times ); the chi_table.h file is taken directly from paper's source
+code which is distributed under GPL.
+
+- (Python) A complete example showing the use of the %MSER detector can be found at samples/python/mser.py
+*/
+class CV_EXPORTS_W MSER : public Feature2D
+/** @brief Wrapping class for feature detection using the FAST method. :
+ */
+class CV_EXPORTS_W FastFeatureDetector : public Feature2D
+/** @brief Wrapping class for feature detection using the AGAST method. :
+ */
+class CV_EXPORTS_W AgastFeatureDetector : public Feature2D
+
+@note AKAZE descriptor can only be used with KAZE or AKAZE keypoints .. [ABD12] KAZE Features. Pablo
+F. Alcantarilla, Adrien Bartoli and Andrew J. Davison. In European Conference on Computer Vision
+(ECCV), Fiorenze, Italy, October 2012.
+*/
+class CV_EXPORTS_W KAZE : public Feature2D
+
+/** @brief Class implementing the BRISK keypoint detector and descriptor extractor, described in @cite LCS11 .
+ */
+class CV_EXPORTS_W BRISK : public Feature2D

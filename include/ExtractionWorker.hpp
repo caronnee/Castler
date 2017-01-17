@@ -19,7 +19,7 @@ enum Modifiers
 	NModifiers
 };
 
-class ExtractionWorker : public QObject, public IReportFunction
+class ExtractionWorker : public QObject, public IReportFunction, public IDetector
 {
 	Q_OBJECT
 		;
@@ -41,19 +41,21 @@ class ExtractionWorker : public QObject, public IReportFunction
 	Providers _provider;
 
 	// main class for detection
-	ImageProcessor processor;
+	ImageProcessor _processor;
 private:
 	
 	bool RunExtractionStep( ImageProcessor& processor );
 
 	void FinishCalibration();
-
+ 
 public:
 	// constructor
 	ExtractionWorker();
 
 	// main report function 
 	void Report(MessageLevel level, const QString & str);
+	
+	void PointCallback(cv::Point3f & point, int id);
 	
 signals:
 	void pointDetectedSignal(int id, cv::Point3f point);

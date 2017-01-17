@@ -47,6 +47,11 @@ void ExtractionWorker::Report(MessageLevel level, const QString & str)
 	emit workerReportSignal(level, str);
 }
 
+void ExtractionWorker::PointCallback(cv::Point3f & point, int id)
+{
+	emit pointDetectedSignal(id, point);
+}
+
 void ExtractionWorker::OpenSlot(const QString & str)
 {
 	if ( _timer.isActive())
@@ -56,7 +61,8 @@ void ExtractionWorker::OpenSlot(const QString & str)
 	_provider.Create(str);
 	
 	DoAssert( _provider.IsValid() );
-	processor.Init(&_provider);
+	_processor.Init(&_provider);
+	_processor._detectorOutput = this ;
 	_timer.start(0,this);
 }
 
@@ -70,7 +76,7 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 		return;
 	}
 
-	if (!RunExtractionStep(processor))
+	if (!RunExtractionStep(_processor))
 	{
 		//nothing more to process
 		return;
@@ -118,7 +124,7 @@ void ExtractionWorker::FinishCalibration()
 	cameraMatrix.at<double>(0, 0) = 1;
 	distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 
-	if (processor.FinishCalibration(_chesspoints, cameraMatrix, distCoeffs))
+	if (_processor.FinishCalibration(_chesspoints, cameraMatrix, distCoeffs))
 	{
 		emit workerReportSignal(MInfo, "Calibration successful");
 		emit camParametersSignal(cameraMatrix, distCoeffs);
@@ -135,13 +141,14 @@ bool ExtractionWorker::RunExtractionStep(ImageProcessor& _processor )
 	{
 		if (!_processor.Next())
 		{
-			if (_mode & (ModeCalibrate | ModeCreate))
+			if (_mode & ModeCalibrate)
 			{
 				FinishCalibration();
 			}
 
 			if (_mode & ModeCreate)
 			{
+				_processor.AutoCalibrate();
 				_processor.FinishCreation();
 			}
 			return true;

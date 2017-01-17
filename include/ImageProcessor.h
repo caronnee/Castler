@@ -17,39 +17,55 @@ struct MatchPair
 	int id = -1;
 };
 
+struct RelMap
+{
+	double rel;
+	int image1;
+	int image2;
+};
+
 struct CameraParams
 {
 	cv::Mat insistric;
 	bool calibrated;
+	const char * name;
 };
 
 struct ImageInfo
 {
 	CameraParams * _camera;
 	cv::Mat _extrinsic;
+	cv::Point3f _position;
 	int imageId;
+	bool _estimated;
 	ImageInfo()
 	{
+		_estimated = false;
 		_extrinsic = cv::Mat::eye(3, 3, CV_64F);
 	}
 };
 
-typedef void (*PointCallback)(cv::Point3f, int index);
+
+class IDetector
+{
+public:
+	//virtual void CameraCallback(cv::Point3f, int index) = 0;
+	virtual void PointCallback(cv::Point3f & point, int id) = 0;
+	~IDetector() {}
+};
 
 class ImageProcessor
 {
 public:
 
-	// point call to to something when point was reconstructes
-	PointCallback _pointCallback = NULL;
+	// class that gives out the results
+	IDetector * _detectorOutput;
 
-	// TODO change to camera calback
-	PointCallback _cameraAdjustedCallback = NULL;
-
+	void AutoCalibrate();
 private:
 
 	// found cameras in calibration
-	std::vector<CameraParams> _cameras;
+	std::vector<CameraParams *> _cameras;
 
 	// color to be used in wire frame
 	cv::Scalar _colors;
@@ -58,7 +74,7 @@ private:
 	cv::Ptr<cv::Feature2D>  _ffd;
 
 	// vector of how much are the shot reliable
-	DoubleVector _reliability;
+	std::vector<RelMap> _reliability;
 
 	// last index processed
 	int _lastImageIndex;
@@ -67,7 +83,7 @@ private:
 	KeypointsArray2 _foundCoords;
 
 	// found descriptors
-	MatsArray2 _foundDesc;
+	MatArray _foundDesc;
 
 	// partial matches
 	std::vector<MatchPair *> _matches;
@@ -90,17 +106,16 @@ private:
 	// current frame size associated with the latest Next call
 	cv::Size _frameSize;
 
-	int FindBestPair(int& firstCamera, int & secondCamera);
+	int FindNextBestPair(int& firstCamera, int & secondCamera);
 
 	// create matches 
 	void PrepareCalibration();
 
 	// return projection from essental matrix
-	cv::Mat FindProjection(cv::Mat essential, int image);
+	cv::Mat FindSecondProjection(cv::Mat essential, int image);
 
 	// extract insinstric parameters
-	void SplitMatrix(cv::Mat projection, cv::Mat& extrinsic, CameraParams *camera);
-
+	void SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera);
 public:
 
 	// finishes calibration according to the known object
