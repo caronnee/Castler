@@ -42,9 +42,8 @@ class ExtractionWorker : public QObject, public IReportFunction, public IDetecto
 
 	// main class for detection
 	ImageProcessor _processor;
+
 private:
-	
-	bool RunExtractionStep( ImageProcessor& processor );
 
 	void FinishCalibration();
  
@@ -67,7 +66,6 @@ signals:
 	void camParametersSignal(cv::Mat camera, cv::Mat distCoeffs);
 
 public slots:
-	void SetMode(int mode);
 	// main thread loop
 	void PreparePair(int start, int modifier);
 	void Process();
@@ -75,7 +73,8 @@ public slots:
 	void Cleanup();
 	void Terminate();
 	void ChangeCalibration(CalibrationSet );
-
+	void ChangeActionMode(int mode);
+	void ChangeVisualMode(int mode);
 public:
 	void timerEvent(QTimerEvent * ev);
 };

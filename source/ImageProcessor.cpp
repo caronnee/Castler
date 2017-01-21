@@ -48,13 +48,13 @@ int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 			else
 			{
 				// one of the images must be already determined
-				int t1 = _reliability[i].image2;
-				int t2 = _reliability[i].image1;
+				int t2 = _reliability[i].image2;
+				int t1 = _reliability[i].image1;
 				if (_imagesInfo[t1]._estimated != _imagesInfo[t2]._estimated)
 				{
 					best = _reliability[i].rel;
-					image2 = _reliability[i].image2;
-					image1 = _reliability[i].image1;
+					image2 = t2;
+					image1 = t1;
 				}
 			}
 		}
@@ -67,6 +67,7 @@ int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 
 ImageProcessor::ImageProcessor()
 {
+	_phase = 0;
 	_detectorOutput = NULL;
 	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
@@ -88,18 +89,57 @@ cv::Size ImageProcessor::GetSize()
 {
 	return _frameSize;
 }
+class Printer {//An abstract printing machine
+	typedef void(Printer::*PTR) ();//pointer-to-member function 
 
-bool ImageProcessor::Next( )
+public:
+	void Copy() {//copy the file
+	}
+	void Append() {//extend the file
+	}
+
+	enum OPTIONS { COPY, APPEND };//two possible commands in the menu.
+
+	void working(OPTIONS option,
+		char* buff,
+		const char* infostr) {
+
+		PTR pmf[2] = { &Printer::Copy, &Printer::Append }; //pointer array 
+
+		switch (option) {
+		case COPY:
+			(this->*pmf[COPY])();
+			break;
+		case APPEND:
+			(this->*pmf[APPEND])();
+			break;
+		}
+	}
+};
+
+bool ImageProcessor::PrepareImage()
 {
-	if (!_provider || _provider->Get()->NextFrame(_frame) == false)
+	if (!_provider ||  _provider->Get()->NextFrame(_frame) == false)
 		return false;
 
 	_lastImageIndex++;
 	_frameSize = _frame.size();
 	cv::cvtColor(_frame, _gr, CV_RGB2GRAY);
-	
+
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
 	_frame.copyTo(_ret);
+
+}
+
+bool ImageProcessor::Next( )
+{
+	if (!_phases[_phase])
+		return false;
+	
+	if ((this->*_phases[_phase])() == false)
+	{
+		_phase++;
+	}
 	return true;
 }
 
@@ -294,6 +334,34 @@ void ImageProcessor::ApplyCalibration(CalibrationSet & calibrationSet)
 	imshow("Second", _ret);
 	cv::waitKey();
 #endif
+}
+
+ImageProcessor::~ImageProcessor()
+{
+	Clear();
+}
+
+void ImageProcessor::Create(const int& mode)
+{
+	Clear();
+	switch (mode)
+	{
+		case ActionModePlay:
+		{
+			_phases[0] = &ImageProcessor::PrepareImage;
+			_phases[1] = NULL;
+			break;
+		}
+		default:
+		{
+			_reporter->Report(MError, "Nothing create :-o");
+		}
+	}
+}
+
+void ImageProcessor::Clear()
+{
+	_phase = 0;
 }
 
 bool ImageProcessor::FinishCalibration(PointsArray & chesspoints, cv::Mat& cameraMatrix, cv::Mat& distCoeffs)
@@ -573,6 +641,8 @@ void ImageProcessor::FinishCreation()
 
 	// this is our first stable camera. Lets reconstruct some 3Dpoint from it
 	int nframes = _foundCoords.size();
+
+	_phase++;
 
 	// let's have all points in images that correspond to this camera
 	while (camerasUsed < nframes)

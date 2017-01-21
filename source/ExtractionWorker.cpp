@@ -4,13 +4,13 @@
 ExtractionWorker::ExtractionWorker()
 {
 	ImageProcessor::_reporter = this;
-	_mode = ModeIdle;
+	_mode = VisualModeStop;
 	_chesspoints.clear();
-	_mode = ModeIdle;
 }
 
 void ExtractionWorker::Cleanup()
 {
+	_mode = VisualModeStop;
 	_timer.stop();
 	_chesspoints.clear();
 	_provider.Clear();
@@ -35,7 +35,12 @@ void ExtractionWorker::ChangeCalibration(CalibrationSet calibration)
 	_calibrationSet = calibration;
 } 
 
-void ExtractionWorker::SetMode(int mode)
+void ExtractionWorker::ChangeActionMode(int mode)
+{
+	_processor.Create(mode);
+}
+
+void ExtractionWorker::ChangeVisualMode(int mode)
 {
 	_mode ^= mode;
 	if ( _timer.isActive() == false )
@@ -66,25 +71,59 @@ void ExtractionWorker::OpenSlot(const QString & str)
 	_timer.start(0,this);
 }
 
-static int actionMask = ModeCreate | ModeUndistort | ModePlay;
+//static int actionMask = ModeCreate | ModeUndistort | ModePlay;
 
 void ExtractionWorker::timerEvent(QTimerEvent * ev)
 {
-	if (_timer.timerId() != ev->timerId()|| (_mode & actionMask ) == 0)
+	if (_timer.timerId() != ev->timerId()|| (_mode == VisualModeStop ) == 0)
 	{
 		// nothing to do
 		return;
 	}
 
-	if (!RunExtractionStep(_processor))
+	if (!_processor.Next())
 	{
-		//nothing more to process
+		_timer.stop();
+		emit finished();
 		return;
 	}
-	_timer.stop();
-	emit finished();
-	//last step for calibration
-	
+	//////////////////////////////////////////////////////
+	//// final for showing image after all preprocessing
+	//////////////////////////////////////////////////////
+
+	QImage::Format format = QImage::Format_RGB888;
+	if (_mode & VisualModeGrey)
+	{
+		format = QImage::Format_Grayscale8;
+		_processor.UseGrey();
+	}
+
+	if (_mode & VisualModeFeatures)
+	{
+		_processor.ApplyFeatureDetector();
+		_processor.DrawFeatures();
+	}
+
+	if (_mode & VisualModeUndistort)
+	{
+		// show undistorted model according to parameters
+		_processor.ApplyCalibration(_calibrationSet);
+	}
+
+	cv::Mat mat = _processor.GetResult();
+
+	//if (found)
+	//{
+	//	QString str = QString::asprintf("Found at %d", _provider.Get()->Position());
+	//	emit workerReportSignal(MInfo, str.toStdString().c_str());
+	//	//cv::drawChessboardCorners(mat, patternSize, cv::Mat(), found);
+	//}
+
+	// Report the we processed something
+	emit workerReportSignal(MInfo, "Emitting result");
+
+	// emit result
+	emit imageProcessed(mat, _provider.Step() / 1000);
 }
 
 void ExtractionWorker::PreparePair(int start, int modifier)
@@ -135,86 +174,50 @@ void ExtractionWorker::FinishCalibration()
 	}
 }
 
-bool ExtractionWorker::RunExtractionStep(ImageProcessor& _processor )
-{
-	cv::Size patternSize(_chessW, _chessH);
-	{
-		if (!_processor.Next())
-		{
-			if (_mode & ModeCalibrate)
-			{
-				FinishCalibration();
-			}
+//bool ExtractionWorker::RunExtractionStep(ImageProcessor& _processor )
+//{
+//	cv::Size patternSize(_chessW, _chessH);
+//	{
+//		if (!_processor.Next())
+//		{
+//			if (_mode & ModeCalibrate)
+//			{
+//				FinishCalibration();
+//			}
+//
+//			if (_mode & ModeCreate)
+//			{
+//				_processor.AutoCalibrate();
+//				_processor.FinishCreation();
+//			}
+//			return true;
+//		}
+//
+//		QString str = QString::asprintf("Processing image %d", _provider.Get()->Position());
+//
+//		emit workerReportSignal(MInfo, str);
+//
+//		// detect
+//		bool found = false;
+//		if (_mode & ModeCalibrate)
+//		{
+//			CoordsArray corners;
+//			_processor.PerformCalibration(_chessW,_chessH, corners);
+//		}
+//		
+//		if (_mode & ModeCreate)
+//		{
+//			_processor.ApplyFeatureDetector();
+//			_processor.CreateMatches();
+//		}
+//		if (_mode & ModeDetect)
+//		{
+//			emit workerReportSignal(MInfo, "Detecting features in next image");
+//			_processor.PerformDetection();
+//		}
+//
 
-			if (_mode & ModeCreate)
-			{
-				_processor.AutoCalibrate();
-				_processor.FinishCreation();
-			}
-			return true;
-		}
-
-		QString str = QString::asprintf("Processing image %d", _provider.Get()->Position());
-
-		emit workerReportSignal(MInfo, str);
-
-		// detect
-		bool found = false;
-		if (_mode & ModeCalibrate)
-		{
-			CoordsArray corners;
-			_processor.PerformCalibration(_chessW,_chessH, corners);
-		}
-		
-		if (_mode & ModeCreate)
-		{
-			_processor.ApplyFeatureDetector();
-			_processor.CreateMatches();
-		}
-		if (_mode & ModeDetect)
-		{
-			emit workerReportSignal(MInfo, "Detecting features in next image");
-			_processor.PerformDetection();
-		}
-
-		//////////////////////////////////////////////////////
-		//// final for showing image after all preprocessing
-		//////////////////////////////////////////////////////
-
-		QImage::Format format = QImage::Format_RGB888;
-		if (_mode & ModeGrey)
-		{
-			format = QImage::Format_Grayscale8;
-			_processor.UseGrey();
-		}
-
-		if (_mode & ModeFeatures)
-		{	
-			_processor.ApplyFeatureDetector();
-			_processor.DrawFeatures();
-		}
-		
-		if (_mode & ModeUndistort)
-		{
-			// show undistorted model according to parameters
-			_processor.ApplyCalibration(_calibrationSet);
-		}
-
-		cv::Mat mat =  _processor.GetResult();
-		
-		if (found)
-		{
-			QString str = QString::asprintf("Found at %d", _provider.Get()->Position());
-			emit workerReportSignal(MInfo, str.toStdString().c_str());
-			//cv::drawChessboardCorners(mat, patternSize, cv::Mat(), found);
-		}
-		
-		// emit result
-		emit workerReportSignal(MInfo, "Emitting result");
-	
-		emit imageProcessed(mat, _provider.Step()/1000);
-	}
-	return false;
-
-}
+//	}
+//	return false;
+//}
 

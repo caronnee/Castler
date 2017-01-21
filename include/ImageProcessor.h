@@ -40,6 +40,7 @@ struct ImageInfo
 	bool _estimated;
 	ImageInfo()
 	{
+		_position = cv::Point3f(0, 0, 0);
 		_estimated = false;
 		_extrinsic = cv::Mat::eye(3, 3, CV_64F);
 	}
@@ -54,16 +55,26 @@ public:
 	~IDetector() {}
 };
 
+// returns true if the hase is finished
+
 class ImageProcessor
 {
-public:
+	typedef bool(ImageProcessor::*Phase) ();//pointer-to-member function 
+	
+	// which part of the detecting are we in
+	int _phase; 
 
+	// function that should be performed
+	Phase _phases[128];
+
+public:
+	
 	// class that gives out the results
 	IDetector * _detectorOutput;
 
 	void AutoCalibrate();
-private:
 
+private:
 	// found cameras in calibration
 	std::vector<CameraParams *> _cameras;
 
@@ -116,6 +127,7 @@ private:
 
 	// extract insinstric parameters
 	void SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera);
+
 public:
 
 	// finishes calibration according to the known object
@@ -137,6 +149,7 @@ public:
 	bool Next();
 	bool Init( Providers * provider, bool ffd = false);
 	cv::Size GetSize();
+	bool PrepareImage();
 	bool PerformCalibration(int chessWidth, int chessHeight, std::vector<cv::Point2f>& corners);
 	void ApplyFeatureDetector();
 	bool PerformDetection();
@@ -146,4 +159,7 @@ public:
 	//
 	void ApplyCalibration(CalibrationSet & calibrationSet);
 
+	~ImageProcessor();
+	void Create(const int& mode);
+	void Clear();
 };

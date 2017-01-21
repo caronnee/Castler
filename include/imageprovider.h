@@ -4,16 +4,22 @@
 #include <QMetaType>
 #include <opencv2/opencv.hpp>
 
-enum CaptureModes
+enum VisualModes
 {
-	ModeIdle = 1, // do nothing
-	ModePlay = 1 << 1,
-	ModeGrey = 1 << 2,
-	ModeCalibrate = 1 << 3,
-	ModeDetect = 1 << 4,
-	ModeUndistort = 1 << 5,
-	ModeFeatures = 1 << 6,
-	ModeCreate = 1 << 7
+	VisualModeStop = 0,
+	VisualModePlay = 1 << 1,
+	VisualModeGrey = 1 << 2,
+	VisualModeFeatures = 1 << 3,
+	VisualModeUndistort = 1 << 4,
+};
+
+enum ActionModes
+{
+	ActionModePlay, // do nothing
+	ActionModeCalibrate,
+	ActionModeDetect,
+	ActionModeCreate,
+	NActions
 };
 
 struct CalibrationSet

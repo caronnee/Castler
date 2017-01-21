@@ -29,7 +29,8 @@ public:
 	~Creator();
 
 signals:
-	void modeChangedSignal(int);
+	void modeChangedVisualSignal(int);
+	void modeChangedActionSignal(int);
 	void PreparePairSignal(int,int);
 
 private slots:

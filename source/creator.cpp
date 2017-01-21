@@ -34,7 +34,8 @@ Creator::Creator(QWidget *parent)
 	connect(_shortcuts[2], SIGNAL(activated()), this, SLOT(AddNewPoint()));
 
 	// worker connects
-	connect(this, SIGNAL(modeChangedSignal(int)), _capturer.GetWorker(), SLOT(SetMode(int)));
+	connect(this, SIGNAL(modeChangedVisualSignal(int)), _capturer.GetWorker(), SLOT(ChangeVisualMode(int)));
+	connect(this, SIGNAL(modeChangedActionSignal(int)), _capturer.GetWorker(), SLOT(ChangeActionMode(int)));
 	connect(ui.renderer, SIGNAL( DescChangedSignal(PositionDesc&)), this, SLOT(FillActive(PositionDesc&)));
 
 	// rendered connects
@@ -134,7 +135,7 @@ void Creator::GetNextImagePair()
 
 void Creator::FeaturesFromFrame()
 {
-	emit modeChangedSignal(ModeFeatures);
+	emit modeChangedVisualSignal(VisualModeFeatures);
 }
 
 void Creator::CreateNew()
@@ -144,12 +145,12 @@ void Creator::CreateNew()
 
 void Creator::ShowGreyFrame()
 {
-	emit modeChangedSignal(ModeGrey);
+	emit modeChangedVisualSignal(VisualModeGrey);
 }
 
 void Creator::Stop()
 {
-	_capturer.Stop();
+	emit modeChangedVisualSignal(VisualModeStop);
 }
 
 void Creator::Pause()
@@ -231,13 +232,13 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 void Creator::ShowUndistorted()
 {
 	SendParameters();
-	emit modeChangedSignal(ModeUndistort);
+	emit modeChangedVisualSignal(VisualModeUndistort);
 }
 
 
 void Creator::RunCalibration()
 {
-	emit modeChangedSignal(ModeCalibrate);
+	emit modeChangedActionSignal(ActionModeCalibrate);
 }
 
 void Creator::LoadCalibrationImages()
@@ -343,7 +344,7 @@ void Creator::StartCreating()
 		compl += str + ";";
 	}
 	_capturer.Load(compl.c_str());
-	emit modeChangedSignal(ModeCreate);
+	emit modeChangedActionSignal(ActionModeCreate);
 }
 
 void Creator::PlayVideo()
@@ -352,7 +353,7 @@ void Creator::PlayVideo()
 	// if nothing is selected, return
 	QString actualString = ui.inputList->selectedItems()[0]->data(Qt::UserRole).toString();
 	_capturer.Load(actualString);
-	emit modeChangedSignal(ModePlay);
+	emit modeChangedActionSignal(ActionModePlay);
 }
 
 const char * CSettingFileName = "/settings.castler";
