@@ -29,7 +29,7 @@ bool ImagesProvider::IsSupported(const QString & source)
 
 ImagesProvider::ImagesProvider(const QString & source)
 {
-	_pos = 0;
+	_pos = -1;
 	QDirIterator it(source, QDir::Files, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{
@@ -42,7 +42,7 @@ ImagesProvider::ImagesProvider(const QString & source)
 
 bool ImagesProvider::End()
 {
-	return _pos == _images.size() - 1;
+	return _pos >= _images.size();
 }
 
 double ImagesProvider::Step()
@@ -58,6 +58,9 @@ bool ImagesProvider::IsValid()
 
 bool ImagesProvider::NextFrame(cv::Mat & frame)
 {
+	SetPosition(_pos + 1);
+	if (_pos >= _images.size())
+		return false;
 	if (_images[_pos].loaded == false)
 	{
 		cv::Mat frame = cv::imread(_images[_pos].name.toStdString().c_str(), CV_LOAD_IMAGE_COLOR);
@@ -65,8 +68,7 @@ bool ImagesProvider::NextFrame(cv::Mat & frame)
 		_images[_pos].image = frame;
 	}
 	frame = _images[_pos].image;
-	SetPosition(_pos + 1);
-	return _pos != 0;
+	return true;
 }
 
 void ImagesProvider::PreviousFrame(cv::Mat & frame)
@@ -81,7 +83,7 @@ void ImagesProvider::PreviousFrame(cv::Mat & frame)
 
 void ImagesProvider::SetPosition(const int & position)
 {
-	_pos = position % _images.size();
+	_pos = position;
 }
 
 int ImagesProvider::Position()
@@ -92,5 +94,10 @@ int ImagesProvider::Position()
 int ImagesProvider::Count()
 {
 	return _images.size();
+}
+
+const QString ImagesProvider::Name() const
+{
+	return _images[_pos].name.toStdString().c_str();
 }
 

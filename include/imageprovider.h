@@ -13,11 +13,11 @@ enum VisualModes
 	VisualModeUndistort = 1 << 4,
 };
 
+// no need to make mask of this - according to these flags processor is created
 enum ActionModes
 {
 	ActionModePlay, // do nothing
 	ActionModeCalibrate,
-	ActionModeDetect,
 	ActionModeCreate,
 	NActions
 };
@@ -43,13 +43,21 @@ public:
 	virtual int Position() = 0;
 	virtual double Step() = 0;
 	virtual int Count() = 0;
+	virtual const QString Name()const = 0;
 };
 
 struct Providers
 {
 	std::vector<IImageProvider *> _providers;
 	int _currentProvider = 0;
-	
+	void Reset()
+	{
+		_currentProvider = 0;
+		for (int i = 0; i < _providers.size(); i++)
+		{
+			_providers[i]->SetPosition(-1);
+		}
+	}
 	//number of frames this provides
 	int Count()
 	{
@@ -81,6 +89,10 @@ struct Providers
 	IImageProvider * Get()
 	{
 		return _providers[_currentProvider];
+	}
+	const QString Name()
+	{
+		return Get()->Name();
 	}
 };
 

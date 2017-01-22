@@ -29,4 +29,5 @@ public:
 	virtual void SetPosition(const int & position);
 	virtual int Position();
 	virtual int Count();
+	virtual const QString Name()const;
 };

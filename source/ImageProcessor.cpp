@@ -3,8 +3,9 @@
 
 IReportFunction * ImageProcessor::_reporter = NULL;
 
-void ImageProcessor::AutoCalibrate()
+bool ImageProcessor::AutoCalibrate()
 {
+	_reporter->Report(MInfo, "Initializing camera");
 	if (_cameras.empty())
 	{
 		CameraParams * params = new CameraParams;
@@ -19,6 +20,21 @@ void ImageProcessor::AutoCalibrate()
 		//TODO
 		_imagesInfo[i]._camera = _cameras[0];
 	}
+	// create tracks from all matches that we discovered
+	int points = 0;
+	for (int i = 0; i < _matches.size(); i++)
+	{
+		if (_matches[i]->id == -1)
+			_matches[i]->id = points++;
+		if (_matches[i]->paired)
+			_matches[i]->paired->id = points;
+	}
+	_meshPoints.clear();;
+	_meshPoints.resize(points);
+	_lastImageIndex = 0;
+	_lastIndex = 0;
+	// done. Nothing more to do
+	return false;
 }
 
 int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
@@ -67,11 +83,27 @@ int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 
 ImageProcessor::ImageProcessor()
 {
+	_lastIndex = 0;
 	_phase = 0;
 	_detectorOutput = NULL;
 	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
 	_lastImageIndex = 0;
+}
+
+bool ImageProcessor::FeaturesStep()
+{
+	if (PrepareImage() == false)
+	{
+		_provider->Reset();
+		_lastImageIndex = 1;
+		_reporter->Report(MInfo, "All entries processed");
+		return false;
+	}
+	QString message = QString::asprintf("Processing %d input ( %s )", _lastImageIndex, _provider->Name().toStdString().c_str());
+	_reporter->Report(MInfo, message);
+	ApplyFeatureDetector();
+	return true;
 }
 
 bool ImageProcessor::Init(Providers * provider, bool ffd /*= false*/)
@@ -128,7 +160,7 @@ bool ImageProcessor::PrepareImage()
 
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
 	_frame.copyTo(_ret);
-
+	return true;
 }
 
 bool ImageProcessor::Next( )
@@ -141,6 +173,52 @@ bool ImageProcessor::Next( )
 		_phase++;
 	}
 	return true;
+}
+
+bool ImageProcessor::FinishCalibration()
+{
+	// last calibration step
+	_reporter->Report(MInfo, "Calculating parameters");
+
+	// finish when all images are processed
+
+	cv::Mat cameraMatrix, distCoeffs, rvecs, tvecs;
+	cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+	cameraMatrix.at<double>(0, 0) = 1;
+	distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+
+	if (FinishCalibration(_chesspoints, cameraMatrix, distCoeffs))
+	{
+		_reporter->Report(MInfo, "Calibration successful");
+		//emit camParametersSignal(cameraMatrix, distCoeffs);
+	}
+	else
+	{
+		_reporter->Report(MError, "Calibration not successful");
+	}
+	return true;
+}
+
+bool ImageProcessor::CalibrateStep()
+{
+	return true;
+}
+
+bool ImageProcessor::CreateChessboards()
+{
+	_chesspoints.clear();
+	//TODO  this should be later autodetected
+	int chessW = 7, chessH = 7;
+#define COEF 10
+	for (int i = 0; i < chessH; i++)
+	{
+		for (int j = 0; j < chessW; j++)
+		{
+			_chesspoints.push_back(cv::Point3f(COEF*i, COEF*j, 0));
+		}
+	}
+	// nothing more to do
+	return false;
 }
 
 bool ImageProcessor::PerformCalibration(int chessWidth, int chessHeight, std::vector<cv::Point2f>& corners)
@@ -352,6 +430,23 @@ void ImageProcessor::Create(const int& mode)
 			_phases[1] = NULL;
 			break;
 		}
+		case ActionModeCalibrate:
+		{
+			_phases[0] = &ImageProcessor::CreateChessboards;
+			_phases[1] = &ImageProcessor::CalibrateStep;
+			_phases[2] = &ImageProcessor::FinishCalibration;
+			_phases[3] = NULL;
+			break;
+		}
+		case ActionModeCreate:
+		{
+			_phases[0] = &ImageProcessor::FeaturesStep;
+			_phases[1] = &ImageProcessor::MatchesStep;
+			_phases[2] = &ImageProcessor::AutoCalibrate;
+			_phases[3] = &ImageProcessor::FinishCreationStep;
+			_phases[4] = &ImageProcessor::GlobalBundleAdjustment;
+			break;
+		}
 		default:
 		{
 			_reporter->Report(MError, "Nothing create :-o");
@@ -379,29 +474,24 @@ bool ImageProcessor::FinishCalibration(PointsArray & chesspoints, cv::Mat& camer
 #define DISCOEF 0.8
 #define INLINER_THRESHOLD 0.01
 
-bool CompareThese(const int &i, const int &j)
-{
-	return true;
-}
-
 // created matches between all images so far
-void ImageProcessor::CreateMatches()
+bool ImageProcessor::MatchesStep()
 {
 	KeypointsArray & currentKeypoints = _foundCoords.back();
 	KeypointsArray matched1, matched2;
-	int currentImage = _foundCoords.size() - 1;
-	for ( int iImage =0; iImage < currentImage; iImage++)
+	int& currentImage = _lastImageIndex;
+	int& iImage = _lastIndex;
+	QString message = QString::asprintf("Matching %d %d",_lastIndex, _lastImageIndex);
+	_reporter->Report(MInfo, message.toStdString().c_str());
+	//for ( int iImage =0; iImage < currentImage; iImage++)
 	{
-		if ( CompareThese(iImage, currentImage) == false)
-			continue;
-
 		cv::BFMatcher matcher(cv::NORM_HAMMING);
 		std::vector< std::vector<cv::DMatch> > nn_matches;
 
 		// we want exact matches, but have 2 of them for comparison
 		matcher.knnMatch(_foundDesc[iImage],_foundDesc[currentImage], nn_matches, 2);
 		if ( nn_matches.empty() )
-			continue;
+			return false;
 		int inliers = 0;
 		// bool for double matches
 		bool * testDouble[2];
@@ -474,6 +564,17 @@ void ImageProcessor::CreateMatches()
 		mp.image2 = iImage;
 		_reliability.push_back(mp);
 	}
+	iImage++;
+	if (iImage == currentImage)
+	{
+		iImage = 0;
+		currentImage++;
+		if (currentImage >= _imagesInfo.size())
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 #include "Misc.h"
@@ -536,9 +637,9 @@ cv::Mat ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
 	cv::transpose(w, wtransposed);
 
 	cv::Mat p[4];
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		p[i] = cv::Mat::zeros(3, 4, CV_64F);
+		p[i] = cv::Mat::zeros(3, 3, CV_64F);
 	}
 	cv::Rect rect(0, 0, 3, 3);
 	cv::Rect rectT(3, 0, 1, 3);
@@ -547,11 +648,12 @@ cv::Mat ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
 	p[2](rect) = u * wtransposed * vtransposed;
 	p[3](rect) = u * wtransposed * vtransposed;
 
+	cv::Point3f position[4];
 	cv::Mat neg =-u;
-	u.col(2).copyTo(p[0](rectT));
-	neg.col(2).copyTo(p[1](rectT));
-	u.col(2).copyTo(p[2](rectT));
-	neg.col(2).copyTo(p[3](rectT));
+	u.col(2).copyTo(position[0]);
+	neg.col(2).copyTo(position[1]);
+	u.col(2).copyTo(position[2]);
+	neg.col(2).copyTo(position[3]));
 
 	int score[4];
 	memset(score, 0, sizeof(score));
@@ -593,7 +695,7 @@ cv::Mat ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
 		if (score[i] > score[ret])
 			ret = i;
 	}
-	SplitMatrix(p[ret], _imagesInfo[image], _imagesInfo[image]._camera );
+	SplitMatrix(p[ret], _imagesInfo[image], _imagesInfo[image]._camera, position[ret] );
 	return p[ret];
 }
 void ImageProcessor::SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera)
@@ -612,167 +714,140 @@ void ImageProcessor::SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, Camera
 	camera->calibrated = true;
 }
 
-// create whole 3d model
-void ImageProcessor::FinishCreation()
+bool ImageProcessor::GlobalBundleAdjustment()
 {
-	// create tracks from all matches that we discovered
-	int points = 0;
-	for (int i = 0; i < _matches.size(); i++)
-	{
-		if (_matches[i]->id == -1)
-			_matches[i]->id = points++;
-		if (_matches[i]->paired)
-			_matches[i]->paired->id = points;
-	}
-
-	_meshPoints.clear();;
-	_meshPoints.resize(points);
-
+	return false;
+}
+// create whole 3d model
+bool ImageProcessor::FinishCreationStep()
+{
 	// we have now tracks
-	ImageProcessor::_reporter->Report(MInfo, "Done generating tracks");
+	ImageProcessor::_reporter->Report(MInfo, "Generating tracks..");
 
-	std::vector<int> processsedCameras;
 	// pick up the initial camera. Two of the images must contains the most matches
-	int image1, image2;
+	int &image1 = _lastImageIndex, &image2=_lastIndex;
 	int camerasUsed = FindNextBestPair(image1, image2);
-
-	processsedCameras.push_back(image1);
-	processsedCameras.push_back(image2);
 
 	// this is our first stable camera. Lets reconstruct some 3Dpoint from it
 	int nframes = _foundCoords.size();
 
-	_phase++;
+	if (camerasUsed == 0)
+		return false;
 
 	// let's have all points in images that correspond to this camera
-	while (camerasUsed < nframes)
+	CoordsArray points1, points2;
+	std::vector<int> matches_ids;
+	for (int i = 0; i < _matches.size(); i++)
 	{
-		CoordsArray points1, points2;
-		std::vector<int> matches_ids;
-		for (int i = 0; i < _matches.size(); i++)
+		if (_matches[i]->imageId == image1 &&
+			_matches[i]->paired->imageId == image2)
 		{
-			if (_matches[i]->imageId == image1 &&
-				_matches[i]->paired->imageId == image2 )
-			{
-				points1.push_back(_foundCoords[image1][_matches[i]->pointdId].pt);
-			
-				points2.push_back(_foundCoords[image2][_matches[i]->pointdId].pt);
-				matches_ids.push_back(i);
-			}
+			points1.push_back(_foundCoords[image1][_matches[i]->pointdId].pt);
+			points2.push_back(_foundCoords[image2][_matches[i]->pointdId].pt);
+			matches_ids.push_back(i);
 		}
-		// estimate position
-		cv::Mat F = cv::findFundamentalMat(cv::Mat(points1), cv::Mat(points2), cv::FM_8POINT, 0, 0);
-		//single value decomposition for reducing rank to 2;
-		//we know that fundamental matrix is rank and the diagonal number are in decreasing order
-		cv::Mat u, vt, w;
-		cv::SVD::compute(F, w, u, vt, cv::SVD::FULL_UV);
-		cv::Mat rec = cv::Mat::zeros(3, 3, CV_64F);
-		rec.at<double>(0, 0) = w.at<double>(0, 0);
-		rec.at<double>(1, 1) = w.at<double>(1, 0);
-		//rec.at<double>(2, 2) = w.at<double>(2, 0);
-		w = rec;
-		double a[9] = {
-			F.at<double>(0,0),F.at<double>(0,1),F.at<double>(0,2),
-			F.at<double>(1,0),F.at<double>(1,1),F.at<double>(1,2),
-			F.at<double>(2,0),F.at<double>(2,1),F.at<double>(2,2),
-		};
-		
-		//compute once again F, with correct dimension
-		F = u*w*vt;
-		double testF[9] = {
-			F.at<double>(0,0),F.at<double>(0,1),F.at<double>(0,2),
-			F.at<double>(1,0),F.at<double>(1,1),F.at<double>(1,2),
-			F.at<double>(2,0),F.at<double>(2,1),F.at<double>(2,2),
-		};
-
-		// now we have F that is close enough
-
-		// now compute essential matrix between these two images, so we would take internal calibration into account
-		// TODO is this the correct essential matrix?
-		cv::Mat E = _imagesInfo[image1]._camera->insistric * F * _imagesInfo[image1]._camera->insistric;
-
-		// calculate projection matrix from essential matrix
-
-		// first if the trivial one
-		cv::Mat p1 = cv::Mat::eye(3, 4, CV_64F);
-
-		//second one we need to compute
-		cv::Mat p2 = FindSecondProjection(E,image2);
-
-		//cv::Point3f ep1, ep2;
-
-		//// find epipolar in the second image
-		//cv::Point3f epipolar = GetEpipoles(F, ep1, ep2);
-		//cv::Mat epMat = CreateCrossMatrix(epipolar);
-		//// Projective matrices
-		//// first matrix is identity
-		//cv::Mat p2 = cv::Mat::eye(3, 4, CV_64F);
-		////second matrix is based on the epipole
-		//cv::Mat mult = epMat.mul(F);
-		//cv::Rect rect(0, 0, 3, 3);
-		//p2(rect)= mult;
-
-		// make it correct according to rest of the cameras 
-		// make it complete with all the other projections that we already have
-		// here we assume that all P are normalized
-		p1 = _imagesInfo[image1]._extrinsic * p1;
-		p2 = _imagesInfo[image1]._extrinsic * p2;
-		
-		// Do triangulation ( two- view now. We will check all of them later )
-		// create Matrix A and B, 
-		int n = 2;
-		cv::Mat A = cv::Mat::zeros ( 2 * n, 3, CV_64F);
-		cv::Mat b = cv::Mat::zeros ( 2 * n, 1, CV_64F);
-		cv::Mat X = cv::Mat::zeros ( 3, 1, CV_64F);
-
-		cv::Rect rct1(0, 0, 3, 3);
-		cv::Rect transl(0, 0, 1,3);
-		cv::Mat projMatrices[] = { p1, p2 };
-		
-		// update p1/p2 base on the minimum distance to the image point
-		// create for allVertices
-		// first camera is always lower
-		for (int i = 0; i < matches_ids.size(); i++)
-		{
-			int image_pid = _matches[matches_ids[i]]->imageId;
-			int image_pid2 = _matches[matches_ids[i]]->paired->imageId;
-			DoAssert(image_pid < _imagesInfo.size());
-			DoAssert(image_pid2 < _imagesInfo.size());
-			cv::Point2f pd[] = { _foundCoords[image1][image_pid].pt, 
-				_foundCoords[image1][image_pid2].pt };
-			// set A
-			for (int iProj = 0; iProj < n; iProj++)
-			{
-				cv::Mat & P = projMatrices[iProj];
-				A.at<double>(iProj*2, 0) = P.at<double>(0, 0) - P.at<double>(2, 0)*pd[iProj].x;
-				A.at<double>(iProj * 2, 1) = P.at<double>(0, 1) - P.at<double>(2, 1)*pd[iProj].x;
-				A.at<double>(iProj * 2, 2) = P.at<double>(0, 2) - P.at<double>(2, 2)*pd[iProj].x;
-				A.at<double>(iProj * 2+1, 0) = P.at<double>(1, 0) - P.at<double>(2, 0)*pd[iProj].y;
-				A.at<double>(iProj * 2 + 1, 1) = P.at<double>(1, 1) - P.at<double>(2, 1)*pd[iProj].y;
-				A.at<double>(iProj * 2 + 1, 2) = P.at<double>(1, 2) - P.at<double>(2, 2)*pd[iProj].y;
-
-				// set B
-				b.at<double>(iProj * 2) = P.at<double>(2, 3)*pd[iProj].x - P.at<double>(0,3);
-				b.at<double>(iProj * 2+1) = P.at<double>(2, 3)*pd[iProj].y - P.at<double>(1, 3);
-			}
-			cv::solve(A, b, X, cv::DECOMP_SVD);
-			cv::Point3f nPoint = X;// Triangulate(p1, p2, pid1, pid2);
-			int index = _matches[matches_ids[i]]->pointdId;
-
-			DoAssert(_detectorOutput);
-			QString o = QString::asprintf("Generated point %d (estimated as %.3f %.3f %.3f) ",index, nPoint.x, nPoint.y, nPoint.z);
-			_reporter->Report(MInfo, o);
-			_detectorOutput->PointCallback(nPoint, index);
-			/*if (_cameraAdjusted)
-				_cameraAdjusted(rotation, position, point);*/
-			CameraParams * param = _imagesInfo[image1]._camera;
-			SplitMatrix(p1, _imagesInfo[image1], param);
-			param = _imagesInfo[image1]._camera;
-			SplitMatrix(p2, _imagesInfo[image2], param);
-		}
-		camerasUsed += FindNextBestPair(image1, image2);
 	}
+	// estimate position
+	cv::Mat F = cv::findFundamentalMat(cv::Mat(points1), cv::Mat(points2), cv::FM_8POINT, 0, 0);
+	//single value decomposition for reducing rank to 2;
+	//we know that fundamental matrix is rank and the diagonal number are in decreasing order
+	cv::Mat u, vt, w;
+	cv::SVD::compute(F, w, u, vt, cv::SVD::FULL_UV);
+	cv::Mat rec = cv::Mat::zeros(3, 3, CV_64F);
+	rec.at<double>(0, 0) = w.at<double>(0, 0);
+	rec.at<double>(1, 1) = w.at<double>(1, 0);
+	//rec.at<double>(2, 2) = w.at<double>(2, 0);
+	w = rec;
 
-	// global bundle adjustments
+	//compute once again F, with correct dimension
+	F = u*w*vt;
 
+	// now we have F that is close enough
+
+	// now compute essential matrix between these two images, so we would take internal calibration into account
+	// TODO is this the correct essential matrix?
+	cv::Mat E = _imagesInfo[image1]._camera->insistric * F * _imagesInfo[image1]._camera->insistric;
+
+	// calculate projection matrix from essential matrix
+
+	// first if the trivial one
+	cv::Mat p1 = cv::Mat::eye(3, 4, CV_64F);
+
+	//second one we need to compute
+	cv::Mat p2 = FindSecondProjection(E, image2);
+
+	//cv::Point3f ep1, ep2;
+
+	//// find epipolar in the second image
+	//cv::Point3f epipolar = GetEpipoles(F, ep1, ep2);
+	//cv::Mat epMat = CreateCrossMatrix(epipolar);
+	//// Projective matrices
+	//// first matrix is identity
+	//cv::Mat p2 = cv::Mat::eye(3, 4, CV_64F);
+	////second matrix is based on the epipole
+	//cv::Mat mult = epMat.mul(F);
+	//cv::Rect rect(0, 0, 3, 3);
+	//p2(rect)= mult;
+
+	// make it correct according to rest of the cameras 
+	// make it complete with all the other projections that we already have
+	// here we assume that all P are normalized
+	p1 = _imagesInfo[image1]._extrinsic * p1;
+	p2 = _imagesInfo[image1]._extrinsic * p2;
+
+	// Do triangulation ( two- view now. We will check all of them later )
+	// create Matrix A and B, 
+	int n = 2;
+	cv::Mat A = cv::Mat::zeros(2 * n, 3, CV_64F);
+	cv::Mat b = cv::Mat::zeros(2 * n, 1, CV_64F);
+	cv::Mat X = cv::Mat::zeros(3, 1, CV_64F);
+
+	cv::Rect rct1(0, 0, 3, 3);
+	cv::Rect transl(0, 0, 1, 3);
+	cv::Mat projMatrices[] = { p1, p2 };
+
+	// update p1/p2 base on the minimum distance to the image point
+	// create for allVertices
+	// first camera is always lower
+	for (int i = 0; i < matches_ids.size(); i++)
+	{
+		int image_pid = _matches[matches_ids[i]]->imageId;
+		int image_pid2 = _matches[matches_ids[i]]->paired->imageId;
+		DoAssert(image_pid < _imagesInfo.size());
+		DoAssert(image_pid2 < _imagesInfo.size());
+		cv::Point2f pd[] = { _foundCoords[image1][image_pid].pt,
+			_foundCoords[image1][image_pid2].pt };
+		// set A
+		for (int iProj = 0; iProj < n; iProj++)
+		{
+			cv::Mat & P = projMatrices[iProj];
+			A.at<double>(iProj * 2, 0) = P.at<double>(0, 0) - P.at<double>(2, 0)*pd[iProj].x;
+			A.at<double>(iProj * 2, 1) = P.at<double>(0, 1) - P.at<double>(2, 1)*pd[iProj].x;
+			A.at<double>(iProj * 2, 2) = P.at<double>(0, 2) - P.at<double>(2, 2)*pd[iProj].x;
+			A.at<double>(iProj * 2 + 1, 0) = P.at<double>(1, 0) - P.at<double>(2, 0)*pd[iProj].y;
+			A.at<double>(iProj * 2 + 1, 1) = P.at<double>(1, 1) - P.at<double>(2, 1)*pd[iProj].y;
+			A.at<double>(iProj * 2 + 1, 2) = P.at<double>(1, 2) - P.at<double>(2, 2)*pd[iProj].y;
+
+			// set B
+			b.at<double>(iProj * 2) = P.at<double>(2, 3)*pd[iProj].x - P.at<double>(0, 3);
+			b.at<double>(iProj * 2 + 1) = P.at<double>(2, 3)*pd[iProj].y - P.at<double>(1, 3);
+		}
+		cv::solve(A, b, X, cv::DECOMP_SVD);
+		cv::Point3f nPoint = X;// Triangulate(p1, p2, pid1, pid2);
+		int index = _matches[matches_ids[i]]->pointdId;
+
+		DoAssert(_detectorOutput);
+		QString o = QString::asprintf("Generated point %d (estimated as %.3f %.3f %.3f) ", index, nPoint.x, nPoint.y, nPoint.z);
+		_reporter->Report(MInfo, o);
+		_detectorOutput->PointCallback(nPoint, index);
+		/*if (_cameraAdjusted)
+			_cameraAdjusted(rotation, position, point);*/
+		CameraParams * param = _imagesInfo[image1]._camera;
+		SplitMatrix(p1, _imagesInfo[image1], param);
+		param = _imagesInfo[image1]._camera;
+		SplitMatrix(p2, _imagesInfo[image2], param);
+	}
+	camerasUsed += FindNextBestPair(image1, image2);
+
+	return true;
 }

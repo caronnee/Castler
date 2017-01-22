@@ -26,8 +26,13 @@ struct RelMap
 
 struct CameraParams
 {
+	// insistric parameters
 	cv::Mat insistric;
+	// distortion coefficients
+	cv::Mat distCoefs;
+	// check if this was already estimated
 	bool calibrated;
+	// name of th camera
 	const char * name;
 };
 
@@ -55,8 +60,6 @@ public:
 	~IDetector() {}
 };
 
-// returns true if the hase is finished
-
 class ImageProcessor
 {
 	typedef bool(ImageProcessor::*Phase) ();//pointer-to-member function 
@@ -67,13 +70,11 @@ class ImageProcessor
 	// function that should be performed
 	Phase _phases[128];
 
-public:
-	
-	// class that gives out the results
-	IDetector * _detectorOutput;
+	// checkpoints to detect for calibration purposes
+	std::vector<cv::Point3f> _chesspoints;
 
-	void AutoCalibrate();
-
+	// last index can be basically anything. Just context
+	int _lastIndex;
 private:
 	// found cameras in calibration
 	std::vector<CameraParams *> _cameras;
@@ -122,22 +123,27 @@ private:
 	// create matches 
 	void PrepareCalibration();
 
-	// return projection from essental matrix
+	// return projection from essential matrix
 	cv::Mat FindSecondProjection(cv::Mat essential, int image);
 
-	// extract insinstric parameters
+	// extract insistric parameters
 	void SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera);
 
+	bool GlobalBundleAdjustment();
 public:
+
+	// class that gives out the results
+	IDetector * _detectorOutput;
+
+	bool AutoCalibrate();
 
 	// finishes calibration according to the known object
 	bool FinishCalibration(PointsArray & chesses, cv::Mat& cameraMatrix, cv::Mat& distCoeffs);
 
-	// create matches between images
-	void CreateMatches();
+	bool FinishCalibration();
 
 	// from all detected structure it hopefully creates mesh
-	void FinishCreation();
+	bool FinishCreationStep();
 
 	// handler for the messages
 	static IReportFunction * _reporter;
@@ -145,9 +151,13 @@ public:
 	// construct
 	ImageProcessor();
 
+	bool MatchesStep();
+	bool FeaturesStep();
 	// set position to the bext image
 	bool Next();
-	bool Init( Providers * provider, bool ffd = false);
+	bool CalibrateStep();
+	bool CreateChessboards();
+	bool Init(Providers * provider, bool ffd = false);
 	cv::Size GetSize();
 	bool PrepareImage();
 	bool PerformCalibration(int chessWidth, int chessHeight, std::vector<cv::Point2f>& corners);

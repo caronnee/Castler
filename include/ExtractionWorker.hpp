@@ -24,15 +24,9 @@ class ExtractionWorker : public QObject, public IReportFunction, public IDetecto
 	Q_OBJECT
 		;
 	int _mode;
-
-	//TODO  this should be later autodetected
-	int _chessW = 7, _chessH=7;
 	
 	// time to check for input
 	QBasicTimer _timer;
-	
-	// checkpoints to detect for calibration purposes
-	std::vector<cv::Point3f> _chesspoints;
 
 	//used calibration
 	CalibrationSet _calibrationSet;
@@ -43,10 +37,6 @@ class ExtractionWorker : public QObject, public IReportFunction, public IDetecto
 	// main class for detection
 	ImageProcessor _processor;
 
-private:
-
-	void FinishCalibration();
- 
 public:
 	// constructor
 	ExtractionWorker();

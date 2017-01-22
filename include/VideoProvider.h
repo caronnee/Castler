@@ -10,7 +10,7 @@ class VideoProvider : public IImageProvider
 	int _frameW;
 	int _fps;
 	int _numFrames;
-
+	QString _aName;
 	static const char * videoExts[];
 	static const int NImages;
 public:
@@ -28,5 +28,6 @@ public:
 	virtual void PreviousFrame(cv::Mat& frame);
 	virtual double Step();
 	virtual int Count();
+	virtual const QString Name() const;
 };
 

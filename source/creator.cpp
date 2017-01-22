@@ -155,7 +155,7 @@ void Creator::Stop()
 
 void Creator::Pause()
 {
-	_capturer.Pause();
+	emit modeChangedVisualSignal(VisualModePlay);
 }
 
 void Creator::SendParameters()

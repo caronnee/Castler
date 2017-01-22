@@ -49,7 +49,8 @@ bool VideoProvider::NextFrame(cv::Mat& frame)
 {
 	_capture->read(frame);
 	cv::cvtColor(frame, frame, CV_BGR2RGB);
-	return Position() != _numFrames;
+	_aName = QString::asprintf("Frame %d / %d", Position(), _numFrames);
+	return Position() < _numFrames;
 }
 
 void VideoProvider::SetPosition(const int & position)
@@ -89,4 +90,9 @@ double VideoProvider::Step()
 int VideoProvider::Count()
 {
 	return _numFrames;
+}
+
+const QString VideoProvider::Name() const
+{
+	return _aName;
 }
