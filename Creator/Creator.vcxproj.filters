@@ -191,12 +191,6 @@
     <ClCompile Include="misc.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_cameraparametersshow.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_cameraparametersshow.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -233,9 +227,6 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\source\rendercircle.hpp">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\source\cameraparametersshow.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

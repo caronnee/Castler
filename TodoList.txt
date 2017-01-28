@@ -1,3 +1,5 @@
+- show correspondences
+- implement manual mode for correspondences
 - Groebnbner essential matrix??!
 - implement autocalibration
 - Detect points from images, different ways. Find the most corresponding
