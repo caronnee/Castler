@@ -72,6 +72,9 @@
     <Filter Include="Source Files\ImageProviders">
       <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Settings">
+      <UniqueIdentifier>{f3b6281f-f3a7-46f8-a7c8-70fb7e2ae3e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_creator.cpp">
@@ -191,6 +194,15 @@
     <ClCompile Include="misc.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\cameraparametersshow.cpp">
+      <Filter>Source Files\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cameraparametersshow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cameraparametersshow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="creator.ui">
@@ -228,6 +240,12 @@
     </CustomBuild>
     <CustomBuild Include="..\source\rendercircle.hpp">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\source\cameraparametersshow.hpp">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\source\cameraparametersshow.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -317,6 +335,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Misc.h">
       <Filter>Source Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_cameraparametersshow.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

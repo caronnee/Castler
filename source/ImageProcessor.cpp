@@ -616,7 +616,7 @@ void ImageProcessor::PrepareCalibration()
 	_reporter->Report( MInfo, "Calibration according to images done");
 }
 
-cv::Mat ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
+void ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
 {
 	cv::Mat u, v,dummy;
 
@@ -648,12 +648,13 @@ cv::Mat ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
 	p[2](rect) = u * wtransposed * vtransposed;
 	p[3](rect) = u * wtransposed * vtransposed;
 
-	cv::Point3f position[4];
+	cv::Mat position[4] = { cv::Mat(1,3,CV_64F), cv::Mat(1,3,CV_64F), 
+		cv::Mat(1,3,CV_64F), cv::Mat(1,3,CV_64F) };
 	cv::Mat neg =-u;
 	u.col(2).copyTo(position[0]);
 	neg.col(2).copyTo(position[1]);
 	u.col(2).copyTo(position[2]);
-	neg.col(2).copyTo(position[3]));
+	neg.col(2).copyTo(position[3]);
 
 	int score[4];
 	memset(score, 0, sizeof(score));
@@ -696,9 +697,9 @@ cv::Mat ImageProcessor::FindSecondProjection(cv::Mat essential, int image )
 			ret = i;
 	}
 	SplitMatrix(p[ret], _imagesInfo[image], _imagesInfo[image]._camera, position[ret] );
-	return p[ret];
 }
-void ImageProcessor::SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera)
+
+void ImageProcessor::SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera, cv::Mat position)
 {
 	// RQ decomposition
 	imageInfo._estimated = true;
@@ -711,6 +712,7 @@ void ImageProcessor::SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, Camera
 	}
 	camera->insistric = K;
 	imageInfo._extrinsic = R;
+	imageInfo._position = position;
 	camera->calibrated = true;
 }
 
@@ -771,10 +773,9 @@ bool ImageProcessor::FinishCreationStep()
 	// calculate projection matrix from essential matrix
 
 	// first if the trivial one
-	cv::Mat p1 = cv::Mat::eye(3, 4, CV_64F);
-
+	
 	//second one we need to compute
-	cv::Mat p2 = FindSecondProjection(E, image2);
+	FindSecondProjection(E, image2);
 
 	//cv::Point3f ep1, ep2;
 
@@ -792,9 +793,11 @@ bool ImageProcessor::FinishCreationStep()
 	// make it correct according to rest of the cameras 
 	// make it complete with all the other projections that we already have
 	// here we assume that all P are normalized
-	p1 = _imagesInfo[image1]._extrinsic * p1;
-	p2 = _imagesInfo[image1]._extrinsic * p2;
+	cv::Mat p1 = _imagesInfo[image1]._extrinsic;
+	cv::Mat p2 = _imagesInfo[image1]._extrinsic;
 
+	// TODO check
+	cv::Mat position = _imagesInfo[image1]._position + _imagesInfo[image2]._position;
 	// Do triangulation ( two- view now. We will check all of them later )
 	// create Matrix A and B, 
 	int n = 2;
@@ -829,8 +832,8 @@ bool ImageProcessor::FinishCreationStep()
 			A.at<double>(iProj * 2 + 1, 2) = P.at<double>(1, 2) - P.at<double>(2, 2)*pd[iProj].y;
 
 			// set B
-			b.at<double>(iProj * 2) = P.at<double>(2, 3)*pd[iProj].x - P.at<double>(0, 3);
-			b.at<double>(iProj * 2 + 1) = P.at<double>(2, 3)*pd[iProj].y - P.at<double>(1, 3);
+			b.at<double>(iProj * 2) = P.at<double>(2, 3)*pd[iProj].x - position.at<double>(0, 3);
+			b.at<double>(iProj * 2 + 1) = P.at<double>(2, 3)*pd[iProj].y - position.at<double>(1, 3);
 		}
 		cv::solve(A, b, X, cv::DECOMP_SVD);
 		cv::Point3f nPoint = X;// Triangulate(p1, p2, pid1, pid2);
@@ -842,10 +845,10 @@ bool ImageProcessor::FinishCreationStep()
 		_detectorOutput->PointCallback(nPoint, index);
 		/*if (_cameraAdjusted)
 			_cameraAdjusted(rotation, position, point);*/
-		CameraParams * param = _imagesInfo[image1]._camera;
-		SplitMatrix(p1, _imagesInfo[image1], param);
+		/*CameraParams * param = _imagesInfo[image1]._camera;
+		SplitMatrix(p1, _imagesInfo[image1], param,_im);
 		param = _imagesInfo[image1]._camera;
-		SplitMatrix(p2, _imagesInfo[image2], param);
+		SplitMatrix(p2, _imagesInfo[image2], param);*/
 	}
 	camerasUsed += FindNextBestPair(image1, image2);
 

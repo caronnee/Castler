@@ -40,12 +40,12 @@ struct ImageInfo
 {
 	CameraParams * _camera;
 	cv::Mat _extrinsic;
-	cv::Point3f _position;
+	cv::Mat _position;
 	int imageId;
 	bool _estimated;
 	ImageInfo()
 	{
-		_position = cv::Point3f(0, 0, 0);
+		_position = cv::Mat::zeros(1, 3, CV_64F);
 		_estimated = false;
 		_extrinsic = cv::Mat::eye(3, 3, CV_64F);
 	}
@@ -124,10 +124,10 @@ private:
 	void PrepareCalibration();
 
 	// return projection from essential matrix
-	cv::Mat FindSecondProjection(cv::Mat essential, int image);
+	void FindSecondProjection(cv::Mat essential, int image);
 
 	// extract insistric parameters
-	void SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera);
+	void SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera, cv::Mat pos);
 
 	bool GlobalBundleAdjustment();
 public:

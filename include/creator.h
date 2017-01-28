@@ -6,6 +6,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <QShortcut>
 #include "FrameProcessor.h"
+#include "cameraparametersshow.hpp"
 
 class Creator : public QWidget, public IReportFunction
 {
@@ -15,6 +16,7 @@ class Creator : public QWidget, public IReportFunction
 	// application shortcuts
 	std::vector<QShortcut *> _shortcuts;
 
+	CameraParametersShow * _cameraWindow;
 	// one common processor for images
 	FrameProcessor _capturer;
 
@@ -44,7 +46,7 @@ private slots:
 	void ShowGreyFrame();
 	void Stop();
 	void Pause();
-	void SendParameters();
+	void SendParameters(CalibrationSet calibrationSet);
 	void SaveCalibration();
 	void EnablePlay();
 	void StartCreating();
@@ -56,7 +58,6 @@ private slots:
 	void SaveSettings();
 	void LoadCalibration();
 	void RunCalibration();
-	void SetCalibCamera(cv::Mat camera, int type);
 	void ShowUndistorted();
 	void LoadCalibrationImages();
 private:

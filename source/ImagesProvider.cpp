@@ -35,6 +35,7 @@ ImagesProvider::ImagesProvider(const QString & source)
 	{
 		it.next();
 		FImage image = { false,it.filePath() };
+		image.name = image.name.toLower();
 		if ( IsSupported( image.name ))
 			_images.push_back(image);
 	}

@@ -65,6 +65,7 @@ public slots:
 	void ChangeCalibration(CalibrationSet );
 	void ChangeActionMode(int mode);
 	void ChangeVisualMode(int mode);
+	void RequestNextFrame();
 public:
 	void timerEvent(QTimerEvent * ev);
 };

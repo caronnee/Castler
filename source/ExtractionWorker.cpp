@@ -46,6 +46,11 @@ void ExtractionWorker::ChangeVisualMode(int mode)
 		_timer.start(0, this);
 }
 
+void ExtractionWorker::RequestNextFrame()
+{
+
+}
+
 void ExtractionWorker::Report(MessageLevel level, const QString & str)
 {
 	emit workerReportSignal(level, str);

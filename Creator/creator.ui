@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Creator</string>
   </property>
-  <layout class="QVBoxLayout" name="appLayout" stretch="0,0">
+  <layout class="QVBoxLayout" name="appLayout" stretch="6,1">
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
@@ -76,8 +76,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>216</width>
-               <height>377</height>
+               <width>233</width>
+               <height>390</height>
               </rect>
              </property>
              <attribute name="label">
@@ -380,17 +380,7 @@
       <attribute name="title">
        <string>Creator</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="1,1,2,0">
-       <item row="3" column="2">
-        <widget class="VideoRenderer" name="cloudPoints"/>
-       </item>
-       <item row="3" column="1">
-        <widget class="InputList" name="inputList">
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
+      <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="1,0,5,0">
        <item row="2" column="1" colspan="3">
         <widget class="QLabel" name="creatorLabel">
          <property name="text">
@@ -404,15 +394,15 @@
           <item>
            <widget class="QToolBox" name="detectorTools">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
-            <widget class="QWidget" name="page">
+            <widget class="QWidget" name="creationPage">
              <property name="geometry">
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>201</width>
-               <height>268</height>
+               <width>128</width>
+               <height>358</height>
               </rect>
              </property>
              <attribute name="label">
@@ -423,6 +413,13 @@
                <widget class="QPushButton" name="createMeshButton">
                 <property name="text">
                  <string>Create Mesh</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="createMeshInteractive">
+                <property name="text">
+                 <string>Start manual mode</string>
                 </property>
                </widget>
               </item>
@@ -440,6 +437,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="InputList" name="inputList">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="calibrationToolGroup">
@@ -447,14 +451,28 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>226</width>
-               <height>383</height>
+               <width>137</width>
+               <height>341</height>
               </rect>
              </property>
              <attribute name="label">
               <string>Calibration tool</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_7" columnstretch="0">
+              <item row="2" column="0">
+               <widget class="QPushButton" name="calibrationFolderButton">
+                <property name="text">
+                 <string>Load calibration images</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QPushButton" name="loadCalibrationButton">
+                <property name="text">
+                 <string>Load calibration</string>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="calibrationLabel">
                 <property name="frameShape">
@@ -477,10 +495,10 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="0">
-               <widget class="QPushButton" name="loadCalibrationButton">
+              <item row="1" column="0">
+               <widget class="QPushButton" name="runCalibrationButton">
                 <property name="text">
-                 <string>Load calibration</string>
+                 <string>runCalibration</string>
                 </property>
                </widget>
               </item>
@@ -491,13 +509,6 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QPushButton" name="runCalibrationButton">
-                <property name="text">
-                 <string>runCalibration</string>
-                </property>
-               </widget>
-              </item>
               <item row="3" column="0">
                <widget class="QPushButton" name="saveCalibrationButton">
                 <property name="text">
@@ -505,158 +516,11 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QPushButton" name="calibrationFolderButton">
-                <property name="text">
-                 <string>Load calibration images</string>
-                </property>
-               </widget>
-              </item>
               <item row="6" column="0">
-               <widget class="QFrame" name="parametersFrame">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+               <widget class="QPushButton" name="cameraParametersWindow">
+                <property name="text">
+                 <string>Camera parameters</string>
                 </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1,1">
-                 <item row="0" column="3">
-                  <widget class="QDoubleSpinBox" name="principalXValue">
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-1000.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>1000.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="3">
-                  <widget class="QDoubleSpinBox" name="k3">
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-10000.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>10000.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="pPointLabel">
-                   <property name="text">
-                    <string>Principal point</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="3">
-                  <widget class="QDoubleSpinBox" name="focusValue">
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="maximum">
-                    <double>1000000.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0" colspan="2">
-                  <widget class="QLabel" name="label_4">
-                   <property name="text">
-                    <string>Radial distortion</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="3">
-                  <widget class="QDoubleSpinBox" name="k1">
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-10000.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>10000.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QLabel" name="label">
-                   <property name="text">
-                    <string>X:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="3">
-                  <widget class="QDoubleSpinBox" name="k2">
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-10000.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>10000.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="label_3">
-                   <property name="text">
-                    <string>Focus:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="7" column="3">
-                  <widget class="QPushButton" name="applyCalibrationButton">
-                   <property name="text">
-                    <string>Apply</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QLabel" name="label_2">
-                   <property name="text">
-                    <string>Y:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="3">
-                  <widget class="QDoubleSpinBox" name="principalYValue">
-                   <property name="decimals">
-                    <number>3</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-1000.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>1000.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </widget>
               </item>
              </layout>
@@ -759,6 +623,9 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="3" column="1" colspan="2">
+        <widget class="VideoRenderer" name="cloudPoints"/>
        </item>
       </layout>
      </widget>
