@@ -15,6 +15,7 @@ Creator::Creator(QWidget *parent)
 	qRegisterMetaType<CalibrationSet>("CalibrationSet");
 	qRegisterMetaType<QMatrix4x4>("QMatrix4x4");
 	qRegisterMetaType<PositionDesc>("PositionDesc");
+	qRegisterMetaType<PointsContext>("PointsContext");
 
     ui.setupUi(this);
 
@@ -83,6 +84,7 @@ Creator::Creator(QWidget *parent)
 	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.cloudPoints, SLOT(Report(MessageLevel, const QString &)));
 	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), ui.cloudPoints, SLOT(ShowParameters(cv::Mat, cv::Mat)));
 	connect(ui.cloudPoints, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
+	connect(ui.manualCreationButton, SIGNAL(clicked()), this, SLOT(StartManualCreation()));
 
 	// comparer connects
 	connect(ui.compareNext, SIGNAL(clicked()), this, SLOT(GetNextImagePair()));
@@ -477,6 +479,22 @@ void Creator::SetCalibCamera(cv::Mat camera, int type)
 		DoAssert(false);
 	}
 }
+
+void Creator::StartManualCreation()
+{
+	// create mesh from all inputs
+	int size = ui.inputList->count();
+	std::string compl;
+	for (int i = 0; i < size; i++)
+	{
+		auto input = ui.inputList->item(i);
+		std::string str = GetFullPath(input->data(Qt::UserRole).toString().toStdString().c_str());
+		compl += str + ";";
+	}
+	_capturer.Load(compl.c_str());
+	emit modeChangedActionSignal(ActionModeCreateManual);
+}
+
 void Creator::PrepareCalibration()
 {
 	CalibrationSet calibration;

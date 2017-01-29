@@ -62,6 +62,8 @@ public:
 
 class ImageProcessor
 {
+	bool _signalAccepted;
+
 	typedef bool(ImageProcessor::*Phase) ();//pointer-to-member function 
 	
 	// which part of the detecting are we in
@@ -129,7 +131,18 @@ private:
 	// extract insistric parameters
 	void SplitMatrix(cv::Mat projection, ImageInfo&imageInfo, CameraParams *camera, cv::Mat pos);
 
+	// main global adjustment
 	bool GlobalBundleAdjustment();
+
+	// prepares left and right image
+	void PrepareDouble(const int& first, const int & second);
+
+	// wait for the input
+	bool ManualFeaturesStep();
+
+	bool InputWait();
+	// waits for the input
+	bool ManualMatchesStep();
 public:
 
 	// class that gives out the results

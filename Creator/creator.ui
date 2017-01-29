@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="creatorTabs">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="rendertab">
       <attribute name="title">
@@ -394,7 +394,7 @@
           <item>
            <widget class="QToolBox" name="detectorTools">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="creationPage">
              <property name="geometry">
@@ -417,7 +417,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="createMeshInteractive">
+               <widget class="QPushButton" name="manualCreationButton">
                 <property name="text">
                  <string>Start manual mode</string>
                 </property>
@@ -952,7 +952,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="lockGroup"/>
   <buttongroup name="renderGroup"/>
+  <buttongroup name="lockGroup"/>
  </buttongroups>
 </ui>

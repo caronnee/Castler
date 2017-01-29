@@ -39,6 +39,7 @@ struct RenderData
 	void Load();
 };
 
+
 // how the mesh should be displayed
 enum RenderStyle
 {
@@ -82,6 +83,7 @@ public:
 	void setClearColor(const QColor &color);
 
 signals:
+
 	void clicked();
 	void reportSignal(MessageLevel, const QString& string);
 	void DescChangedSignal(PositionDesc&);

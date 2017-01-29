@@ -44,10 +44,18 @@ bool VideoProvider::IsValid()
 {
 	return _capture->isOpened();
 }
-
-bool VideoProvider::NextFrame(cv::Mat& frame)
+bool VideoProvider::Next()
 {
-	_capture->read(frame);
+	if (Position() + 1 < _numFrames)
+	{
+		SetPosition(Position() + 1);
+		return true;
+	}
+	return false;
+}
+bool VideoProvider::Frame(cv::Mat& frame)
+{
+	_capture->retrieve(frame);
 	cv::cvtColor(frame, frame, CV_BGR2RGB);
 	_aName = QString::asprintf("Frame %d / %d", Position(), _numFrames);
 	return Position() < _numFrames;
@@ -78,8 +86,8 @@ int VideoProvider::Position()
 void VideoProvider::PreviousFrame(cv::Mat& frame)
 {
 	int position = Position();
-	SetPosition(position - 2);
-	NextFrame(frame);
+	SetPosition(position - 1);
+	Frame(frame);
 }
 
 double VideoProvider::Step()

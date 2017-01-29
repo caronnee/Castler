@@ -19,6 +19,7 @@ enum ActionModes
 	ActionModePlay, // do nothing
 	ActionModeCalibrate,
 	ActionModeCreate,
+	ActionModeCreateManual,
 	NActions
 };
 
@@ -37,9 +38,10 @@ class IImageProvider
 {
 public:
 	virtual bool IsValid() = 0;
-	virtual bool NextFrame(cv::Mat & frame)=0;
+	virtual bool Frame(cv::Mat & frame)=0;
 	virtual void PreviousFrame(cv::Mat & frame)=0;
 	virtual void SetPosition(const int & position) = 0;
+	virtual bool Next() = 0;
 	virtual int Position() = 0;
 	virtual double Step() = 0;
 	virtual int Count() = 0;
@@ -50,6 +52,7 @@ struct Providers
 {
 	std::vector<IImageProvider *> _providers;
 	int _currentProvider = 0;
+
 	void Reset()
 	{
 		_currentProvider = 0;
@@ -68,13 +71,37 @@ struct Providers
 		}
 		return ret;
 	}
-
-	bool Next(cv::Mat&frame)
+	bool SetPosition(const int & position)
+	{
+		int tempPosition = position;
+		_currentProvider = 0;
+		while (_providers[_currentProvider]->Count() < tempPosition)
+		{
+			tempPosition -= _providers[_currentProvider]->Count();
+			_currentProvider++;
+			if (_currentProvider >= _providers.size())
+				return false;
+		}
+		
+		_providers[_currentProvider]->SetPosition(tempPosition);
+		return true;
+	}
+	void Get(int position, cv::Mat& frame)
+	{
+		SetPosition(position);
+		_providers[_currentProvider]->Frame(frame);
+	}
+	bool Frame(cv::Mat& frame)
+	{
+		return _providers[_currentProvider]->Frame(frame);
+	}
+	bool Next()
 	{
 		while (_currentProvider < _providers.size())
 		{
-			if (_providers[_currentProvider]->NextFrame(frame))
+			if (!_providers[_currentProvider]->Next());
 				return true;
+			// no more images in current provider
 			_currentProvider++;
 		}
 		return false;

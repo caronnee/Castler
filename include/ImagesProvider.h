@@ -24,7 +24,8 @@ public:
 
 	virtual bool IsValid();
 
-	virtual bool NextFrame(cv::Mat & frame);
+	virtual bool Next();
+	virtual bool Frame(cv::Mat & frame);
 	virtual void PreviousFrame(cv::Mat & frame);
 	virtual void SetPosition(const int & position);
 	virtual int Position();

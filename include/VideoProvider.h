@@ -21,7 +21,8 @@ public:
 	VideoProvider(const QString & source);
 
 	virtual bool IsValid();
-	virtual bool NextFrame(cv::Mat& frame);
+	virtual bool Next();
+	bool Frame(cv::Mat& frame);
 	void SetPosition(const int & position);
 	virtual int Size();
 	int Position();

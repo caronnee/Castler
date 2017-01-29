@@ -132,8 +132,11 @@ void ExtractionWorker::PreparePair(int start, int modifier)
 	if (_provider.IsValid()==false)
 		return;
 	cv::Mat m1, m2;
-	_provider.Next(m1);
-	_provider.Next(m2);
+	_provider.Next();
+	_provider.Frame(m1);
+
+	_provider.Next();
+	_provider.Frame(m2);
 	if (modifier == CannyModifier)
 	{
 		cv::Mat blurred;

@@ -3,6 +3,7 @@
 #include <QPainter>
 #include "debug.h"
 #include "ReportFunctions.h"
+#include <qevent.h>
 
 void VideoRenderer::paintEvent(QPaintEvent *)
 {
@@ -25,14 +26,46 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 	//m_img = QImage();
 }
 
+void VideoRenderer::SwitchKeys(QKeyEvent *e)
+{
+	bool shiftPressed = e->modifiers() & Qt::ShiftModifier;
+	switch (e->key())
+	{
+	case Qt::Key_Return:
+	{
+		if (shiftPressed)
+		{
+			// phase complete signal
+			emit PhaseDoneSignal();
+		}
+		else
+		{
+			// phase action complete
+			emit PartialActionDoneSignal(_pointsContext);
+		}
+		// emit acception signal
+		break;
+	}
+	}
+}
+
 void VideoRenderer::setImage(cv::Mat img)
 {
 	_img = img.clone();
 	update();
 }
 
+void VideoRenderer::keyPressEvent(QKeyEvent *ev)
+{
+	SwitchKeys(ev);
+}
+
 VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
 	setAttribute(Qt::WA_OpaquePaintEvent);
+	setFocusPolicy(Qt::ClickFocus);
+
+	_pointsContext.p1 = cv::Point2f(0, 0);
+	_pointsContext.p2 = cv::Point2f(0, 0);
 }
 
 void VideoRenderer::SetParameters( CalibrationSet calibration)

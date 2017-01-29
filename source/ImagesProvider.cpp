@@ -57,11 +57,17 @@ bool ImagesProvider::IsValid()
 	return _images.size() > 0;
 }
 
-bool ImagesProvider::NextFrame(cv::Mat & frame)
+bool ImagesProvider::Next()
 {
-	SetPosition(_pos + 1);
-	if (_pos >= _images.size())
+	if (_pos +1 >= _images.size())
 		return false;
+
+	SetPosition(_pos + 1);
+	return true;
+}
+
+bool ImagesProvider::Frame(cv::Mat & frame)
+{
 	if (_images[_pos].loaded == false)
 	{
 		cv::Mat frame = cv::imread(_images[_pos].name.toStdString().c_str(), CV_LOAD_IMAGE_COLOR);

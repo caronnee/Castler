@@ -31,7 +31,7 @@ bool ImageProcessor::AutoCalibrate()
 	}
 	_meshPoints.clear();;
 	_meshPoints.resize(points);
-	_lastImageIndex = 0;
+	_lastImageIndex = 1;
 	_lastIndex = 0;
 	// done. Nothing more to do
 	return false;
@@ -83,12 +83,13 @@ int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 
 ImageProcessor::ImageProcessor()
 {
+	_signalAccepted = false;
 	_lastIndex = 0;
 	_phase = 0;
 	_detectorOutput = NULL;
 	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
-	_lastImageIndex = 0;
+	_lastImageIndex = 1;
 }
 
 bool ImageProcessor::FeaturesStep()
@@ -151,13 +152,12 @@ public:
 
 bool ImageProcessor::PrepareImage()
 {
-	if (!_provider ||  _provider->Get()->NextFrame(_frame) == false)
+	if (!_provider || _provider->Next() || _provider->Frame(_frame) == false)
 		return false;
 
 	_lastImageIndex++;
 	_frameSize = _frame.size();
 	cv::cvtColor(_frame, _gr, CV_RGB2GRAY);
-
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
 	_frame.copyTo(_ret);
 	return true;
@@ -447,6 +447,14 @@ void ImageProcessor::Create(const int& mode)
 			_phases[4] = &ImageProcessor::GlobalBundleAdjustment;
 			break;
 		}
+		case ActionModeCreateManual:
+		{
+			_phases[0] = &ImageProcessor::ManualMatchesStep;
+			_phases[1] = &ImageProcessor::InputWait;
+			_phases[2] = &ImageProcessor::FinishCreationStep;
+			_phases[3] = &ImageProcessor::GlobalBundleAdjustment;
+			break;
+		}
 		default:
 		{
 			_reporter->Report(MError, "Nothing create :-o");
@@ -720,6 +728,55 @@ bool ImageProcessor::GlobalBundleAdjustment()
 {
 	return false;
 }
+
+void ImageProcessor::PrepareDouble(const int& first, const int & second)
+{
+	cv::Mat f, s;
+	_provider->Get(first,f);
+	_provider->Get(second,s);
+	// merge to one
+	cv::Size s1 = f.size();
+	cv::Size s2 = s.size();
+	if (s1.height < s2.height)
+		s1.height = s2.height;
+	s1.width += s2.width;
+	_ret = cv::Mat(s1, CV_8UC3);
+	s1 = f.size();
+	cv::Mat left(_ret, cv::Rect(0, 0, s1.width, s1.height));
+	cv::Mat right(_ret, cv::Rect(s1.width,0, s2.width, s2.height));
+	s.copyTo(left);
+	f.copyTo(right);
+}
+
+bool ImageProcessor::ManualFeaturesStep()
+{
+	return true;
+}
+
+bool ImageProcessor::InputWait()
+{
+	if (!_signalAccepted)
+		return true; 
+	_phase--;
+	_lastIndex++;
+	if (_lastIndex == _imagesInfo.size())
+	{
+		_lastImageIndex++;
+		if (_lastImageIndex == _imagesInfo.size() - 1)
+		{
+			_lastImageIndex = 1;
+			return true;
+		}
+		_lastIndex = 0;
+	}
+	return true;
+}
+bool ImageProcessor::ManualMatchesStep()
+{
+	PrepareDouble(_lastIndex, _lastImageIndex);
+	return false;
+}
+
 // create whole 3d model
 bool ImageProcessor::FinishCreationStep()
 {
