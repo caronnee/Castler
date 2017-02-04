@@ -32,7 +32,7 @@ private:
 	bool _mousePressed;
 
 	// last pressed point. Must be always regarding the original image
-	cv::Point2f _lastPoint;
+	//cv::Point2f _lastPoint;
 
 	// selected points
 	PointsContext _pointsContext;

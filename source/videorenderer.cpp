@@ -8,23 +8,37 @@
 void VideoRenderer::paintEvent(QPaintEvent *)
 {
 	if (_img.empty())
-		return;// do not paint
+	{
+		// do not paint
+		return;
+	}
 
 	QPainter p(this);
 	p.eraseRect(this->rect());
+
 	cv::Mat matched;
 	int h = _img.size().height * _scale;
 	int w = _img.size().width * _scale;
+
 	if (w <= 0 || h <= 0)
 	{
 		emit reportSignal(MInfo,"size is zero!");
 		return;
 	}
+	
 	QString s = QString::asprintf("Scaled with .5%f to %d %d from original %d %d", _scale, w, h, _img.size().width, _img.size().height);
 	emit reportSignal(MInfo, s);
+	
 	int vh = size().height();
 	int vw = size().width();
+
 	cv::resize(_img, matched, cv::Size(w,h));
+
+	for (int i = 0; i < _pointsContext.p1.size(); i++)
+	{
+		cv::circle(matched, _pointsContext.p1[i]*_scale,5,cv::Scalar(1,0,0),2);
+	}
+
 	cv::Rect r(_offsetx, _offsety, qMin(w, vw), qMin(h, vh));
 	cv::Mat wnd= matched(r);
 	QImage::Format format = QImage::Format_RGB888;
@@ -80,6 +94,12 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 	if (scale < 0)
 		scale = -1.0 / scale;
 	_scale *= scale;
+	if (_scale > 1)
+	{
+		emit reportSignal(MWarning, "Zoom detoriation!");
+		scale = 1.0 / scale;
+		_scale = 1;
+	}
 	_offsetx = scale * _offsetx;
 	_offsety = scale * _offsety;
 	//QPoint p = event->pos();
@@ -117,11 +137,19 @@ void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 {
 	_mousePressed = false;
+	if (ev->buttons()& Qt::LeftButton)
+		return;// just moving around
 	// generate click and pretend that this is the feature
 	//only in step one
 	if (_pointsContext.provided == false)
 	{
-		_pointsContext.p1.push_back(_lastPoint);
+		
+		// terribly non-acurate:-/ but hey, user input...
+		QPoint p = ev->pos();
+		//p = QWidget::mapFromGlobal(p);
+		cv::Point r(_offsetx + p.x()/_scale, _offsety + p.y()/_scale);
+		_pointsContext.p1.push_back(r);
+		update();
 	}
 	else
 	{

@@ -1,4 +1,8 @@
-- implement manual mode for correspondences
+- manual picking features
+- manual coorespondences
+- streaming
+- mart segmet and look for it in other images?
+
 - show correspondences
 - implement comparer;)
 - Groebnbner essential matrix??!
