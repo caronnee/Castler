@@ -89,7 +89,29 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 
 void VideoRenderer::mousePressEvent(QMouseEvent *ev)
 {
+	_startingMousePos = ev->pos();
 	_mousePressed = true;
+}
+
+#include "Misc.h"
+
+void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
+{
+	if (!_mousePressed || _img.empty())
+		return;
+
+	//if left is pressed, move image
+	if (ev->buttons() & Qt::LeftButton)
+	{
+		_offsetx += _startingMousePos.x() - ev->pos().x();
+		_offsety += _startingMousePos.y() - ev->pos().y();
+		int nh = _img.size().height * _scale - size().height();
+		int nw = _img.size().width * _scale - size().width();
+		CheckBoundary<int>(_offsetx, 0, nw);
+		CheckBoundary<int>(_offsety, 0, nh);
+		_startingMousePos = ev->pos();
+		update();
+	}
 }
 
 void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)

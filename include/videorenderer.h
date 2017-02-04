@@ -16,18 +16,22 @@ class VideoRenderer : public QWidget {
 	Q_OBJECT
 		;
 private:
+	// legal only when mouse is pressed
+	QPoint _startingMousePos;
+
 	// scale of the showed image
 	float _scale;
 
 	// starting x
-	float _offsetx;
+	int _offsetx;
 
 	// starting y 
-	float _offsety;
+	int _offsety;
 
 	// mouse pressed flag
 	bool _mousePressed;
-	// last pressed point. Must be always refarding the original image
+
+	// last pressed point. Must be always regarding the original image
 	cv::Point2f _lastPoint;
 
 	// selected points
@@ -52,6 +56,7 @@ public slots:
 public:
 	void wheelEvent(QWheelEvent * event);
 	void mousePressEvent(QMouseEvent *ev);
+	void mouseMoveEvent(QMouseEvent *ev);
 	void mouseReleaseEvent(QMouseEvent *ev);
 	void keyPressEvent(QKeyEvent *ev);
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
