@@ -29,7 +29,7 @@ bool ImagesProvider::IsSupported(const QString & source)
 
 ImagesProvider::ImagesProvider(const QString & source)
 {
-	_pos = -1;
+	_pos = 0;
 	QDirIterator it(source, QDir::Files, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{

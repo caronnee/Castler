@@ -18,8 +18,15 @@ class FrameProcessor : public QObject
 {
 	Q_OBJECT
 		;
+
+private:
+	// scale to get this to the QT label size
+	int _seconds = 0;
+
 	std::stack<cv::Mat> _images;
+
 	ExtractionWorker _worker;
+
 protected:
 	// main thread doing openCV stuff
 	QThread _thread;
@@ -42,10 +49,6 @@ signals :
 
 public slots:
 	void Report(MessageLevel level, const QString & message);
-
-private:
-	// scale to get this to the QT label size
-	int _seconds = 0;
 
 public:
 

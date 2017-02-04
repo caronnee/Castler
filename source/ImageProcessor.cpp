@@ -31,7 +31,7 @@ bool ImageProcessor::AutoCalibrate()
 	}
 	_meshPoints.clear();;
 	_meshPoints.resize(points);
-	_lastImageIndex = 1;
+	_lastIndexSecondary = 1;
 	_lastIndex = 0;
 	// done. Nothing more to do
 	return false;
@@ -83,13 +83,14 @@ int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 
 ImageProcessor::ImageProcessor()
 {
+	_modified = false;
 	_signalAccepted = false;
 	_lastIndex = 0;
 	_phase = 0;
 	_detectorOutput = NULL;
 	_provider = NULL;
 	_colors = cv::Scalar(0, 1, 0);
-	_lastImageIndex = 1;
+	_lastIndexSecondary = 1;
 }
 
 bool ImageProcessor::FeaturesStep()
@@ -97,11 +98,11 @@ bool ImageProcessor::FeaturesStep()
 	if (PrepareImage() == false)
 	{
 		_provider->Reset();
-		_lastImageIndex = 1;
+		_lastIndexSecondary = 1;
 		_reporter->Report(MInfo, "All entries processed");
 		return false;
 	}
-	QString message = QString::asprintf("Processing %d input ( %s )", _lastImageIndex, _provider->Name().toStdString().c_str());
+	QString message = QString::asprintf("Processing %d input ( %s )", _lastIndexSecondary, _provider->Name().toStdString().c_str());
 	_reporter->Report(MInfo, message);
 	ApplyFeatureDetector();
 	return true;
@@ -122,40 +123,13 @@ cv::Size ImageProcessor::GetSize()
 {
 	return _frameSize;
 }
-class Printer {//An abstract printing machine
-	typedef void(Printer::*PTR) ();//pointer-to-member function 
-
-public:
-	void Copy() {//copy the file
-	}
-	void Append() {//extend the file
-	}
-
-	enum OPTIONS { COPY, APPEND };//two possible commands in the menu.
-
-	void working(OPTIONS option,
-		char* buff,
-		const char* infostr) {
-
-		PTR pmf[2] = { &Printer::Copy, &Printer::Append }; //pointer array 
-
-		switch (option) {
-		case COPY:
-			(this->*pmf[COPY])();
-			break;
-		case APPEND:
-			(this->*pmf[APPEND])();
-			break;
-		}
-	}
-};
 
 bool ImageProcessor::PrepareImage()
 {
-	if (!_provider || _provider->Next() || _provider->Frame(_frame) == false)
+	_modified = true;
+	if (!_provider || _provider->Frame(_frame) == false)
 		return false;
 
-	_lastImageIndex++;
 	_frameSize = _frame.size();
 	cv::cvtColor(_frame, _gr, CV_RGB2GRAY);
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
@@ -266,7 +240,7 @@ bool ImageProcessor::PerformDetection()
 	std::vector<float> err;
 	cv::TermCriteria crit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 10, 0.03);
 	DoAssert(newKeypoints.size() > 0);
-	cv::calcOpticalFlowPyrLK(_gr, newgr, _foundCoords[_lastImageIndex-1], convertedKeypoints, status, err);
+	cv::calcOpticalFlowPyrLK(_gr, newgr, _foundCoords[_lastIndexSecondary-1], convertedKeypoints, status, err);
 
 	// First, filter out the points with high error
 	std::vector<cv::Point2f> right_points_to_find;
@@ -354,7 +328,7 @@ void ImageProcessor::UseGrey()
 bool ImageProcessor::DrawFeatures()
 {
 	std::vector<cv::Point2f> points;
-	cv::KeyPoint::convert(_foundCoords[_lastImageIndex],points);
+	cv::KeyPoint::convert(_foundCoords[_lastIndexSecondary],points);
 	for (int i = 0; i < points.size(); i++)
 	{
 		cv::circle(_ret, points[i], 18, cv::Scalar(0.4, 200, 150),3);
@@ -419,40 +393,47 @@ ImageProcessor::~ImageProcessor()
 	Clear();
 }
 
+#define APP_FCE(name) _phases[index++] = name
+
 void ImageProcessor::Create(const int& mode)
 {
+	int index = 0;
 	Clear();
 	switch (mode)
 	{
 		case ActionModePlay:
 		{
-			_phases[0] = &ImageProcessor::PrepareImage;
-			_phases[1] = NULL;
+			APP_FCE(&ImageProcessor::PrepareImage);
+			APP_FCE(NULL);
 			break;
 		}
 		case ActionModeCalibrate:
 		{
-			_phases[0] = &ImageProcessor::CreateChessboards;
-			_phases[1] = &ImageProcessor::CalibrateStep;
-			_phases[2] = &ImageProcessor::FinishCalibration;
-			_phases[3] = NULL;
+			APP_FCE(&ImageProcessor::CreateChessboards);
+			APP_FCE(&ImageProcessor::CalibrateStep);
+			APP_FCE(&ImageProcessor::FinishCalibration);
+			APP_FCE(NULL);
 			break;
 		}
 		case ActionModeCreate:
 		{
-			_phases[0] = &ImageProcessor::FeaturesStep;
-			_phases[1] = &ImageProcessor::MatchesStep;
-			_phases[2] = &ImageProcessor::AutoCalibrate;
-			_phases[3] = &ImageProcessor::FinishCreationStep;
-			_phases[4] = &ImageProcessor::GlobalBundleAdjustment;
+			APP_FCE(&ImageProcessor::FeaturesStep);
+			APP_FCE(&ImageProcessor::MatchesStep);
+			APP_FCE(&ImageProcessor::AutoCalibrate);
+			APP_FCE(&ImageProcessor::FinishCreationStep);
+			APP_FCE(&ImageProcessor::GlobalBundleAdjustment);
+			APP_FCE(NULL);
 			break;
 		}
 		case ActionModeCreateManual:
 		{
-			_phases[0] = &ImageProcessor::ManualMatchesStep;
-			_phases[1] = &ImageProcessor::InputWait;
-			_phases[2] = &ImageProcessor::FinishCreationStep;
-			_phases[3] = &ImageProcessor::GlobalBundleAdjustment;
+			APP_FCE(&ImageProcessor::ManualFeaturesStep);
+			APP_FCE(&ImageProcessor::InputWait);
+			APP_FCE(&ImageProcessor::ManualMatchesStep);
+			APP_FCE(&ImageProcessor::InputWait);
+			APP_FCE(&ImageProcessor::FinishCreationStep);
+			APP_FCE(&ImageProcessor::GlobalBundleAdjustment);
+			APP_FCE(NULL);
 			break;
 		}
 		default:
@@ -465,6 +446,15 @@ void ImageProcessor::Create(const int& mode)
 void ImageProcessor::Clear()
 {
 	_phase = 0;
+	_modified = 0;
+}
+
+bool ImageProcessor::CleanModifiedFlag()
+{
+	if (!_modified)
+		return false;
+	_modified = false;
+	return true;
 }
 
 bool ImageProcessor::FinishCalibration(PointsArray & chesspoints, cv::Mat& cameraMatrix, cv::Mat& distCoeffs)
@@ -487,9 +477,9 @@ bool ImageProcessor::MatchesStep()
 {
 	KeypointsArray & currentKeypoints = _foundCoords.back();
 	KeypointsArray matched1, matched2;
-	int& currentImage = _lastImageIndex;
+	int& currentImage = _lastIndexSecondary;
 	int& iImage = _lastIndex;
-	QString message = QString::asprintf("Matching %d %d",_lastIndex, _lastImageIndex);
+	QString message = QString::asprintf("Matching %d %d",_lastIndex, _lastIndexSecondary);
 	_reporter->Report(MInfo, message.toStdString().c_str());
 	//for ( int iImage =0; iImage < currentImage; iImage++)
 	{
@@ -750,7 +740,11 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 
 bool ImageProcessor::ManualFeaturesStep()
 {
-	return true;
+	_provider->Next();
+	// hack to move to the next phase
+	_lastIndexSecondary = _imagesInfo.size();
+	PrepareImage();
+	return false;
 }
 
 bool ImageProcessor::InputWait()
@@ -761,10 +755,10 @@ bool ImageProcessor::InputWait()
 	_lastIndex++;
 	if (_lastIndex == _imagesInfo.size())
 	{
-		_lastImageIndex++;
-		if (_lastImageIndex == _imagesInfo.size() - 1)
+		_lastIndexSecondary++;
+		if (_lastIndexSecondary == _imagesInfo.size() - 1)
 		{
-			_lastImageIndex = 1;
+			_lastIndexSecondary = 1;
 			return true;
 		}
 		_lastIndex = 0;
@@ -773,7 +767,7 @@ bool ImageProcessor::InputWait()
 }
 bool ImageProcessor::ManualMatchesStep()
 {
-	PrepareDouble(_lastIndex, _lastImageIndex);
+	PrepareDouble(_lastIndex, _lastIndexSecondary);
 	return false;
 }
 
@@ -784,7 +778,7 @@ bool ImageProcessor::FinishCreationStep()
 	ImageProcessor::_reporter->Report(MInfo, "Generating tracks..");
 
 	// pick up the initial camera. Two of the images must contains the most matches
-	int &image1 = _lastImageIndex, &image2=_lastIndex;
+	int &image1 = _lastIndexSecondary, &image2=_lastIndex;
 	int camerasUsed = FindNextBestPair(image1, image2);
 
 	// this is our first stable camera. Lets reconstruct some 3Dpoint from it

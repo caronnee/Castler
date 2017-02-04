@@ -14,7 +14,7 @@ bool FrameProcessor::Load(const QString & str)
 
 void FrameProcessor::timerEvent(QTimerEvent * ev) {
 	
-	if (ev->timerId() != _timer.timerId()) 
+	if ((ev->timerId() != _timer.timerId()) ) 
 		return;
 	ShowCurrent();
 }

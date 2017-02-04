@@ -53,74 +53,38 @@ struct Providers
 	std::vector<IImageProvider *> _providers;
 	int _currentProvider = 0;
 
-	void Reset()
-	{
-		_currentProvider = 0;
-		for (int i = 0; i < _providers.size(); i++)
-		{
-			_providers[i]->SetPosition(-1);
-		}
-	}
+	// sets provider to 0
+	void Reset();
+
 	//number of frames this provides
-	int Count()
-	{
-		int ret = 0;
-		for (int i = 0; i < _providers.size(); i++)
-		{
-			ret += _providers[i]->Count();
-		}
-		return ret;
-	}
-	bool SetPosition(const int & position)
-	{
-		int tempPosition = position;
-		_currentProvider = 0;
-		while (_providers[_currentProvider]->Count() < tempPosition)
-		{
-			tempPosition -= _providers[_currentProvider]->Count();
-			_currentProvider++;
-			if (_currentProvider >= _providers.size())
-				return false;
-		}
-		
-		_providers[_currentProvider]->SetPosition(tempPosition);
-		return true;
-	}
-	void Get(int position, cv::Mat& frame)
-	{
-		SetPosition(position);
-		_providers[_currentProvider]->Frame(frame);
-	}
-	bool Frame(cv::Mat& frame)
-	{
-		return _providers[_currentProvider]->Frame(frame);
-	}
-	bool Next()
-	{
-		while (_currentProvider < _providers.size())
-		{
-			if (!_providers[_currentProvider]->Next());
-				return true;
-			// no more images in current provider
-			_currentProvider++;
-		}
-		return false;
-	}
+	int Count();
+
+	// set position
+	bool SetPosition(const int & position);
+
+	// sets positino and immediately retrieves frame
+	void Get(int position, cv::Mat& frame);
+
+	// retrieves frame
+	bool Frame(cv::Mat& frame);
+
+	// move one forward
+	bool Next();
 	int Step()
 	{
 		return _providers[_currentProvider]->Step();
 	}
+	
+	// used for destructor
 	void Clear();
+
+	// created providers
 	void Create(const QString & str);
+
 	bool IsValid() const;
-	IImageProvider * Get()
-	{
-		return _providers[_currentProvider];
-	}
-	const QString Name()
-	{
-		return Get()->Name();
-	}
+
+	// current nae of the processed frame
+	const QString Name();
 };
 
 

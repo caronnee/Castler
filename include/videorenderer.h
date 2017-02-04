@@ -7,14 +7,30 @@
 
 struct PointsContext
 {
-	cv::Point p1, p2;
+	bool provided;
+	std::vector<cv::Point2f> p1;
+	PointsContext() : provided(false) {}
 };
 
 class VideoRenderer : public QWidget {
 	Q_OBJECT
 		;
 private:
+	// scale of the showed image
+	float _scale;
 
+	// starting x
+	float _offsetx;
+
+	// starting y 
+	float _offsety;
+
+	// mouse pressed flag
+	bool _mousePressed;
+	// last pressed point. Must be always refarding the original image
+	cv::Point2f _lastPoint;
+
+	// selected points
 	PointsContext _pointsContext;
 
 	cv::Mat _img;
@@ -34,6 +50,9 @@ public slots:
 	void ShowParameters(cv::Mat camera, cv::Mat dist);
 	
 public:
+	void wheelEvent(QWheelEvent * event);
+	void mousePressEvent(QMouseEvent *ev);
+	void mouseReleaseEvent(QMouseEvent *ev);
 	void keyPressEvent(QKeyEvent *ev);
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
 	~VideoRenderer();

@@ -1,5 +1,5 @@
-- show correspondences
 - implement manual mode for correspondences
+- show correspondences
 - implement comparer;)
 - Groebnbner essential matrix??!
 - implement autocalibration

@@ -91,6 +91,11 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 		emit finished();
 		return;
 	}
+	if (_processor.CleanModifiedFlag() == false)
+	{
+		// nothing to emit
+		return;
+	}
 	//////////////////////////////////////////////////////
 	//// final for showing image after all preprocessing
 	//////////////////////////////////////////////////////

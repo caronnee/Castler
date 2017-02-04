@@ -62,8 +62,13 @@ public:
 
 class ImageProcessor
 {
+	//checking there was some change to the entry
+	bool _modified;
+
+	//flag is there was some signale o move on
 	bool _signalAccepted;
 
+	// hot the phase functions should look like
 	typedef bool(ImageProcessor::*Phase) ();//pointer-to-member function 
 	
 	// which part of the detecting are we in
@@ -91,7 +96,7 @@ private:
 	std::vector<RelMap> _reliability;
 
 	// last index processed
-	int _lastImageIndex;
+	int _lastIndexSecondary;
 	
 	// coordinates, [imageId, pointId] coord. imageId is based on the provider
 	KeypointsArray2 _foundCoords;
@@ -140,7 +145,9 @@ private:
 	// wait for the input
 	bool ManualFeaturesStep();
 
+	// check if some sognal was obtained
 	bool InputWait();
+
 	// waits for the input
 	bool ManualMatchesStep();
 public:
@@ -148,6 +155,7 @@ public:
 	// class that gives out the results
 	IDetector * _detectorOutput;
 
+	// automatically guess calibration 
 	bool AutoCalibrate();
 
 	// finishes calibration according to the known object
@@ -185,4 +193,5 @@ public:
 	~ImageProcessor();
 	void Create(const int& mode);
 	void Clear();
+	bool CleanModifiedFlag();
 };
