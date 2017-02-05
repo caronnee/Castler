@@ -58,6 +58,7 @@ signals:
 public slots:
 	// main thread loop
 	void PreparePair(int start, int modifier);
+	void ProcessPartialAction(PointsContext);
 	void Process();
 	void OpenSlot(const QString& str);
 	void Cleanup();

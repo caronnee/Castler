@@ -37,6 +37,15 @@ bool ImageProcessor::AutoCalibrate()
 	return false;
 }
 
+void ImageProcessor::InputFeatures(const PointsContext & c)
+{
+	KeypointsArray k;
+	cv::KeyPoint::convert(c.p1, k);
+	_foundCoords.push_back(k);
+	// zero. Just to indicate that we do not have any foundcoords
+	_foundDesc.push_back(cv::Mat());
+}
+
 int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 {
 	// and it must have good inline ratio, from the homography calculation
@@ -83,6 +92,7 @@ int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
 
 ImageProcessor::ImageProcessor()
 {
+	_signalAccepted = NULL;
 	_modified = false;
 	_signalAccepted = false;
 	_lastIndex = 0;
@@ -230,7 +240,7 @@ bool ImageProcessor::PerformDetection()
 {
 	cv::Mat frame;
 
-	std::vector<cv::KeyPoint> newKeypoints;
+	KeypointsArray newKeypoints;
 
 	cv::Mat newgr;
 	// new gray leveled image
@@ -455,6 +465,14 @@ bool ImageProcessor::CleanModifiedFlag()
 		return false;
 	_modified = false;
 	return true;
+}
+
+void ImageProcessor::ProcessContext(const PointsContext& context)
+{
+	DoAssert(_signalAccepted);
+	(this->*_signalAccepted)(context);
+	// accepted
+	_signalAccepted = NULL;
 }
 
 bool ImageProcessor::FinishCalibration(PointsArray & chesspoints, cv::Mat& cameraMatrix, cv::Mat& distCoeffs)
@@ -744,12 +762,13 @@ bool ImageProcessor::ManualFeaturesStep()
 	// hack to move to the next phase
 	_lastIndexSecondary = _imagesInfo.size();
 	PrepareImage();
+	_signalAccepted = &ImageProcessor::InputFeatures;
 	return false;
 }
 
 bool ImageProcessor::InputWait()
 {
-	if (!_signalAccepted)
+	if (_signalAccepted)
 		return true; 
 	_phase--;
 	_lastIndex++;

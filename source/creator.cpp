@@ -54,6 +54,7 @@ Creator::Creator(QWidget *parent)
 	ui.lockGroup->setId(ui.lightRadioButton, PositionLight);
 
 	// videorender connections
+	connect(ui.cloudPoints, SIGNAL(PartialActionDoneSignal(PointsContext)), _capturer.GetWorker(), SLOT(ProcessPartialAction(PointsContext)));
 	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));

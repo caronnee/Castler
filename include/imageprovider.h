@@ -23,6 +23,13 @@ enum ActionModes
 	NActions
 };
 
+struct PointsContext
+{
+	bool provided;
+	std::vector<cv::Point2f> p1;
+	PointsContext() : provided(false) {}
+};
+
 struct CalibrationSet
 {
 	float px, py, k1, k2, k3, fx, fy;

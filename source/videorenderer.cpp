@@ -62,6 +62,7 @@ void VideoRenderer::SwitchKeys(QKeyEvent *e)
 			{
 				// phase complete signal
 				emit PhaseDoneSignal();
+				_pointsContext.p1.clear();
 			}
 			else
 			{
@@ -83,6 +84,9 @@ void VideoRenderer::setImage(cv::Mat img)
 	_scale = qMin(s1, s2);
 	update();
 }
+
+#include "Misc.h"
+
 // zoom
 void VideoRenderer::wheelEvent(QWheelEvent * event)
 {
@@ -102,6 +106,10 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 	}
 	_offsetx = scale * _offsetx;
 	_offsety = scale * _offsety;
+	int nh = _img.size().height * _scale - size().height();
+	int nw = _img.size().width * _scale - size().width();
+	CheckBoundary<int>(_offsetx, 0, nw);
+	CheckBoundary<int>(_offsety, 0, nh);
 	//QPoint p = event->pos();
 	//p = QWidget::mapFromGlobal(p);
 	update();
@@ -112,8 +120,6 @@ void VideoRenderer::mousePressEvent(QMouseEvent *ev)
 	_startingMousePos = ev->pos();
 	_mousePressed = true;
 }
-
-#include "Misc.h"
 
 void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 {
@@ -127,8 +133,8 @@ void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 		_offsety += _startingMousePos.y() - ev->pos().y();
 		int nh = _img.size().height * _scale - size().height();
 		int nw = _img.size().width * _scale - size().width();
-		CheckBoundary<int>(_offsetx, 0, nw);
-		CheckBoundary<int>(_offsety, 0, nh);
+		CheckBoundary<int>(_offsetx, 0, qMax(0, nw));
+		CheckBoundary<int>(_offsety, 0, qMax(0,nh));
 		_startingMousePos = ev->pos();
 		update();
 	}
@@ -143,7 +149,6 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 	//only in step one
 	if (_pointsContext.provided == false)
 	{
-		
 		// terribly non-acurate:-/ but hey, user input...
 		QPoint p = ev->pos();
 		//p = QWidget::mapFromGlobal(p);

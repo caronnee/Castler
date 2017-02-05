@@ -5,13 +5,6 @@
 #include <QThread>
 #include "ReportFunctions.h"
 
-struct PointsContext
-{
-	bool provided;
-	std::vector<cv::Point2f> p1;
-	PointsContext() : provided(false) {}
-};
-
 class VideoRenderer : public QWidget {
 	Q_OBJECT
 		;

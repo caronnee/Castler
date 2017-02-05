@@ -155,6 +155,11 @@ void ExtractionWorker::PreparePair(int start, int modifier)
 	emit imagePairSignal(m1, m2);
 }
 
+void ExtractionWorker::ProcessPartialAction(PointsContext context)
+{
+	_processor.ProcessContext(context);
+}
+
 void ExtractionWorker::Process()
 {
 	emit workerReportSignal(MInfo, "Starting thread process");

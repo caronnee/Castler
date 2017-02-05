@@ -65,11 +65,13 @@ class ImageProcessor
 	//checking there was some change to the entry
 	bool _modified;
 
-	//flag is there was some signale o move on
-	bool _signalAccepted;
-
 	// hot the phase functions should look like
 	typedef bool(ImageProcessor::*Phase) ();//pointer-to-member function 
+	
+	typedef void(ImageProcessor::*UserInput) (const PointsContext &);//pointer-to-member function 
+
+    //flag is there was some signal o move on
+	UserInput _signalAccepted;
 	
 	// which part of the detecting are we in
 	int _phase; 
@@ -77,6 +79,7 @@ class ImageProcessor
 	// function that should be performed
 	Phase _phases[128];
 
+	void InputFeatures( const PointsContext & c);
 	// checkpoints to detect for calibration purposes
 	std::vector<cv::Point3f> _chesspoints;
 
@@ -194,4 +197,5 @@ public:
 	void Create(const int& mode);
 	void Clear();
 	bool CleanModifiedFlag();
+	void ProcessContext(const PointsContext& context);
 };
