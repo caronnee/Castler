@@ -39,6 +39,7 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 		cv::circle(matched, _pointsContext.p1[i]*_scale,5,cv::Scalar(1,0,0),2);
 	}
 
+	DoAssert(_offsetx >= 0);
 	cv::Rect r(_offsetx, _offsety, qMin(w, vw), qMin(h, vh));
 	cv::Mat wnd= matched(r);
 	QImage::Format format = QImage::Format_RGB888;
@@ -102,11 +103,12 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 	if (_scale > 1)
 	{
 		emit reportSignal(MWarning, "Zoom detoriation!");
-		scale = 1.0 / scale;
-		_scale = 1;
 	}
+	CheckBoundary<float>(_scale, 0.1, 1);
 	_offsetx = scale * _offsetx;
+	DoAssert(_offsetx >= 0);
 	_offsety = scale * _offsety;
+	DoAssert(_offsety >= 0);
 	int nh = _img.size().height * _scale - size().height();
 	int nw = _img.size().width * _scale - size().width();
 	CheckBoundary<int>(_offsetx, 0, nw);
@@ -114,6 +116,11 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 	//QPoint p = event->pos();
 	//p = QWidget::mapFromGlobal(p);
 	update();
+}
+
+void VideoRenderer::focusOutEvent(QFocusEvent* event)
+{
+	_canAccept = false;
 }
 
 void VideoRenderer::mousePressEvent(QMouseEvent *ev)
@@ -128,7 +135,7 @@ void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 		return;
 
 	//if left is pressed, move image
-	if (ev->buttons() & Qt::LeftButton)
+	if (ev->buttons() & Qt::RightButton)
 	{
 		_offsetx += _startingMousePos.x() - ev->pos().x();
 		_offsety += _startingMousePos.y() - ev->pos().y();
@@ -143,8 +150,14 @@ void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 
 void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 {
+	if (_canAccept == false)
+	{
+		// gained focud
+		_canAccept = true;
+		return;
+	}
 	_mousePressed = false;
-	if (ev->buttons()& Qt::LeftButton)
+	if (ev->buttons()& Qt::RightButton)
 		return;// just moving around
 	// generate click and pretend that this is the feature
 	//only in step one
@@ -154,6 +167,10 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		QPoint p = ev->pos();
 		//p = QWidget::mapFromGlobal(p);
 		cv::Point r(_offsetx + p.x()/_scale, _offsety + p.y()/_scale);
+		if (r.x > _img.size().width || r.y > _img.size().height)
+		{
+			return;
+		}
 		_pointsContext.p1.push_back(r);
 		update();
 	}
@@ -170,6 +187,7 @@ void VideoRenderer::keyPressEvent(QKeyEvent *ev)
 }
 
 VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
+	_canAccept = false;
 	_scale = 1;
 	_offsetx = 0;
 	_offsety = 0;

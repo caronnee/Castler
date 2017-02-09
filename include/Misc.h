@@ -14,10 +14,11 @@ inline void swapMin(int & a, int & b)
 template<typename  T>
 void CheckBoundary(T& a, const T&mn, const T& mx)
 {
-	if (a < mn)
-		a = mn;
 	if (a > mx)
 		a = mx;
+
+	if (a < mn)
+		a = mn;
 }
 cv::Point3f GetEpipoles(cv::Mat F, cv::Point3f& fe, cv::Point3f& fe2);
 cv::Mat CreateCrossMatrix(cv::Point3f x);

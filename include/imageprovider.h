@@ -27,6 +27,7 @@ struct PointsContext
 {
 	bool provided;
 	std::vector<cv::Point2f> p1;
+	std::vector<int> indexes;
 	PointsContext() : provided(false) {}
 };
 

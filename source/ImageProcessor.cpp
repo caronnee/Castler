@@ -776,6 +776,22 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	s.copyTo(left);
 	f.copyTo(right);
 	_modified = true;
+	// set context
+	_context.provided = true;
+	_context.p1.clear();
+	_context.indexes.clear();
+	KeypointsArray & arr = _foundCoords[first];
+	for (int i = 0; i < arr.size(); i++)
+	{
+		_context.p1.push_back(arr[i].pt);
+		_context.indexes.push_back(i);
+	}
+	KeypointsArray & arr2 = _foundCoords[second];
+	for (int i = 0; i < arr2.size(); i++)
+	{
+		_context.p1.push_back(arr2[i].pt + cv::Point2f(s1.width, s1.height));
+		_context.indexes.push_back(i);
+	}
 }
 
 struct SerializeFeaturesCallback

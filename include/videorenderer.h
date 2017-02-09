@@ -9,6 +9,9 @@ class VideoRenderer : public QWidget {
 	Q_OBJECT
 		;
 private:
+
+	bool _canAccept;
+
 	// legal only when mouse is pressed
 	QPoint _startingMousePos;
 
@@ -50,6 +53,7 @@ public:
 	void wheelEvent(QWheelEvent * event);
 	void mousePressEvent(QMouseEvent *ev);
 	void mouseMoveEvent(QMouseEvent *ev);
+	void focusOutEvent(QFocusEvent *ev);
 	void mouseReleaseEvent(QMouseEvent *ev);
 	void keyPressEvent(QKeyEvent *ev);
 	VideoRenderer(QWidget * parent = Q_NULLPTR);
