@@ -42,7 +42,7 @@ signals:
 	void PartialActionDoneSignal(PointsContext);
 
 public slots:
-	void setImage(cv::Mat img);
+	void setImage(cv::Mat img, PointsContext context);
 	void Report(MessageLevel level, const QString & message);
 	void ShowParameters(cv::Mat camera, cv::Mat dist);
 	

@@ -24,8 +24,10 @@ void FrameProcessor::ShowCurrent()
 	if (_images.empty())
 		return;
 	cv::Mat image = _images.top();
-	emit imageReadySignal(image);
+	PointsContext context = _contexts.top();
+	emit imageReadySignal(image,context);
 	_images.pop();
+	_contexts.pop();
 }
 
 void FrameProcessor::ThreadStopped()
@@ -51,14 +53,15 @@ FrameProcessor::FrameProcessor()
 	connect(this, SIGNAL(cleanupSignal()), &_worker, SLOT(Cleanup()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(deleteLater()));
 	connect(&_thread, SIGNAL(finished()), &_worker, SLOT(Terminate()));
-	connect(&_worker, SIGNAL(imageProcessed(cv::Mat, double)), this, SLOT( ImageReported( cv::Mat,double )));
+	connect(&_worker, SIGNAL(imageProcessed(cv::Mat, PointsContext)), this, SLOT( ImageReported( cv::Mat, PointsContext )));
 }
 
-void FrameProcessor::ImageReported(cv::Mat image, double seconds)
+void FrameProcessor::ImageReported(cv::Mat image, PointsContext seconds)
 {
 	_images.push(image);
+	_contexts.push(seconds);
 	if (!_timer.isActive())
-		_timer.start(seconds, this);
+		_timer.start(0, this);
 }
 
 FrameProcessor::~FrameProcessor()
@@ -87,4 +90,5 @@ void FrameProcessor::Stop()
 	_timer.stop();
 	std::stack<cv::Mat> empty;
 	std::swap(_images, empty);
+	_thread.terminate();
 }

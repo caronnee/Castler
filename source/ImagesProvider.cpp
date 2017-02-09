@@ -29,7 +29,7 @@ bool ImagesProvider::IsSupported(const QString & source)
 
 ImagesProvider::ImagesProvider(const QString & source)
 {
-	_pos = 0;
+	_pos = -1;
 	QDirIterator it(source, QDir::Files, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{
@@ -68,6 +68,8 @@ bool ImagesProvider::Next()
 
 bool ImagesProvider::Frame(cv::Mat & frame)
 {
+	if (_pos < 0)
+		return false;
 	if (_images[_pos].loaded == false)
 	{
 		cv::Mat frame = cv::imread(_images[_pos].name.toStdString().c_str(), CV_LOAD_IMAGE_COLOR);

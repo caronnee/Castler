@@ -94,8 +94,8 @@ bool Providers::Next()
 {
 	while (_currentProvider < _providers.size())
 	{
-		if (!_providers[_currentProvider]->Next());
-		return true;
+		if (_providers[_currentProvider]->Next())
+			return true;
 		// no more images in current provider
 		_currentProvider++;
 	}

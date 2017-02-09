@@ -24,7 +24,7 @@ private:
 	int _seconds = 0;
 
 	std::stack<cv::Mat> _images;
-
+	std::stack<PointsContext> _contexts;
 	ExtractionWorker _worker;
 
 protected:
@@ -36,11 +36,11 @@ protected:
 	
 public slots:
 	void ThreadStopped();
-	void ImageReported(cv::Mat image, double seconds);
+	void ImageReported(cv::Mat image, PointsContext seconds);
 
 signals :
 	void cleanupSignal();
-	void imageReadySignal(cv::Mat image);
+	void imageReadySignal(cv::Mat,PointsContext);
 	void reportSignal(MessageLevel level, const QString& string);
 	// nothing cool, just calibrate according to video/image. Signal when result is ready
 	void calibrationResult(int errorcode, cv::Mat calibration);

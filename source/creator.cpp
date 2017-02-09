@@ -55,6 +55,7 @@ Creator::Creator(QWidget *parent)
 
 	// videorender connections
 	connect(ui.cloudPoints, SIGNAL(PartialActionDoneSignal(PointsContext)), _capturer.GetWorker(), SLOT(ProcessPartialAction(PointsContext)));
+	connect(ui.cloudPoints, SIGNAL(PhaseDoneSignal()), _capturer.GetWorker(), SLOT(ProcessActionDone()));
 	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
@@ -80,7 +81,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.playUndistortedButton, SIGNAL(clicked()), this, SLOT(ShowUndistorted()));
 	connect(ui.saveCalibrationButton, SIGNAL(clicked()), this, SLOT(SaveCalibration()));
 
-	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat)), ui.cloudPoints, SLOT(setImage(cv::Mat)));
+	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat,PointsContext)), ui.cloudPoints, SLOT(setImage(cv::Mat,PointsContext)));
 
 	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.cloudPoints, SLOT(Report(MessageLevel, const QString &)));
 	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), ui.cloudPoints, SLOT(ShowParameters(cv::Mat, cv::Mat)));
@@ -255,7 +256,7 @@ void Creator::LoadCalibration(const QString & input)
 
 Creator::~Creator()
 {
-	
+	_capturer.Stop();
 }
 
 void Creator::Report(MessageLevel level, const QString & str)

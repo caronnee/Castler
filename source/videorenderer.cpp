@@ -74,9 +74,10 @@ void VideoRenderer::SwitchKeys(QKeyEvent *e)
 	}
 }
 
-void VideoRenderer::setImage(cv::Mat img)
+void VideoRenderer::setImage(cv::Mat img,PointsContext context)
 {
 	_img = img.clone();
+	_pointsContext = context;
 	QSize s = size();
 	cv::Size ss = img.size();
 	float s1 = (float) s.width() / ss.width;
@@ -134,7 +135,7 @@ void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 		int nh = _img.size().height * _scale - size().height();
 		int nw = _img.size().width * _scale - size().width();
 		CheckBoundary<int>(_offsetx, 0, qMax(0, nw));
-		CheckBoundary<int>(_offsety, 0, qMax(0,nh));
+		CheckBoundary<int>(_offsety, 0, qMax(0, nh));
 		_startingMousePos = ev->pos();
 		update();
 	}

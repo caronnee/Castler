@@ -75,8 +75,6 @@ void ExtractionWorker::OpenSlot(const QString & str)
 	_timer.start(0,this);
 }
 
-//static int actionMask = ModeCreate | ModeUndistort | ModePlay;
-
 void ExtractionWorker::timerEvent(QTimerEvent * ev)
 {
 	if (_timer.timerId() != ev->timerId()|| (_mode == VisualModeStop ))
@@ -120,7 +118,6 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 	}
 
 	cv::Mat mat = _processor.GetResult();
-
 	//if (found)
 	//{
 	//	QString str = QString::asprintf("Found at %d", _provider.Get()->Position());
@@ -129,7 +126,7 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 	//}
 
 	// emit result
-	emit imageProcessed(mat, _provider.Step() / 1000);
+	emit imageProcessed(mat, _processor.Context() );
 }
 
 void ExtractionWorker::PreparePair(int start, int modifier)
@@ -155,6 +152,12 @@ void ExtractionWorker::PreparePair(int start, int modifier)
 	emit imagePairSignal(m1, m2);
 }
 
+void ExtractionWorker::ProcessActionDone()
+{
+	//clean up
+	_processor.ActionDone();
+}
+
 void ExtractionWorker::ProcessPartialAction(PointsContext context)
 {
 	_processor.ProcessContext(context);
@@ -164,8 +167,6 @@ void ExtractionWorker::Process()
 {
 	emit workerReportSignal(MInfo, "Starting thread process");
 }
-
-
 
 //bool ExtractionWorker::RunExtractionStep(ImageProcessor& _processor )
 //{

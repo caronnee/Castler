@@ -49,12 +49,6 @@
       <UniqueIdentifier>{3d5a55ae-79bc-4641-9a78-73922648a4cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Filename">
-      <UniqueIdentifier>{fe48f3bb-1fcb-4aac-9f74-5d1818a73698}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Debug">
-      <UniqueIdentifier>{9bd377a4-dfa9-4e7f-85b4-e18885603a08}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Filename">
       <UniqueIdentifier>{6c06825a-66c8-43bf-85d4-6bb498b501bd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders">
@@ -71,6 +65,12 @@
     </Filter>
     <Filter Include="Source Files\ImageProviders">
       <UniqueIdentifier>{97bd373d-58b8-438c-9bef-5bf11caf6c21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Debug">
+      <UniqueIdentifier>{9bd377a4-dfa9-4e7f-85b4-e18885603a08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Filename">
+      <UniqueIdentifier>{fe48f3bb-1fcb-4aac-9f74-5d1818a73698}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -256,10 +256,10 @@
       <Filter>Source Files\Source</Filter>
     </ClInclude>
     <ClInclude Include="Filename.h">
-      <Filter>Filename</Filter>
+      <Filter>Header Files\Filename</Filter>
     </ClInclude>
     <ClInclude Include="..\include\debug.h">
-      <Filter>Debug</Filter>
+      <Filter>Header Files\Debug</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Filename.h">
       <Filter>Header Files</Filter>

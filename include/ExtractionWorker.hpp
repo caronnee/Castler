@@ -52,12 +52,13 @@ signals:
 	void started(int optimalseconds);
 	void workerReportSignal(MessageLevel level, const QString & str);
 	void finished();
-	void imageProcessed(cv::Mat image, double seconds);
+	void imageProcessed(cv::Mat image, PointsContext context);
 	void camParametersSignal(cv::Mat camera, cv::Mat distCoeffs);
 
 public slots:
 	// main thread loop
 	void PreparePair(int start, int modifier);
+	void ProcessActionDone();
 	void ProcessPartialAction(PointsContext);
 	void Process();
 	void OpenSlot(const QString& str);

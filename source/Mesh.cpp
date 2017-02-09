@@ -33,16 +33,6 @@ Mesh::~Mesh()
 	// TODO Auto-generated destructor stub
 }
 
-void SavePoint(FILE * file, cv::Point3f&point)
-{
-	fprintf(file, "%f %f %f\n", point.x, point.y, point.z);
-}
-void LoadPoint(FILE * file, cv::Point3f&point)
-{
-	float x, y, z;
-	fscanf(file, "%f %f %f\n", &x, &y, &z);
-	point = cv::Point3f(x, y, z);
-}
 
 void SaveArrayPoint(FILE * file, std::vector<Vertex> &point)
 {
@@ -64,24 +54,7 @@ void LoadArrayPoint(FILE * file, std::vector<Vertex> &point)
 		LoadPoint(file, point[i]._normal);
 	}
 }
-void SaveArrayint(FILE * file, std::vector<int> &point)
-{
-	fprintf(file, "%d ", (int)point.size());
-	for (int i = 0; i < point.size(); i++)
-	{
-		fprintf(file, "%d ", point[i]);
-	}
-}
-void LoadArrayint(FILE * file, std::vector<int> &point)
-{
-	int sz;
-	fscanf(file, "%d ", &sz);
-	point.resize(sz);
-	for (int i = 0; i < point.size(); i++)
-	{
-		fscanf(file, "%d ", &point[i]);
-	}
-}
+
 void SaveDesc(FILE * file, PositionDesc & desc)
 {
 	fprintf(file, "%f %f %f %f %f\n", desc._azimuth, desc._elevation, desc._xPos, desc._yPos, desc._zPos);

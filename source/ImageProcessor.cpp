@@ -1,7 +1,13 @@
 #include "ImageProcessor.h"
+#include "typedefs.h"
 #include "Misc.h"
 
 IReportFunction * ImageProcessor::_reporter = NULL;
+
+struct SerializeCallback
+{
+	SerializeKeyPoints serializeKeypoint;
+};
 
 bool ImageProcessor::AutoCalibrate()
 {
@@ -37,6 +43,13 @@ bool ImageProcessor::AutoCalibrate()
 	return false;
 }
 
+// structure to load features
+struct StreamFeatures
+{
+	//keypoint save/load function
+
+};
+
 void ImageProcessor::InputFeatures(const PointsContext & c)
 {
 	KeypointsArray k;
@@ -44,6 +57,17 @@ void ImageProcessor::InputFeatures(const PointsContext & c)
 	_foundCoords.push_back(k);
 	// zero. Just to indicate that we do not have any foundcoords
 	_foundDesc.push_back(cv::Mat());
+	// save to the files
+	FILE* file = fopen((_provider->Name() + ".keys").toStdString().c_str(), "wb");
+	if (file)
+	{
+		std::vector<cv::KeyPoint> points;
+		cv::KeyPoint::convert(c.p1,points);
+		SaveArrayKeypoint(file, points);
+		fclose(file);
+	}
+
+	(_provider->Name(),k);
 }
 
 int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
@@ -239,13 +263,11 @@ void ImageProcessor::ApplyFeatureDetector()
 bool ImageProcessor::PerformDetection()
 {
 	cv::Mat frame;
-
 	KeypointsArray newKeypoints;
-
 	cv::Mat newgr;
+
 	// new gray leveled image
 	std::vector<cv::Point2f> convertedKeypoints;
-
 	std::vector<uchar> status;
 	std::vector<float> err;
 	cv::TermCriteria crit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 10, 0.03);
@@ -475,6 +497,15 @@ void ImageProcessor::ProcessContext(const PointsContext& context)
 	_signalAccepted = NULL;
 }
 
+
+void ImageProcessor::ActionDone()
+{
+	_signalAccepted = NULL;
+	_lastIndex = 0;
+	_lastIndexSecondary = 1;
+	_phase++;
+}
+
 bool ImageProcessor::FinishCalibration(PointsArray & chesspoints, cv::Mat& cameraMatrix, cv::Mat& distCoeffs)
 {
 	int flags = cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT | cv::CALIB_FIX_K4 | cv::CALIB_FIX_K5;
@@ -562,17 +593,7 @@ bool ImageProcessor::MatchesStep()
 			if (status[a] == false)
 				continue;
 			inliers++;
-			// we can use this, create a match
-			MatchPair * p1 = new MatchPair;
-			p1->imageId = _foundCoords.size() - 1;
-			p1->pointdId = itest1[a];
-			MatchPair * p2 = new MatchPair;
-			p2->imageId = iImage;
-			p2->pointdId = itest2[a];
-			p1->paired = p2;
-			p2->paired = p1;
-			_matches.push_back(p1);
-			_matches.push_back(p2);
+			AddPair(iImage, itest2[a], _foundCoords.size() - 1, itest1[a]);			
 		}
 		RelMap mp;
 		mp.rel = nn_matches.size() ? (double)inliers / nn_matches.size() : 0;
@@ -754,14 +775,32 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	cv::Mat right(_ret, cv::Rect(s1.width,0, s2.width, s2.height));
 	s.copyTo(left);
 	f.copyTo(right);
+	_modified = true;
 }
+
+struct SerializeFeaturesCallback
+{
+	SerializeKeyPoints serializeKeypoints;
+};
 
 bool ImageProcessor::ManualFeaturesStep()
 {
-	_provider->Next();
-	// hack to move to the next phase
+	if (!_provider->Next())
+		return false;
 	_lastIndexSecondary = _imagesInfo.size();
 	PrepareImage();
+	// fill context with everything that you have
+	QString nm = _provider->Name() + ".keys";
+	FILE* file = fopen(nm.toStdString().c_str(), "rb");
+	if (file)
+	{
+		std::vector<cv::KeyPoint> points;
+		LoadArrayKeypoint(file, points);
+		cv::KeyPoint::convert(points, _context.p1);
+		// false because this can be changed
+		_context.provided = false;
+		fclose(file);
+	}
 	_signalAccepted = &ImageProcessor::InputFeatures;
 	return false;
 }
@@ -770,7 +809,7 @@ bool ImageProcessor::InputWait()
 {
 	if (_signalAccepted)
 		return true; 
-	_phase--;
+	// move the index
 	_lastIndex++;
 	if (_lastIndex == _imagesInfo.size())
 	{
@@ -782,12 +821,46 @@ bool ImageProcessor::InputWait()
 		}
 		_lastIndex = 0;
 	}
+	_phase--;
 	return true;
 }
+void ImageProcessor::InputMatches(const PointsContext & context)
+{
+	// in points context we have all the correspondences
+	for (int i = 0; i < context.p1.size(); i++)
+	{
+		int sec = context.p1[i].x;
+		int sec2 = context.p1[i].y;
+		AddPair(_lastIndex, sec, _lastIndexSecondary, sec2);
+		RelMap r;
+		r.image1 = _lastIndex;
+		r.image2 = _lastIndexSecondary;
+		// default when we did not check fundamental matrix
+		r.rel = 1;
+		_reliability.push_back(r);
+	}
+}
+
 bool ImageProcessor::ManualMatchesStep()
 {
 	PrepareDouble(_lastIndex, _lastIndexSecondary);
+	_signalAccepted = &ImageProcessor::InputMatches;
 	return false;
+}
+
+void ImageProcessor::AddPair(const int& iImage, const int& iPoint, const int&jImage, const int & jPoint)
+{
+	// we can use this, create a match
+	MatchPair * p1 = new MatchPair;
+	p1->imageId = iImage;
+	p1->pointdId = iPoint;
+	MatchPair * p2 = new MatchPair;
+	p2->imageId = jImage;
+	p2->pointdId = jPoint;
+	p1->paired = p2;
+	p2->paired = p1;
+	_matches.push_back(p1);
+	_matches.push_back(p2);
 }
 
 // create whole 3d model

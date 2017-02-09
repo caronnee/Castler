@@ -18,3 +18,10 @@ typedef std::vector<int> PolyIndices;
 typedef std::map<std::pair<int,int>, int[2] > PairMap;
 typedef std::pair<int, int> IntPair;
 typedef std::vector<double> DoubleVector;
+
+//---------------------------------------------------------------------------
+//-----------------SERIALIZATION COMMON TYPEDEFS-----------------------------
+//---------------------------------------------------------------------------
+typedef void(*SerializePoint)(FILE * file, cv::Point3f&point);
+typedef void(*SerializeArraySize)(FILE * file, std::vector<int> &point);
+typedef void(*SerializeKeyPoints)(FILE * file, std::vector<cv::KeyPoint>&point);

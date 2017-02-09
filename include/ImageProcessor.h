@@ -80,6 +80,7 @@ class ImageProcessor
 	Phase _phases[128];
 
 	void InputFeatures( const PointsContext & c);
+
 	// checkpoints to detect for calibration purposes
 	std::vector<cv::Point3f> _chesspoints;
 
@@ -125,6 +126,9 @@ private:
 	// current return image
 	cv::Mat _ret;
 
+	// any additional data that go with this
+	PointsContext _context;
+
 	// current frame size associated with the latest Next call
 	cv::Size _frameSize;
 
@@ -148,11 +152,16 @@ private:
 	// wait for the input
 	bool ManualFeaturesStep();
 
-	// check if some sognal was obtained
+	// check if some signal was obtained
 	bool InputWait();
+
+	// manual setting of the points
+	void InputMatches(const PointsContext & context);
 
 	// waits for the input
 	bool ManualMatchesStep();
+
+	void AddPair(const int& iImage, const int& iPoint, const int&jImage, const int & jPoint);
 public:
 
 	// class that gives out the results
@@ -198,4 +207,10 @@ public:
 	void Clear();
 	bool CleanModifiedFlag();
 	void ProcessContext(const PointsContext& context);
+	PointsContext Context()const
+	{
+		return _context;
+	}
+	void Terminate();
+	void ActionDone();
 };

@@ -34,9 +34,7 @@ struct PositionDesc
 //                OBJECT MESH CLASS                    //
 // --------------------------------------------------- //
 
-typedef void(*SerializePoint)(FILE * file, cv::Point3f&point);
 typedef void(*SerializeArrayPoint)(FILE * file, std::vector<Vertex> &point);
-typedef void(*SerializeArraySize)(FILE * file, std::vector<int> &point);
 typedef void(*SerializeDesc)(FILE * file, PositionDesc& desc);
 
 struct SerializeCallback

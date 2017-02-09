@@ -49,3 +49,51 @@ int Sign(const int & a)
 		return 1;
 	return 0;
 }
+
+void SavePoint(FILE * file, cv::Point3f&point)
+{
+	fprintf(file, "%f %f %f\n", point.x, point.y, point.z);
+}
+
+void LoadPoint(FILE * file, cv::Point3f&point)
+{
+	float x, y, z;
+	fscanf(file, "%f %f %f\n", &x, &y, &z);
+	point = cv::Point3f(x, y, z);
+}
+
+void SaveArrayint(FILE * file, std::vector<int> &point)
+{
+	fprintf(file, "%d ", (int)point.size());
+	for (int i = 0; i < point.size(); i++)
+	{
+		fprintf(file, "%d ", point[i]);
+	}
+}
+
+void LoadArrayint(FILE * file, std::vector<int> &point)
+{
+	int sz;
+	fscanf(file, "%d ", &sz);
+	point.resize(sz);
+	for (int i = 0; i < point.size(); i++)
+	{
+		fscanf(file, "%d ", &point[i]);
+	}
+}
+void SaveArrayKeypoint(FILE * file, std::vector<cv::KeyPoint> &points)
+{
+	size_t s = points.size();
+	fwrite( &s,sizeof(size_t),1,file);
+	fwrite(points.data(), sizeof(cv::KeyPoint), s, file);
+}
+
+void LoadArrayKeypoint(FILE * file, std::vector<cv::KeyPoint> &points)
+{
+	size_t s;
+	int count = fread(&s, sizeof(size_t), 1, file);
+	if (count == 0)
+		return;
+	points.resize(s);
+	fread(points.data(), sizeof(cv::KeyPoint), s, file);
+}

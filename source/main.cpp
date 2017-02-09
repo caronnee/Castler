@@ -12,5 +12,7 @@ int main(int argc, char *argv[])
 
   Creator w;
   w.show();
-  return a.exec();
+  bool ret = a.exec();
+
+  return ret;
 }
