@@ -54,6 +54,7 @@ public:
 	virtual double Step() = 0;
 	virtual int Count() = 0;
 	virtual const QString Name()const = 0;
+	virtual const QString Name(const int & pos) const=0;
 };
 
 struct Providers
@@ -68,7 +69,10 @@ struct Providers
 	int Count();
 
 	// set position
-	bool SetPosition(const int & position);
+	void SetPosition(const int & position);
+
+	// fins position to be set
+	void FindPosition(int & position, int & provider);
 
 	// sets positino and immediately retrieves frame
 	void Get(int position, cv::Mat& frame);
@@ -93,6 +97,7 @@ struct Providers
 
 	// current nae of the processed frame
 	const QString Name();
+	const QString Name(const int & id);
 };
 
 

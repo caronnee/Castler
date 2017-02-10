@@ -79,6 +79,7 @@ void VideoRenderer::setImage(cv::Mat img,PointsContext context)
 {
 	_img = img.clone();
 	_pointsContext = context;
+	_offsetx = _offsety = 0;
 	QSize s = size();
 	cv::Size ss = img.size();
 	float s1 = (float) s.width() / ss.width;

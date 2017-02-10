@@ -31,4 +31,5 @@ public:
 	virtual int Position();
 	virtual int Count();
 	virtual const QString Name()const;
+	virtual const QString Name(const int & pos) const;
 };

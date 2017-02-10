@@ -30,5 +30,6 @@ public:
 	virtual double Step();
 	virtual int Count();
 	virtual const QString Name() const;
+	virtual const QString Name(const int & pos) const;
 };
 

@@ -105,6 +105,10 @@ int ImagesProvider::Count()
 	return _images.size();
 }
 
+const QString ImagesProvider::Name(const int & pos) const
+{
+	return _images[pos].name.toStdString().c_str();
+}
 const QString ImagesProvider::Name() const
 {
 	return _images[_pos].name.toStdString().c_str();

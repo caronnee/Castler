@@ -132,6 +132,9 @@ private:
 	// current frame size associated with the latest Next call
 	cv::Size _frameSize;
 
+	// loaf from corresponding key file
+	void LoadKeys(const QString & fid, const int & idx);
+
 	int FindNextBestPair(int& firstCamera, int & secondCamera);
 
 	// create matches 

@@ -758,11 +758,31 @@ bool ImageProcessor::GlobalBundleAdjustment()
 	return false;
 }
 
+void ImageProcessor::LoadKeys(const QString& name, const int&fid )
+{
+	if (_foundCoords.size() <= fid)
+		_foundCoords.resize(fid+1);
+	QString nm = name + ".keys";
+	FILE* file = fopen(nm.toStdString().c_str(), "rb");
+	if (file)
+	{
+		std::vector<cv::KeyPoint> points;
+		LoadArrayKeypoint(file, points);
+		cv::KeyPoint::convert(points, _context.p1);
+		// false because this can be changed
+		_context.provided = false;
+		_foundCoords[fid] = points;
+		fclose(file);
+	}
+}
+
 void ImageProcessor::PrepareDouble(const int& first, const int & second)
 {
 	cv::Mat f, s;
 	_provider->Get(first,f);
 	_provider->Get(second,s);
+	LoadKeys(_provider->Name(first),first);
+	LoadKeys(_provider->Name(second),second);
 	// merge to one
 	cv::Size s1 = f.size();
 	cv::Size s2 = s.size();
@@ -773,8 +793,8 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	s1 = f.size();
 	cv::Mat left(_ret, cv::Rect(0, 0, s1.width, s1.height));
 	cv::Mat right(_ret, cv::Rect(s1.width,0, s2.width, s2.height));
-	s.copyTo(left);
-	f.copyTo(right);
+	f.copyTo(left);
+	s.copyTo(right);
 	_modified = true;
 	// set context
 	_context.provided = true;
@@ -789,7 +809,7 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	KeypointsArray & arr2 = _foundCoords[second];
 	for (int i = 0; i < arr2.size(); i++)
 	{
-		_context.p1.push_back(arr2[i].pt + cv::Point2f(s1.width, s1.height));
+		_context.p1.push_back(arr2[i].pt + cv::Point2f(s1.width, 0));
 		_context.indexes.push_back(i);
 	}
 }
@@ -806,17 +826,7 @@ bool ImageProcessor::ManualFeaturesStep()
 	_lastIndexSecondary = _imagesInfo.size();
 	PrepareImage();
 	// fill context with everything that you have
-	QString nm = _provider->Name() + ".keys";
-	FILE* file = fopen(nm.toStdString().c_str(), "rb");
-	if (file)
-	{
-		std::vector<cv::KeyPoint> points;
-		LoadArrayKeypoint(file, points);
-		cv::KeyPoint::convert(points, _context.p1);
-		// false because this can be changed
-		_context.provided = false;
-		fclose(file);
-	}
+	LoadKeys(_provider->Name(),_foundCoords.size());
 	_signalAccepted = &ImageProcessor::InputFeatures;
 	return false;
 }

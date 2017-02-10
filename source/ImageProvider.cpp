@@ -44,20 +44,23 @@ int Providers::Count()
 	return ret;
 }
 
-bool Providers::SetPosition(const int & position)
+void Providers::SetPosition(const int & position)
 {
 	int tempPosition = position;
 	_currentProvider = 0;
-	while (_providers[_currentProvider]->Count() < tempPosition)
-	{
-		tempPosition -= _providers[_currentProvider]->Count();
-		_currentProvider++;
-		if (_currentProvider >= _providers.size())
-			return false;
-	}
-
+	FindPosition(tempPosition, _currentProvider);
 	_providers[_currentProvider]->SetPosition(tempPosition);
-	return true;
+}
+
+void Providers::FindPosition(int & position, int & provider)
+{
+	while (_providers[provider]->Count() < position)
+	{
+		position -= _providers[provider]->Count();
+		provider++;
+		if (provider >= _providers.size())
+			return;
+	}
 }
 
 void Providers::Clear()
@@ -73,6 +76,12 @@ bool Providers::IsValid() const
 	return _providers.size() && _providers[0]->IsValid();
 }
 
+const QString Providers::Name(const int & id)
+{
+	int position = id, provider = 0;
+	FindPosition(position, provider);
+	return _providers[provider]->Name(position);
+}
 
 const QString Providers::Name()
 {

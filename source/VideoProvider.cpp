@@ -57,7 +57,7 @@ bool VideoProvider::Frame(cv::Mat& frame)
 {
 	_capture->retrieve(frame);
 	cv::cvtColor(frame, frame, CV_BGR2RGB);
-	_aName = QString::asprintf("Frame %d / %d", Position(), _numFrames);
+	_aName = Name(Position()) ;
 	return Position() < _numFrames;
 }
 
@@ -100,6 +100,10 @@ int VideoProvider::Count()
 	return _numFrames;
 }
 
+const QString VideoProvider::Name(const int & pos) const
+{
+	return QString::asprintf("Frame %d / %d", pos, _numFrames);
+}
 const QString VideoProvider::Name() const
 {
 	return _aName;
