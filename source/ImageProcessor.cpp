@@ -792,7 +792,7 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	_modified = true;
 	// set context
 	_context.provided = true;
-	_context.p1.clear();
+	_context.Clear();
 	_context.indexes.clear();
 	KeypointsArray & arr = _foundCoords[first];
 	for (int i = 0; i < arr.size(); i++)

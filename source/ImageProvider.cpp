@@ -121,3 +121,9 @@ void Providers::Create(const QString & str)
 			_providers.push_back(p);
 	}
 }
+
+void PointsContext::Clear()
+{
+	indexes.clear();
+	p1.clear();
+}

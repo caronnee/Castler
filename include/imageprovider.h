@@ -29,6 +29,7 @@ struct PointsContext
 	CoordsArray p1;
 	std::vector<int> indexes;
 	PointsContext() : provided(false) {}
+	void Clear();
 };
 
 struct CalibrationSet

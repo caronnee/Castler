@@ -75,7 +75,7 @@ void VideoRenderer::SwitchKeys(QKeyEvent *e)
 			{
 				// phase complete signal
 				emit PhaseDoneSignal();
-				_pointsContext.p1.clear();
+				_pointsContext.Clear();
 			}
 			else
 			{
@@ -200,8 +200,8 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		// move to the 
 		//float dist = 25.0/(_scale*_scale);
 		cv::Point2f c;
-		c.x = ev->pos().x();
-		c.y = ev->pos().y();
+		c.x = ev->pos().x() + _offsetx;
+		c.y = ev->pos().y() + _offsety;
 
 		c /= _scale;
 		// make
@@ -236,7 +236,7 @@ VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
 	_offsety = 0;
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setFocusPolicy(Qt::ClickFocus);
-	_pointsContext.p1.clear();
+	_pointsContext.Clear();
 	_mousePressed = false;
 }
 
