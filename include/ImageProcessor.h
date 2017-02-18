@@ -10,6 +10,7 @@
 struct MatchPair
 {
 	int imageId;
+	// index to the array of image
 	int pointdId;
 	// next that was not paired yet to anyone
 	MatchPair * paired;
@@ -161,10 +162,17 @@ private:
 	// manual setting of the points
 	void InputMatches(const PointsContext & context);
 
+	void SaveMatches(const std::string & name, std::vector<MatchPair*> pairs);
+	// load file that contains matches
+	void LoadMatches(const std::string & name);
+
+	// load matches according to indexes
+	void LoadMatches(int & i1, int&i2);
+
 	// waits for the input
 	bool ManualMatchesStep();
 
-	void AddPair(const int& iImage, const int& iPoint, const int&jImage, const int & jPoint);
+	MatchPair * AddPair(const int& iImage, const int& iPoint, const int&jImage, const int & jPoint);
 public:
 
 	// class that gives out the results

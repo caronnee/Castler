@@ -36,7 +36,19 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 
 	for (int i = 0; i < _pointsContext.p1.size(); i++)
 	{
-		cv::circle(matched, _pointsContext.p1[i]*_scale,5,cv::Scalar(1,0,0),2);
+		cv::circle(matched, _pointsContext.p1[i]*_scale,5,cv::Scalar(0,0,255),2);
+	}
+	for (int i = 1; i < _pointsContext.indexes.size(); i+=2)
+	{
+		int first = _pointsContext.indexes[i-1];
+		int second = _pointsContext.indexes[i];
+		cv::line(matched, _pointsContext.p1[first]*_scale, _pointsContext.p1[second]*_scale, cv::Scalar(0, 255, 0), 2);
+	}
+
+	if (_pointsContext.indexes.size() & 1)
+	{
+		int i = _pointsContext.indexes.back();
+		cv::circle(matched, _pointsContext.p1[i] * _scale, 5, cv::Scalar(1, 1, 1), -2);
 	}
 
 	DoAssert(_offsetx >= 0);
@@ -95,7 +107,7 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 {
 	if (_img.empty())
 		return;
-	//_lastpoint will by always regarding the original image
+
 	// new size
 	double scale = event->delta() / 140.f;
 	if (scale < 0)
@@ -167,19 +179,49 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		// terribly non-acurate:-/ but hey, user input...
 		QPoint p = ev->pos();
 		//p = QWidget::mapFromGlobal(p);
-		cv::Point r(_offsetx + p.x()/_scale, _offsety + p.y()/_scale);
+		cv::Point2f r(_offsetx + p.x()/_scale, _offsety + p.y()/_scale);
 		if (r.x > _img.size().width || r.y > _img.size().height)
 		{
 			return;
 		}
-		_pointsContext.p1.push_back(r);
+		int index = ArrayContains(r, _pointsContext.p1, 1.0/_scale);
+		if (index >= 0)
+			_pointsContext.p1.erase(_pointsContext.p1.begin() + index);
+		else
+			_pointsContext.p1.push_back(r);
 		update();
 	}
 	else
 	{
-		// TODO implement
-		__debugbreak();
+		// move or delete the point
+		//find the nearest point to change
+		int candidate = -1;
+		// tolerance 5 pixels
+		// move to the 
+		//float dist = 25.0/(_scale*_scale);
+		cv::Point2f c;
+		c.x = ev->pos().x();
+		c.y = ev->pos().y();
+
+		c /= _scale;
+		// make
+		candidate = ArrayContains(c, _pointsContext.p1, 1.0 / _scale);
+		if (candidate >= 0)
+		{
+			if ((!_pointsContext.indexes.empty()) && 
+				candidate == _pointsContext.indexes.back())
+			{
+				_pointsContext.indexes.pop_back();
+			}
+			else
+			{
+				// mark this candidate red and wait for the second input
+				_pointsContext.indexes.push_back(candidate);
+			}			
+			update();
+		}
 	}
+
 }
 
 void VideoRenderer::keyPressEvent(QKeyEvent *ev)

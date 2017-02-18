@@ -22,11 +22,11 @@ enum ActionModes
 	ActionModeCreateManual,
 	NActions
 };
-
+#include "typedefs.h"
 struct PointsContext
 {
 	bool provided;
-	std::vector<cv::Point2f> p1;
+	CoordsArray p1;
 	std::vector<int> indexes;
 	PointsContext() : provided(false) {}
 };

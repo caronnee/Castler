@@ -2,6 +2,23 @@
 #include "opencv2/opencv.hpp"
 #include <windows.h>
 
+// surrouding of 5 pixels. Should be enough
+int ArrayContains(cv::Point2f & testPoint, CoordsArray & points, float scaleAdjust)
+{
+	float dist = 25 * scaleAdjust;
+	int candidate = -1;
+	for (int i = 0; i < points.size(); i++)
+	{
+		cv::Point2f pnt = points[i] - testPoint;
+		float testD = pnt.dot(pnt);
+		if (testD < dist)
+		{
+			dist = testD;
+			candidate = i;
+		}
+	}
+	return candidate;
+}
 cv::Point3f GetEpipoles(cv::Mat F, cv::Point3f& fe,cv::Point3f& fe2)
 {
 	cv::Mat u, v, w;

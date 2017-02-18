@@ -10,6 +10,7 @@ class VideoRenderer : public QWidget {
 		;
 private:
 
+	//first click should be only for enabling foxcus
 	bool _canAccept;
 
 	// legal only when mouse is pressed
@@ -27,14 +28,15 @@ private:
 	// mouse pressed flag
 	bool _mousePressed;
 
-	// last pressed point. Must be always regarding the original image
-	//cv::Point2f _lastPoint;
-
 	// selected points
 	PointsContext _pointsContext;
 
+	// image to be shown
 	cv::Mat _img;
+
 	void paintEvent(QPaintEvent *);
+
+	// keyboard handling
 	void SwitchKeys(QKeyEvent *e);
 signals:
 	void reportSignal(MessageLevel level, const QString & str);

@@ -104,13 +104,14 @@ int ImagesProvider::Count()
 {
 	return _images.size();
 }
+#include "Filename.h"
 
 const QString ImagesProvider::Name(const int & pos) const
 {
-	return _images[pos].name.toStdString().c_str();
+	return _images[pos].name;
 }
 const QString ImagesProvider::Name() const
 {
-	return _images[_pos].name.toStdString().c_str();
+	return Name(_pos);
 }
 

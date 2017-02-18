@@ -1,6 +1,7 @@
 #include "ImageProcessor.h"
 #include "typedefs.h"
 #include "Misc.h"
+#include "Filename.h"
 
 IReportFunction * ImageProcessor::_reporter = NULL;
 
@@ -42,13 +43,6 @@ bool ImageProcessor::AutoCalibrate()
 	// done. Nothing more to do
 	return false;
 }
-
-// structure to load features
-struct StreamFeatures
-{
-	//keypoint save/load function
-
-};
 
 void ImageProcessor::InputFeatures(const PointsContext & c)
 {
@@ -762,8 +756,8 @@ void ImageProcessor::LoadKeys(const QString& name, const int&fid )
 {
 	if (_foundCoords.size() <= fid)
 		_foundCoords.resize(fid+1);
-	QString nm = name + ".keys";
-	FILE* file = fopen(nm.toStdString().c_str(), "rb");
+	std::string nm = GetFullPath( (name + ".keys").toStdString());
+	FILE* file = fopen(nm.c_str(), "rb");
 	if (file)
 	{
 		std::vector<cv::KeyPoint> points;
@@ -804,21 +798,25 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	for (int i = 0; i < arr.size(); i++)
 	{
 		_context.p1.push_back(arr[i].pt);
-		_context.indexes.push_back(i);
 	}
+
+	//TODO this can be optimized
+	for (int i = 0; i < _matches.size(); i++)
+	{
+		// only lower
+		if (_matches[i]->imageId != first)
+			continue;
+		_context.indexes.push_back(_matches[i]->pointdId);
+		_context.indexes.push_back(_matches[i]->paired->pointdId);
+	}
+
 	KeypointsArray & arr2 = _foundCoords[second];
 	for (int i = 0; i < arr2.size(); i++)
 	{
 		_context.p1.push_back(arr2[i].pt + cv::Point2f(s1.width, 0));
-		_context.indexes.push_back(i);
+		_context.provided = true;
 	}
 }
-
-struct SerializeFeaturesCallback
-{
-	SerializeKeyPoints serializeKeypoints;
-};
-
 bool ImageProcessor::ManualFeaturesStep()
 {
 	if (!_provider->Next())
@@ -836,28 +834,39 @@ bool ImageProcessor::InputWait()
 	if (_signalAccepted)
 		return true; 
 	// move the index
-	_lastIndex++;
-	if (_lastIndex == _imagesInfo.size())
+	_lastIndexSecondary++;
+	if (_lastIndexSecondary == _imagesInfo.size())
 	{
-		_lastIndexSecondary++;
-		if (_lastIndexSecondary == _imagesInfo.size() - 1)
+		_lastIndex++;
+		if (_lastIndex == _imagesInfo.size()-1)
 		{
+			_lastIndex = 0;
 			_lastIndexSecondary = 1;
-			return true;
+			return false;
 		}
-		_lastIndex = 0;
+		_lastIndexSecondary = _lastIndex+1;
+		return true;
 	}
 	_phase--;
 	return true;
 }
+
+static std::string CreateMatchesName(std::string str1, std::string str2)
+{
+	std::string strTitle = "_"+ FindTitle(str2) + ".matches";
+	std::string ret = ReplaceExt(str1, strTitle.c_str());
+	return GetFullPath(ret);
+}
 void ImageProcessor::InputMatches(const PointsContext & context)
 {
+	std::vector<MatchPair *> pair;
 	// in points context we have all the correspondences
-	for (int i = 0; i < context.p1.size(); i++)
+	for (int i = 1; i < context.indexes.size(); i+=2)
 	{
-		int sec = context.p1[i].x;
-		int sec2 = context.p1[i].y;
-		AddPair(_lastIndex, sec, _lastIndexSecondary, sec2);
+		int sec = context.indexes[i-1];
+		int sec2 = context.indexes[i];
+		MatchPair* p= AddPair(_lastIndex, sec, _lastIndexSecondary, sec2);
+		pair.push_back(p);
 		RelMap r;
 		r.image1 = _lastIndex;
 		r.image2 = _lastIndexSecondary;
@@ -865,16 +874,59 @@ void ImageProcessor::InputMatches(const PointsContext & context)
 		r.rel = 1;
 		_reliability.push_back(r);
 	}
+	std::string n1 = _provider->Name(_lastIndex).toStdString();
+	std::string n2 = _provider->Name(_lastIndexSecondary).toStdString();
+	SaveMatches(CreateMatchesName(n1,n2), pair);
 }
 
+void ImageProcessor::SaveMatches(const std::string & name, std::vector<MatchPair*> pairs)
+{
+	FILE* file = fopen(name.c_str(),"wb");
+	for (int i = 0; i < pairs.size(); i++)
+	{
+		MatchPair * pair = pairs[i];
+		if (pair->imageId > pair->paired->imageId)
+			continue;		
+		fwrite(&pair->id, 1, sizeof(pair->id), file);
+		fwrite(&pair->imageId, 1, sizeof(pair->imageId), file);
+		fwrite(&pair->paired->imageId, 1, sizeof(pair->pointdId), file);
+		fwrite(&pair->paired->id, 1, sizeof(pair->pointdId), file);
+	}
+	fclose(file);
+}
+void ImageProcessor::LoadMatches(const std::string & name)
+{
+	FILE * file = fopen(name.c_str(), "rb");
+	if (!file)
+		return;// nothing to load
+	while(!feof(file))
+	{
+		int id1,id2, im1, im2,pt;
+		fread(&id1, 1, sizeof(id1), file);
+		fread(&im1, 1, sizeof(id1), file);
+		fread(&id2, 1, sizeof(id1), file);
+		fread(&im2, 1, sizeof(id1), file);
+
+		AddPair(im1, id1, im2, id2);
+	}
+	fclose(file);
+}
+
+void ImageProcessor::LoadMatches(int & i1, int&i2)
+{
+	std::string	n1 = _provider->Name(i1).toStdString();
+	std::string n2 = _provider->Name(i2).toStdString();
+	LoadMatches(CreateMatchesName(n1,n2));
+}
 bool ImageProcessor::ManualMatchesStep()
 {
 	PrepareDouble(_lastIndex, _lastIndexSecondary);
+	LoadMatches(_lastIndex, _lastIndexSecondary);
 	_signalAccepted = &ImageProcessor::InputMatches;
 	return false;
 }
 
-void ImageProcessor::AddPair(const int& iImage, const int& iPoint, const int&jImage, const int & jPoint)
+MatchPair * ImageProcessor::AddPair(const int& iImage, const int& iPoint, const int&jImage, const int & jPoint)
 {
 	// we can use this, create a match
 	MatchPair * p1 = new MatchPair;
@@ -887,6 +939,7 @@ void ImageProcessor::AddPair(const int& iImage, const int& iPoint, const int&jIm
 	p2->paired = p1;
 	_matches.push_back(p1);
 	_matches.push_back(p2);
+	return p1;
 }
 
 // create whole 3d model

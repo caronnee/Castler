@@ -15,6 +15,14 @@ std::string GetFullPath(const std::string & relativeName)
 	return str;
 }
 
+std::string ReplaceExt(const std::string & path, const char * ext)
+{
+	int t = path.find_last_of('.');
+	if (t == std::string::npos)
+		return path + ext;
+	std::string s = path.substr(0, t);
+	return s + ext;
+}
 std::string FindTitle(const std::string & path)
 {
 	int t = path.find_last_of('\\');
@@ -23,7 +31,8 @@ std::string FindTitle(const std::string & path)
 	if (t <= 0)
 		return path;
 	int dt = path.find_last_of('.');
+	t++;
 	if (dt < t)
 		return path.substr(t);
-	return path.substr(t, dt - t - 1);
+	return path.substr(t, dt - t);
 }
