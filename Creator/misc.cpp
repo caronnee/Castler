@@ -2,7 +2,16 @@
 #include "opencv2/opencv.hpp"
 #include <windows.h>
 
-// surrouding of 5 pixels. Should be enough
+int ArrayContains(int & value, PolyIndices & indices)
+{
+	for (int i = 0; i < indices.size(); i++)
+	{
+		if (value == indices[i])
+			return i;
+	}
+	return -1;
+}
+// surrounding of 5 pixels. Should be enough
 int ArrayContains(cv::Point2f & testPoint, CoordsArray & points, float scaleAdjust)
 {
 	float dist = 25 * scaleAdjust;

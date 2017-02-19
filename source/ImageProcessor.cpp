@@ -47,7 +47,7 @@ bool ImageProcessor::AutoCalibrate()
 void ImageProcessor::InputFeatures(const PointsContext & c)
 {
 	KeypointsArray k;
-	cv::KeyPoint::convert(c.p1, k);
+	cv::KeyPoint::convert(c.coords, k);
 	_foundCoords.push_back(k);
 	// zero. Just to indicate that we do not have any foundcoords
 	_foundDesc.push_back(cv::Mat());
@@ -56,7 +56,7 @@ void ImageProcessor::InputFeatures(const PointsContext & c)
 	if (file)
 	{
 		std::vector<cv::KeyPoint> points;
-		cv::KeyPoint::convert(c.p1,points);
+		cv::KeyPoint::convert(c.coords,points);
 		SaveArrayKeypoint(file, points);
 		fclose(file);
 	}
@@ -762,9 +762,9 @@ void ImageProcessor::LoadKeys(const QString& name, const int&fid )
 	{
 		std::vector<cv::KeyPoint> points;
 		LoadArrayKeypoint(file, points);
-		cv::KeyPoint::convert(points, _context.p1);
+		cv::KeyPoint::convert(points, _context.coords);
 		// false because this can be changed
-		_context.provided = false;
+		_context.mode = false;
 		_foundCoords[fid] = points;
 		fclose(file);
 	}
@@ -791,13 +791,13 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	s.copyTo(right);
 	_modified = true;
 	// set context
-	_context.provided = true;
+	_context.mode = true;
 	_context.Clear();
 	_context.indexes.clear();
 	KeypointsArray & arr = _foundCoords[first];
 	for (int i = 0; i < arr.size(); i++)
 	{
-		_context.p1.push_back(arr[i].pt);
+		_context.coords.push_back(arr[i].pt);
 	}
 
 	//TODO this can be optimized
@@ -806,16 +806,20 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 		// only lower
 		if (_matches[i]->imageId != first)
 			continue;
-		_context.indexes.push_back(_matches[i]->pointdId);
-		_context.indexes.push_back(_matches[i]->paired->pointdId);
+		if (_matches[i]->paired->imageId != second)
+			continue;
+		_context.indexes.push_back(_matches[i]->pointdCoordId);
+		_context.indexes.push_back(_matches[i]->paired->pointdCoordId);
 	}
-
+	_context.mode = true;
+	_context.data = _context.coords.size();
 	KeypointsArray & arr2 = _foundCoords[second];
 	for (int i = 0; i < arr2.size(); i++)
 	{
-		_context.p1.push_back(arr2[i].pt + cv::Point2f(s1.width, 0));
-		_context.provided = true;
+		_context.coords.push_back(arr2[i].pt + cv::Point2f(s1.width, 0));
+
 	}
+	
 }
 bool ImageProcessor::ManualFeaturesStep()
 {
@@ -887,10 +891,8 @@ void ImageProcessor::SaveMatches(const std::string & name, std::vector<MatchPair
 		MatchPair * pair = pairs[i];
 		if (pair->imageId > pair->paired->imageId)
 			continue;		
-		fwrite(&pair->id, 1, sizeof(pair->id), file);
-		fwrite(&pair->imageId, 1, sizeof(pair->imageId), file);
-		fwrite(&pair->paired->imageId, 1, sizeof(pair->pointdId), file);
-		fwrite(&pair->paired->id, 1, sizeof(pair->pointdId), file);
+		fwrite(&pair->pointdCoordId, 1, sizeof(pair->pointdCoordId), file);
+		fwrite(&pair->paired->pointdCoordId, 1, sizeof(pair->pointdCoordId), file);
 	}
 	fclose(file);
 }
@@ -901,13 +903,14 @@ void ImageProcessor::LoadMatches(const std::string & name)
 		return;// nothing to load
 	while(!feof(file))
 	{
-		int id1,id2, im1, im2,pt;
-		fread(&id1, 1, sizeof(id1), file);
-		fread(&im1, 1, sizeof(id1), file);
-		fread(&id2, 1, sizeof(id1), file);
-		fread(&im2, 1, sizeof(id1), file);
+		int id1, id2;
+		int len = fread(&id1, 1, sizeof(id1), file); 
+		if (len == 0)
+			break;
 
-		AddPair(im1, id1, im2, id2);
+		fread(&id2, 1, sizeof(id1), file);
+
+		AddPair(_lastIndex, id1, _lastIndexSecondary, id2);
 	}
 	fclose(file);
 }
@@ -920,8 +923,8 @@ void ImageProcessor::LoadMatches(int & i1, int&i2)
 }
 bool ImageProcessor::ManualMatchesStep()
 {
-	PrepareDouble(_lastIndex, _lastIndexSecondary);
 	LoadMatches(_lastIndex, _lastIndexSecondary);
+	PrepareDouble(_lastIndex, _lastIndexSecondary);
 	_signalAccepted = &ImageProcessor::InputMatches;
 	return false;
 }
@@ -931,10 +934,10 @@ MatchPair * ImageProcessor::AddPair(const int& iImage, const int& iPoint, const 
 	// we can use this, create a match
 	MatchPair * p1 = new MatchPair;
 	p1->imageId = iImage;
-	p1->pointdId = iPoint;
+	p1->pointdCoordId = iPoint;
 	MatchPair * p2 = new MatchPair;
 	p2->imageId = jImage;
-	p2->pointdId = jPoint;
+	p2->pointdCoordId = jPoint;
 	p1->paired = p2;
 	p2->paired = p1;
 	_matches.push_back(p1);
@@ -966,8 +969,8 @@ bool ImageProcessor::FinishCreationStep()
 		if (_matches[i]->imageId == image1 &&
 			_matches[i]->paired->imageId == image2)
 		{
-			points1.push_back(_foundCoords[image1][_matches[i]->pointdId].pt);
-			points2.push_back(_foundCoords[image2][_matches[i]->pointdId].pt);
+			points1.push_back(_foundCoords[image1][_matches[i]->pointdCoordId].pt);
+			points2.push_back(_foundCoords[image2][_matches[i]->pointdCoordId].pt);
 			matches_ids.push_back(i);
 		}
 	}
@@ -1059,7 +1062,7 @@ bool ImageProcessor::FinishCreationStep()
 		}
 		cv::solve(A, b, X, cv::DECOMP_SVD);
 		cv::Point3f nPoint = X;// Triangulate(p1, p2, pid1, pid2);
-		int index = _matches[matches_ids[i]]->pointdId;
+		int index = _matches[matches_ids[i]]->pointdCoordId;
 
 		DoAssert(_detectorOutput);
 		QString o = QString::asprintf("Generated point %d (estimated as %.3f %.3f %.3f) ", index, nPoint.x, nPoint.y, nPoint.z);

@@ -34,21 +34,21 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 
 	cv::resize(_img, matched, cv::Size(w,h));
 
-	for (int i = 0; i < _pointsContext.p1.size(); i++)
+	for (int i = 0; i < _pointsContext.coords.size(); i++)
 	{
-		cv::circle(matched, _pointsContext.p1[i]*_scale,5,cv::Scalar(0,0,255),2);
+		cv::circle(matched, _pointsContext.coords[i]*_scale,5,cv::Scalar(0,0,255),2);
 	}
 	for (int i = 1; i < _pointsContext.indexes.size(); i+=2)
 	{
 		int first = _pointsContext.indexes[i-1];
 		int second = _pointsContext.indexes[i];
-		cv::line(matched, _pointsContext.p1[first]*_scale, _pointsContext.p1[second]*_scale, cv::Scalar(0, 255, 0), 2);
+		cv::line(matched, _pointsContext.coords[first]*_scale, _pointsContext.coords[second]*_scale, cv::Scalar(0, 255, 0), 2);
 	}
 
 	if (_pointsContext.indexes.size() & 1)
 	{
 		int i = _pointsContext.indexes.back();
-		cv::circle(matched, _pointsContext.p1[i] * _scale, 5, cv::Scalar(1, 1, 1), -2);
+		cv::circle(matched, _pointsContext.coords[i] * _scale, 5, cv::Scalar(1, 1, 1), -2);
 	}
 
 	DoAssert(_offsetx >= 0);
@@ -174,7 +174,7 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		return;// just moving around
 	// generate click and pretend that this is the feature
 	//only in step one
-	if (_pointsContext.provided == false)
+	if (_pointsContext.mode == false)
 	{
 		// terribly non-acurate:-/ but hey, user input...
 		QPoint p = ev->pos();
@@ -184,11 +184,20 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		{
 			return;
 		}
-		int index = ArrayContains(r, _pointsContext.p1, 1.0/_scale);
-		if (index >= 0)
-			_pointsContext.p1.erase(_pointsContext.p1.begin() + index);
+		int index = ArrayContains(r, _pointsContext.coords, 1.0/_scale);
+		int indexIndexes = ArrayContains(index, _pointsContext.indexes);
+		if (indexIndexes >= 0)
+		{
+			indexIndexes -= indexIndexes & 1;
+			// twice
+			_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+			_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+			update();
+		}
+		else if (index >= 0)
+			_pointsContext.coords.erase(_pointsContext.coords.begin() + index);
 		else
-			_pointsContext.p1.push_back(r);
+			_pointsContext.coords.push_back(r);
 		update();
 	}
 	else
@@ -202,10 +211,9 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		cv::Point2f c;
 		c.x = ev->pos().x() + _offsetx;
 		c.y = ev->pos().y() + _offsety;
-
 		c /= _scale;
 		// make
-		candidate = ArrayContains(c, _pointsContext.p1, 1.0 / _scale);
+		candidate = ArrayContains(c, _pointsContext.coords, 1.0 / _scale);
 		if (candidate >= 0)
 		{
 			if ((!_pointsContext.indexes.empty()) && 
@@ -215,8 +223,34 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 			}
 			else
 			{
+				if ( (_pointsContext.indexes.size()%2) == 0 )
+				{
+					_pointsContext.indexes.push_back(candidate);
+				}
+				else
+				{
+					int last = _pointsContext.indexes.back();
+					if ((candidate) < _pointsContext.data == (last < _pointsContext.data))
+					{
+						_pointsContext.indexes.pop_back();
+						_pointsContext.indexes.push_back(candidate);
+					}
+					else
+					{
+						// make it in correct order
+						int index = _pointsContext.indexes.back();
+						if (index >= _pointsContext.data) //correct
+						{
+							_pointsContext.indexes.back() = candidate;
+							_pointsContext.indexes.push_back(index);
+						}
+						else
+						{
+							_pointsContext.indexes.push_back(candidate);
+						}
+					}
+				}
 				// mark this candidate red and wait for the second input
-				_pointsContext.indexes.push_back(candidate);
 			}			
 			update();
 		}

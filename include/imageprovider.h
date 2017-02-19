@@ -25,10 +25,11 @@ enum ActionModes
 #include "typedefs.h"
 struct PointsContext
 {
-	bool provided;
-	CoordsArray p1;
+	bool mode;
+	CoordsArray coords;
 	std::vector<int> indexes;
-	PointsContext() : provided(false) {}
+	int data;
+	PointsContext() : mode(false) {}
 	void Clear();
 };
 

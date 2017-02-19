@@ -11,7 +11,7 @@ struct MatchPair
 {
 	int imageId;
 	// index to the array of image
-	int pointdId;
+	int pointdCoordId;
 	// next that was not paired yet to anyone
 	MatchPair * paired;
 	// this correspond to the finally reconstructed point

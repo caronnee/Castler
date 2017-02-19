@@ -125,5 +125,5 @@ void Providers::Create(const QString & str)
 void PointsContext::Clear()
 {
 	indexes.clear();
-	p1.clear();
+	coords.clear();
 }
