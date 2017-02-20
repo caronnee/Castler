@@ -763,6 +763,21 @@ void ImageProcessor::LoadKeys(const QString& name, const int&fid )
 		std::vector<cv::KeyPoint> points;
 		LoadArrayKeypoint(file, points);
 		cv::KeyPoint::convert(points, _context.coords);
+		int index = 0;
+		while (index <= _context.coords.size())
+		{
+			if (_context.coords[index].x > _ret.size().width)
+			{
+				_context.coords.erase(_context.coords.begin() + index);
+				continue;
+			}
+			if (_context.coords[index].y > _ret.size().height)
+			{
+				_context.coords.erase(_context.coords.begin() + index);
+				continue;
+			}
+			index++;
+		}
 		// false because this can be changed
 		_context.mode = false;
 		_foundCoords[fid] = points;

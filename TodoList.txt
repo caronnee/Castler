@@ -1,3 +1,4 @@
+- hide already matched keypoints
 - manual picking features
 - manual coorespondences
 - streaming

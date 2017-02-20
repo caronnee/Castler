@@ -185,16 +185,7 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 			return;
 		}
 		int index = ArrayContains(r, _pointsContext.coords, 1.0/_scale);
-		int indexIndexes = ArrayContains(index, _pointsContext.indexes);
-		if (indexIndexes >= 0)
-		{
-			indexIndexes -= indexIndexes & 1;
-			// twice
-			_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
-			_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
-			update();
-		}
-		else if (index >= 0)
+		if (index >= 0)
 			_pointsContext.coords.erase(_pointsContext.coords.begin() + index);
 		else
 			_pointsContext.coords.push_back(r);
@@ -216,42 +207,55 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		candidate = ArrayContains(c, _pointsContext.coords, 1.0 / _scale);
 		if (candidate >= 0)
 		{
-			if ((!_pointsContext.indexes.empty()) && 
+			if ((_pointsContext.indexes.size()&1) &&
 				candidate == _pointsContext.indexes.back())
 			{
 				_pointsContext.indexes.pop_back();
 			}
 			else
 			{
-				if ( (_pointsContext.indexes.size()%2) == 0 )
+				int indexIndexes = ArrayContains(candidate, _pointsContext.indexes);
+				if (indexIndexes >= 0)
 				{
-					_pointsContext.indexes.push_back(candidate);
+					indexIndexes -= indexIndexes & 1;
+					DoAssert(indexIndexes < _pointsContext.indexes.size());
+					// twice
+					_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+					DoAssert(indexIndexes < _pointsContext.indexes.size());
+					_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+					update();
 				}
 				else
 				{
-					int last = _pointsContext.indexes.back();
-					if ((candidate) < _pointsContext.data == (last < _pointsContext.data))
+					if ((_pointsContext.indexes.size() &1) == 0)
 					{
-						_pointsContext.indexes.pop_back();
 						_pointsContext.indexes.push_back(candidate);
 					}
 					else
 					{
-						// make it in correct order
-						int index = _pointsContext.indexes.back();
-						if (index >= _pointsContext.data) //correct
+						int last = _pointsContext.indexes.back();
+						if ((candidate) < _pointsContext.data == (last < _pointsContext.data))
 						{
-							_pointsContext.indexes.back() = candidate;
-							_pointsContext.indexes.push_back(index);
+							_pointsContext.indexes.pop_back();
+							_pointsContext.indexes.push_back(candidate);
 						}
 						else
 						{
-							_pointsContext.indexes.push_back(candidate);
+							// make it in correct order
+							int index = _pointsContext.indexes.back();
+							if (index >= _pointsContext.data) //correct
+							{
+								_pointsContext.indexes.back() = candidate;
+								_pointsContext.indexes.push_back(index);
+							}
+							else
+							{
+								_pointsContext.indexes.push_back(candidate);
+							}
 						}
 					}
 				}
-				// mark this candidate red and wait for the second input
-			}			
+			}
 			update();
 		}
 	}
