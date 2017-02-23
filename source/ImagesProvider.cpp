@@ -8,6 +8,21 @@
 
 static QStringList imagesExts = { ".jpg",".png",".jpeg",".tga",".tif", ".tiff" };
 
+#include "Filename.h"
+
+void ImagesProvider::SkipCurrent()
+{
+	std::string str = Name().toStdString();
+	std::string dir = ExtractDirectory(str);
+	FILE * f = fopen((dir + ".exclude").c_str(), "a+");
+	if (!f)
+		return;
+	fwrite(str.c_str(), 1, str.size(), f);
+	fclose(f);
+	_images.erase(_images.begin() + _pos);
+	if (_pos == _images.size())
+		_pos--;
+};
 IImageProvider * ImagesProvider::create(const QString & source)
 {
 	if (PathIsDirectoryA(source.toStdString().c_str()) || IsSupported(source))

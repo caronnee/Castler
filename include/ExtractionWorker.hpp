@@ -57,6 +57,7 @@ signals:
 
 public slots:
 	// main thread loop
+void DeleteInputEntry();
 	void PreparePair(int start, int modifier);
 	void ProcessActionDone();
 	void ProcessPartialAction(PointsContext);

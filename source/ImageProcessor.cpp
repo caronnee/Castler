@@ -5,10 +5,12 @@
 
 IReportFunction * ImageProcessor::_reporter = NULL;
 
-struct SerializeCallback
+static std::string CreateMatchesName(std::string str1, std::string str2)
 {
-	SerializeKeyPoints serializeKeypoint;
-};
+	std::string strTitle = "_" + FindTitle(str2) + ".matches";
+	std::string ret = ReplaceExt(str1, strTitle.c_str());
+	return GetFullPath(ret);
+}
 
 bool ImageProcessor::AutoCalibrate()
 {
@@ -112,7 +114,6 @@ ImageProcessor::ImageProcessor()
 {
 	_signalAccepted = NULL;
 	_modified = false;
-	_signalAccepted = false;
 	_lastIndex = 0;
 	_phase = 0;
 	_detectorOutput = NULL;
@@ -154,6 +155,7 @@ cv::Size ImageProcessor::GetSize()
 
 bool ImageProcessor::PrepareImage()
 {
+	_context.Clear();
 	_modified = true;
 	if (!_provider || _provider->Frame(_frame) == false)
 		return false;
@@ -162,6 +164,7 @@ bool ImageProcessor::PrepareImage()
 	cv::cvtColor(_frame, _gr, CV_RGB2GRAY);
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
 	_frame.copyTo(_ret);
+	_context.description = _provider->Name();
 	return true;
 }
 
@@ -764,7 +767,7 @@ void ImageProcessor::LoadKeys(const QString& name, const int&fid )
 		LoadArrayKeypoint(file, points);
 		cv::KeyPoint::convert(points, _context.coords);
 		int index = 0;
-		while (index <= _context.coords.size())
+		while (index < _context.coords.size())
 		{
 			if (_context.coords[index].x > _ret.size().width)
 			{
@@ -787,6 +790,7 @@ void ImageProcessor::LoadKeys(const QString& name, const int&fid )
 
 void ImageProcessor::PrepareDouble(const int& first, const int & second)
 {
+	_context.Clear();
 	cv::Mat f, s;
 	_provider->Get(first,f);
 	_provider->Get(second,s);
@@ -808,7 +812,6 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	// set context
 	_context.mode = true;
 	_context.Clear();
-	_context.indexes.clear();
 	KeypointsArray & arr = _foundCoords[first];
 	for (int i = 0; i < arr.size(); i++)
 	{
@@ -834,7 +837,7 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 		_context.coords.push_back(arr2[i].pt + cv::Point2f(s1.width, 0));
 
 	}
-	
+	_context.description = CreateMatchesName(_provider->Name(first).toStdString(), _provider->Name(second).toStdString()).c_str();
 }
 bool ImageProcessor::ManualFeaturesStep()
 {
@@ -854,7 +857,7 @@ bool ImageProcessor::InputWait()
 		return true; 
 	// move the index
 	_lastIndexSecondary++;
-	if (_lastIndexSecondary == _imagesInfo.size())
+	if (_lastIndexSecondary >= _imagesInfo.size())
 	{
 		_lastIndex++;
 		if (_lastIndex == _imagesInfo.size()-1)
@@ -870,12 +873,7 @@ bool ImageProcessor::InputWait()
 	return true;
 }
 
-static std::string CreateMatchesName(std::string str1, std::string str2)
-{
-	std::string strTitle = "_"+ FindTitle(str2) + ".matches";
-	std::string ret = ReplaceExt(str1, strTitle.c_str());
-	return GetFullPath(ret);
-}
+
 void ImageProcessor::InputMatches(const PointsContext & context)
 {
 	std::vector<MatchPair *> pair;

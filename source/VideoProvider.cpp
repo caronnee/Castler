@@ -4,6 +4,10 @@
 const char * VideoProvider::videoExts[] = { ".3gp",".avi",".mpeg",".mp4" };
 const int VideoProvider::NImages = sizeof(videoExts) / sizeof(videoExts[0]);
 
+void VideoProvider::SkipCurrent()
+{
+	__debugbreak();
+}
 IImageProvider * VideoProvider::create(const QString & source)
 {
 	bool found = false;

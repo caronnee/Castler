@@ -54,6 +54,9 @@ Creator::Creator(QWidget *parent)
 	ui.lockGroup->setId(ui.lightRadioButton, PositionLight);
 
 	// videorender connections
+	connect(ui.clearButton, SIGNAL(clicked()), ui.cloudPoints, SLOT(VideoClear()));
+	connect(ui.deleteEntry, SIGNAL(clicked()), _capturer.GetWorker(), SLOT(DeleteInputEntry()));
+	connect(ui.hideKeysCheckbox, SIGNAL(stateChanged(int)), ui.cloudPoints, SLOT(SetMatchesState(int)));
 	connect(ui.cloudPoints, SIGNAL(PartialActionDoneSignal(PointsContext)), _capturer.GetWorker(), SLOT(ProcessPartialAction(PointsContext)));
 	connect(ui.cloudPoints, SIGNAL(PhaseDoneSignal()), _capturer.GetWorker(), SLOT(ProcessActionDone()));
 	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
@@ -81,6 +84,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.playUndistortedButton, SIGNAL(clicked()), this, SLOT(ShowUndistorted()));
 	connect(ui.saveCalibrationButton, SIGNAL(clicked()), this, SLOT(SaveCalibration()));
 
+	connect(&_capturer, SIGNAL(imageDescription(QString)), ui.creatorLabel, SLOT(setText(QString)));
 	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat,PointsContext)), ui.cloudPoints, SLOT(setImage(cv::Mat,PointsContext)));
 
 	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.cloudPoints, SLOT(Report(MessageLevel, const QString &)));

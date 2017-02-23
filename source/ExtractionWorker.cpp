@@ -126,7 +126,13 @@ void ExtractionWorker::timerEvent(QTimerEvent * ev)
 	//}
 
 	// emit result
-	emit imageProcessed(mat, _processor.Context() );
+	emit imageProcessed(mat, _processor.Context());
+}
+
+void ExtractionWorker::DeleteInputEntry()
+{
+	// delete actual entry
+	_provider.SkipCurrent();
 }
 
 void ExtractionWorker::PreparePair(int start, int modifier)

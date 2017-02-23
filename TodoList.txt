@@ -1,8 +1,9 @@
+- delete from set
 - hide already matched keypoints
 - manual picking features
 - manual coorespondences
 - streaming
-- mart segmet and look for it in other images?
+- mark segmet and look for it in other images?
 
 - show correspondences
 - implement comparer;)

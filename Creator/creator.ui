@@ -384,7 +384,7 @@
        <item row="2" column="1" colspan="3">
         <widget class="QLabel" name="creatorLabel">
          <property name="text">
-          <string/>
+          <string>dd</string>
          </property>
         </widget>
        </item>
@@ -402,7 +402,7 @@
                <x>0</x>
                <y>0</y>
                <width>128</width>
-               <height>358</height>
+               <height>331</height>
               </rect>
              </property>
              <attribute name="label">
@@ -413,6 +413,20 @@
                <widget class="QPushButton" name="createMeshButton">
                 <property name="text">
                  <string>Create Mesh</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="clearButton">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="deleteEntry">
+                <property name="text">
+                 <string>Delete from set</string>
                 </property>
                </widget>
               </item>
@@ -452,7 +466,7 @@
                <x>0</x>
                <y>0</y>
                <width>137</width>
-               <height>341</height>
+               <height>314</height>
               </rect>
              </property>
              <attribute name="label">
@@ -522,6 +536,60 @@
                  <string>Camera parameters</string>
                 </property>
                </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page">
+             <attribute name="label">
+              <string>Options</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>Model surface</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="greyCheckBox">
+                <property name="text">
+                 <string>Grey</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="hideKeysCheckbox">
+                <property name="text">
+                 <string>Hide keypoints</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="tristate">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="featuresCheckbox">
+                <property name="text">
+                 <string>Show features</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -598,27 +666,6 @@
               <string>Harris</string>
              </property>
             </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="insideCheckBox">
-            <property name="text">
-             <string>modelIsInside</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="greyCheckBox">
-            <property name="text">
-             <string>Grey</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="featuresCheckbox">
-            <property name="text">
-             <string>Features</string>
-            </property>
            </widget>
           </item>
          </layout>

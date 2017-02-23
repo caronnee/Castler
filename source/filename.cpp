@@ -1,6 +1,15 @@
 #include "Filename.h"
 #include <Windows.h>
 
+std::string ExtractDirectory(const std::string & path)
+{
+	int t = path.find_last_of('\\');
+	int tt = path.find_last_of('/');
+	t = max(t, tt);
+	if (t <= 0)
+		return path;
+	return path.substr(0, t);
+}
 std::string GetFullPath(const std::string & relativeName)
 {
 	if (relativeName[1] == ':')

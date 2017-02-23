@@ -20,6 +20,7 @@ public:
 
 	VideoProvider(const QString & source);
 
+	void SkipCurrent();
 	virtual bool IsValid();
 	virtual bool Next();
 	bool Frame(cv::Mat& frame);

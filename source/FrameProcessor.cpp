@@ -26,6 +26,7 @@ void FrameProcessor::ShowCurrent()
 	cv::Mat image = _images.top();
 	PointsContext context = _contexts.top();
 	emit imageReadySignal(image,context);
+	emit imageDescription(context.description);
 	_images.pop();
 	_contexts.pop();
 }

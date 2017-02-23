@@ -4,7 +4,19 @@
 #include "debug.h"
 #include "ReportFunctions.h"
 #include <qevent.h>
+#include "Misc.h"
 
+enum MatchesMode
+{
+	MatchesNoHide,
+	MatchesHideKeypoints,
+	MatchesShowSetLine
+};
+
+void VideoRenderer::SetMatchesState(int state)
+{
+	_matchesMode = state;
+}
 void VideoRenderer::paintEvent(QPaintEvent *)
 {
 	if (_img.empty())
@@ -34,9 +46,24 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 
 	cv::resize(_img, matched, cv::Size(w,h));
 
-	for (int i = 0; i < _pointsContext.coords.size(); i++)
+	if (_matchesMode == MatchesHideKeypoints)
 	{
-		cv::circle(matched, _pointsContext.coords[i]*_scale,5,cv::Scalar(0,0,255),2);
+		// hide only those that are in matches
+		for (int i = 0; i < _pointsContext.coords.size(); i++)
+		{
+			if (ArrayContains(i, _pointsContext.indexes) >= 0)
+			{
+				continue;
+			}
+			cv::circle(matched, _pointsContext.coords[i] * _scale, 5, cv::Scalar(0, 0, 255), 2);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < _pointsContext.coords.size(); i++)
+		{
+			cv::circle(matched, _pointsContext.coords[i] * _scale, 5, cv::Scalar(0, 0, 255), 2);
+		}
 	}
 	for (int i = 1; i < _pointsContext.indexes.size(); i+=2)
 	{
@@ -87,6 +114,11 @@ void VideoRenderer::SwitchKeys(QKeyEvent *e)
 	}
 }
 
+void VideoRenderer::VideoClear()
+{
+	_pointsContext.Clear();
+}
+
 void VideoRenderer::setImage(cv::Mat img,PointsContext context)
 {
 	_img = img.clone();
@@ -99,8 +131,6 @@ void VideoRenderer::setImage(cv::Mat img,PointsContext context)
 	_scale = qMin(s1, s2);
 	update();
 }
-
-#include "Misc.h"
 
 // zoom
 void VideoRenderer::wheelEvent(QWheelEvent * event)
@@ -146,12 +176,12 @@ void VideoRenderer::mouseMoveEvent(QMouseEvent *ev)
 {
 	if (!_mousePressed || _img.empty())
 		return;
-
+	_canAccept = false;
 	//if left is pressed, move image
 	if (ev->buttons() & Qt::RightButton)
 	{
-		_offsetx += _startingMousePos.x() - ev->pos().x();
-		_offsety += _startingMousePos.y() - ev->pos().y();
+		_offsetx += (_startingMousePos.x() - ev->pos().x())*_scale;
+		_offsety += (_startingMousePos.y() - ev->pos().y())*_scale;
 		int nh = _img.size().height * _scale - size().height();
 		int nw = _img.size().width * _scale - size().width();
 		CheckBoundary<int>(_offsetx, 0, qMax(0, nw));
@@ -165,7 +195,7 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 {
 	if (_canAccept == false)
 	{
-		// gained focud
+		// gained focus
 		_canAccept = true;
 		return;
 	}
@@ -179,7 +209,8 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 		// terribly non-acurate:-/ but hey, user input...
 		QPoint p = ev->pos();
 		//p = QWidget::mapFromGlobal(p);
-		cv::Point2f r(_offsetx + p.x()/_scale, _offsety + p.y()/_scale);
+		cv::Point2f r((_offsetx + p.x())/_scale, 
+			(_offsety + p.y())/_scale);
 		if (r.x > _img.size().width || r.y > _img.size().height)
 		{
 			return;
@@ -268,6 +299,7 @@ void VideoRenderer::keyPressEvent(QKeyEvent *ev)
 }
 
 VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
+	_matchesMode = 0;
 	_canAccept = false;
 	_scale = 1;
 	_offsetx = 0;

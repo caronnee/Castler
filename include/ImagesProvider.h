@@ -13,6 +13,7 @@ class ImagesProvider : public IImageProvider
 	int _pos;
 	std::vector<FImage> _images;
 public:
+	void SkipCurrent();
 	static IImageProvider * create(const QString & source);
 	static bool IsSupported(const QString & source);
 

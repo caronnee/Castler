@@ -29,8 +29,9 @@ struct PointsContext
 	CoordsArray coords;
 	std::vector<int> indexes;
 	int data;
+	QString description;
 	PointsContext() : mode(false) {}
-	void Clear();
+	void Clear();	
 };
 
 struct CalibrationSet
@@ -57,6 +58,7 @@ public:
 	virtual int Count() = 0;
 	virtual const QString Name()const = 0;
 	virtual const QString Name(const int & pos) const=0;
+	virtual void SkipCurrent() = 0;
 };
 
 struct Providers
@@ -84,6 +86,10 @@ struct Providers
 
 	// move one forward
 	bool Next();
+	void SkipCurrent()
+	{
+		_providers[_currentProvider]->SkipCurrent();
+	}
 	int Step()
 	{
 		return _providers[_currentProvider]->Step();
