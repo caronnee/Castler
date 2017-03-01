@@ -22,7 +22,7 @@ CsvReader::CsvReader(const string &path, const char &separator){
 }
 
 /* Read a plane text file with .ply format */
-void CsvReader::readPLY(vector<Vertex> &list_vertex, vector<vector<int> > &list_triangles, Point3f& centerOffset)
+void CsvReader::readPLY(vector<Vertex> &list_vertex, vector<vector<int> > &list_triangles, cv::Point3f& centerOffset)
 {
     std::string line, tmp_str, n;
     int num_vertex = 0, num_triangles = 0;

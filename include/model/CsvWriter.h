@@ -7,14 +7,14 @@
 //#include "Utils.h"
 
 using namespace std;
-using namespace cv;
+
 
 class CsvWriter {
 public:
   CsvWriter(const string &path, const string &separator = " ");
   ~CsvWriter();
-  void writeXYZ(const vector<Point3f> &list_points3d);
-  void writeUVXYZ(const vector<Point3f> &list_points3d, const vector<Point2f> &list_points2d, const Mat &descriptors);
+  void writeXYZ(const vector<cv::Point3f> &list_points3d);
+  void writeUVXYZ(const vector<cv::Point3f> &list_points3d, const vector<cv::Point2f> &list_points2d, const cv::Mat &descriptors);
 
 private:
   ofstream _file;

@@ -19,7 +19,7 @@ CsvWriter::~CsvWriter() {
   _file.close();
 }
 
-void CsvWriter::writeXYZ(const vector<Point3f> &list_points3d)
+void CsvWriter::writeXYZ(const vector<cv::Point3f> &list_points3d)
 {
   string x, y, z;
   for(unsigned int i = 0; i < list_points3d.size(); ++i)
@@ -33,7 +33,7 @@ void CsvWriter::writeXYZ(const vector<Point3f> &list_points3d)
 
 }
 
-void CsvWriter::writeUVXYZ(const vector<Point3f> &list_points3d, const vector<Point2f> &list_points2d, const Mat &descriptors)
+void CsvWriter::writeUVXYZ(const vector<cv::Point3f> &list_points3d, const vector<cv::Point2f> &list_points2d, const cv::Mat &descriptors)
 {
   string u, v, x, y, z, descriptor_str;
   for(unsigned int i = 0; i < list_points3d.size(); ++i)

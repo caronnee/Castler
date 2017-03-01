@@ -8,7 +8,7 @@
 #include<set>
 
 using namespace std;
-using namespace cv;
+
 
 struct Vertex
 {
@@ -35,7 +35,7 @@ public:
   * @param list_triangle - The container of the triangles list of the mesh
   * @return
   */
-  void readPLY(vector<Vertex> &list_vertex, vector<vector<int> > &list_triangles, Point3f& centerOffset);
+  void readPLY(vector<Vertex> &list_vertex, vector<vector<int> > &list_triangles, cv::Point3f& centerOffset);
 
 private:
   /** The current stream file for the reader */

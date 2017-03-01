@@ -123,7 +123,7 @@ void Mesh::Load(const std::string path, bool repairNormals)
 	for (int i = 0; i < shapes.size(); i++)
 	{
 		PolyIndices &poly = shapes[i];
-		Point3f normal = GetNormal(poly[0], poly[1],poly[2]);
+		cv::Point3f normal = GetNormal(poly[0], poly[1],poly[2]);
 		for (int iPoly = 0; iPoly < poly.size(); iPoly++)
 		{
 			int &vertex = poly[iPoly];
