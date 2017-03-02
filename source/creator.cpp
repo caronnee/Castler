@@ -57,6 +57,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.clearButton, SIGNAL(clicked()), ui.cloudPoints, SLOT(VideoClear()));
 	connect(ui.deleteEntry, SIGNAL(clicked()), _capturer.GetWorker(), SLOT(DeleteInputEntry()));
 	connect(ui.hideKeysCheckbox, SIGNAL(stateChanged(int)), ui.cloudPoints, SLOT(SetMatchesState(int)));
+	connect(ui.hideKeysCheckbox, SIGNAL(stateChanged(int)), this, SLOT(SwitchMatchesName(int)));
 	connect(ui.cloudPoints, SIGNAL(PartialActionDoneSignal(PointsContext)), _capturer.GetWorker(), SLOT(ProcessPartialAction(PointsContext)));
 	connect(ui.cloudPoints, SIGNAL(PhaseDoneSignal()), _capturer.GetWorker(), SLOT(ProcessActionDone()));
 	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
@@ -101,6 +102,13 @@ Creator::Creator(QWidget *parent)
 
 	// rest of the initialization
 	LoadSettings();
+	SwitchMatchesName(0);
+}
+
+void Creator::SwitchMatchesName(int name)
+{
+	static char * names[] = { "ShowAll", "Remove matched", "Show lines" };
+	ui.hideKeysCheckbox->setText(names[name]);
 }
 
 void Creator::FillActive(PositionDesc & des)
@@ -425,10 +433,6 @@ void Creator::SaveSettings()
 	settings.setValue(singleModelStr, ui.modelName->text());
 
 	QString name = "last";
-	if (ui.creatorLabel->text().size())
-	{
-		name = ui.creatorLabel->text();
-	}
 	QString model = QApplication::applicationDirPath() + "\\" + name;
 	QSettings modelSettings(model, QSettings::IniFormat);
 	modelSettings.beginWriteArray(modelsStr);

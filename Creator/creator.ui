@@ -394,7 +394,7 @@
           <item>
            <widget class="QToolBox" name="detectorTools">
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="creationPage">
              <property name="geometry">
@@ -575,6 +575,16 @@
                <widget class="QCheckBox" name="featuresCheckbox">
                 <property name="text">
                  <string>Show features</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="endLineModeButton">
+                <property name="text">
+                 <string>Feature line edges</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

@@ -35,8 +35,8 @@ signals:
 	void PreparePairSignal(int,int);
 
 private slots:
-
-void StartManualCreation();
+	void SwitchMatchesName(int name);
+	void StartManualCreation();
 	void PrepareCalibration();
 	void SetCalibCamera(cv::Mat camera, int type);
 	void FillActive(PositionDesc & des);

@@ -34,13 +34,16 @@ private:
 	// image to be shown
 	cv::Mat _img;
 
+	int _startLine;
 	int _matchesMode;
 
 	void paintEvent(QPaintEvent *);
 
 	// keyboard handling
 	void SwitchKeys(QKeyEvent *e);
+
 signals:
+
 	void reportSignal(MessageLevel level, const QString & str);
 	void setCameraSignal(cv::Mat mat, int type);
 	void Finished();
@@ -49,8 +52,7 @@ signals:
 	void PartialActionDoneSignal(PointsContext);
 
 public slots:
-
-void VideoClear();
+	void VideoClear();
 	void setImage(cv::Mat img, PointsContext context);
 	void Report(MessageLevel level, const QString & message);
 	void ShowParameters(cv::Mat camera, cv::Mat dist);

@@ -16,6 +16,8 @@ enum MatchesMode
 void VideoRenderer::SetMatchesState(int state)
 {
 	_matchesMode = state;
+	_startLine = -1;
+	update();
 }
 void VideoRenderer::paintEvent(QPaintEvent *)
 {
@@ -64,12 +66,25 @@ void VideoRenderer::paintEvent(QPaintEvent *)
 		{
 			cv::circle(matched, _pointsContext.coords[i] * _scale, 5, cv::Scalar(0, 0, 255), 2);
 		}
-	}
-	for (int i = 1; i < _pointsContext.indexes.size(); i+=2)
-	{
-		int first = _pointsContext.indexes[i-1];
-		int second = _pointsContext.indexes[i];
-		cv::line(matched, _pointsContext.coords[first]*_scale, _pointsContext.coords[second]*_scale, cv::Scalar(0, 255, 0), 2);
+
+		if (_matchesMode == MatchesShowSetLine)
+		{
+			if (_startLine >= 0)
+			{
+				int startCoord = _pointsContext.indexes[_startLine];
+				int startCoord2 = _pointsContext.indexes[_startLine+1];
+				cv::line(matched, _pointsContext.coords[startCoord] * _scale, _pointsContext.coords[startCoord2] * _scale, cv::Scalar(0, 255, 0), 2);
+			}
+		}
+		else
+		{
+			for (int i = 1; i < _pointsContext.indexes.size(); i += 2)
+			{
+				int first = _pointsContext.indexes[i - 1];
+				int second = _pointsContext.indexes[i];
+				cv::line(matched, _pointsContext.coords[first] * _scale, _pointsContext.coords[second] * _scale, cv::Scalar(0, 255, 0), 2);
+			}
+		}
 	}
 
 	if (_pointsContext.indexes.size() & 1)
@@ -116,7 +131,11 @@ void VideoRenderer::SwitchKeys(QKeyEvent *e)
 
 void VideoRenderer::VideoClear()
 {
-	_pointsContext.Clear();
+	if (_pointsContext.mode)
+		_pointsContext.indexes.clear();
+	else
+		_pointsContext.Clear();
+	update();
 }
 
 void VideoRenderer::setImage(cv::Mat img,PointsContext context)
@@ -139,14 +158,24 @@ void VideoRenderer::wheelEvent(QWheelEvent * event)
 		return;
 
 	// new size
-	double scale = event->delta() / 140.f;
+	double scale = event->delta() / 200.f;
+	CheckBoundary(scale, -0.99, 0.99);
+
 	if (scale < 0)
-		scale = -1.0 / scale;
-	_scale *= scale;
+	{
+		scale = -scale;
+		_scale/= scale;
+	}
+	else
+	{
+		_scale *= scale;
+	}
+
 	if (_scale > 1)
 	{
 		emit reportSignal(MWarning, "Zoom detoriation!");
 	}
+
 	CheckBoundary<float>(_scale, 0.1, 1);
 	_offsetx = scale * _offsetx;
 	DoAssert(_offsetx >= 0);
@@ -251,9 +280,16 @@ void VideoRenderer::mouseReleaseEvent(QMouseEvent *ev)
 					indexIndexes -= indexIndexes & 1;
 					DoAssert(indexIndexes < _pointsContext.indexes.size());
 					// twice
-					_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
-					DoAssert(indexIndexes < _pointsContext.indexes.size());
-					_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+					if (_matchesMode == MatchesShowSetLine)
+					{
+						_startLine = indexIndexes;
+					}
+					else
+					{
+						_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+						DoAssert(indexIndexes < _pointsContext.indexes.size());
+						_pointsContext.indexes.erase(_pointsContext.indexes.begin() + indexIndexes);
+					}
 					update();
 				}
 				else
@@ -299,6 +335,7 @@ void VideoRenderer::keyPressEvent(QKeyEvent *ev)
 }
 
 VideoRenderer::VideoRenderer(QWidget * parent) : QWidget(parent) {
+	_startLine = -1;
 	_matchesMode = 0;
 	_canAccept = false;
 	_scale = 1;

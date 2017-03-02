@@ -54,7 +54,7 @@ void ImageProcessor::InputFeatures(const PointsContext & c)
 	// zero. Just to indicate that we do not have any foundcoords
 	_foundDesc.push_back(cv::Mat());
 	// save to the files
-	FILE* file = fopen((_provider->Name() + ".keys").toStdString().c_str(), "wb");
+	FILE* file = fopen((c.description + ".keys").toStdString().c_str(), "wb");
 	if (file)
 	{
 		std::vector<cv::KeyPoint> points;
@@ -489,6 +489,8 @@ bool ImageProcessor::CleanModifiedFlag()
 void ImageProcessor::ProcessContext(const PointsContext& context)
 {
 	DoAssert(_signalAccepted);
+	if (!_signalAccepted)
+		return;
 	(this->*_signalAccepted)(context);
 	// accepted
 	_signalAccepted = NULL;
@@ -860,13 +862,13 @@ bool ImageProcessor::InputWait()
 	if (_lastIndexSecondary >= _imagesInfo.size())
 	{
 		_lastIndex++;
-		if (_lastIndex == _imagesInfo.size()-1)
+		if (_lastIndex == _imagesInfo.size())
 		{
 			_lastIndex = 0;
 			_lastIndexSecondary = 1;
 			return false;
 		}
-		_lastIndexSecondary = _lastIndex+1;
+		_lastIndexSecondary = _lastIndex;
 		return true;
 	}
 	_phase--;
@@ -891,9 +893,7 @@ void ImageProcessor::InputMatches(const PointsContext & context)
 		r.rel = 1;
 		_reliability.push_back(r);
 	}
-	std::string n1 = _provider->Name(_lastIndex).toStdString();
-	std::string n2 = _provider->Name(_lastIndexSecondary).toStdString();
-	SaveMatches(CreateMatchesName(n1,n2), pair);
+	SaveMatches(context.description.toStdString(), pair);
 }
 
 void ImageProcessor::SaveMatches(const std::string & name, std::vector<MatchPair*> pairs)

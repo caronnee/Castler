@@ -1,9 +1,10 @@
+- loading from blender / ply files + textures
+- voronoi diagram for final matching
+- screenshot saving
 - delete from set
-- hide already matched keypoints
-- manual picking features
-- manual coorespondences
 - streaming
 - mark segmet and look for it in other images?
+- mark line and
 
 - show correspondences
 - implement comparer;)
