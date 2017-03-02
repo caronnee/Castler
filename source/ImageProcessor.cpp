@@ -63,7 +63,6 @@ void ImageProcessor::InputFeatures(const PointsContext & c)
 		fclose(file);
 	}
 
-	(_provider->Name(),k);
 }
 
 int ImageProcessor::FindNextBestPair(int& firstCamera, int & secondCamera)
@@ -869,6 +868,7 @@ bool ImageProcessor::InputWait()
 			return false;
 		}
 		_lastIndexSecondary = _lastIndex;
+		_phase--;
 		return true;
 	}
 	_phase--;
@@ -879,6 +879,8 @@ bool ImageProcessor::InputWait()
 void ImageProcessor::InputMatches(const PointsContext & context)
 {
 	std::vector<MatchPair *> pair;
+	std::vector<cv::Point2f> points1;
+	std::vector<cv::Point2f> points2;
 	// in points context we have all the correspondences
 	for (int i = 1; i < context.indexes.size(); i+=2)
 	{
@@ -886,12 +888,28 @@ void ImageProcessor::InputMatches(const PointsContext & context)
 		int sec2 = context.indexes[i];
 		MatchPair* p= AddPair(_lastIndex, sec, _lastIndexSecondary, sec2);
 		pair.push_back(p);
-		RelMap r;
-		r.image1 = _lastIndex;
-		r.image2 = _lastIndexSecondary;
-		// default when we did not check fundamental matrix
-		r.rel = 1;
+		points1.push_back(_context.coords[sec]);
+		points2.push_back(_context.coords[sec2]);
+	}
+
+	RelMap r;
+	r.image1 = _lastIndex;
+	r.image2 = _lastIndexSecondary;
+	// default when we did not check fundamental matrix
+	
+	r.rel = 0;
+
+	// check if there can be fundamental matrix created from the provided matches
+	std::vector<uchar> status;
+	cv::Mat fundamendal = cv::findFundamentalMat(points1, points2, status);
+	if (fundamendal.empty())
+		_reporter->Report(MWarning, "Fundamental matrix was not found! Too low number of matches?");
+	else
+	{
+		double inside = std::count(status.begin(), status.end(), 1);
+		r.rel = inside / status.size();
 		_reliability.push_back(r);
+		_reporter->Report(MInfo, "Fundamental matrix was not found! Too low number of matches?");
 	}
 	SaveMatches(context.description.toStdString(), pair);
 }

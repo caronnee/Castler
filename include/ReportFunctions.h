@@ -2,11 +2,17 @@
 
 #include <QString>
 
+#define MESSAGES(XX)\
+	XX(Info, "blue")\
+	XX(Warning, "orange")\
+	XX(Error, "red")\
+	XX(Normal, "black")\
+
+#define MESSAGE_ENUM(name,color) M##name,
+
 enum MessageLevel
 {
-	MInfo,
-	MWarning,
-	MError,
+	MESSAGES( MESSAGE_ENUM )
 	MLevels
 };
 

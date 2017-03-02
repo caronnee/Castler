@@ -17,17 +17,27 @@ LogHandler::~LogHandler()
 
 }
 
-QString levels[MLevels] = { "Info:", "Warning", "Error" };
+#define ERROR_NAME(name, color) _STRINGIZE(name),
+
+const char * levels[MLevels] = { 
+	MESSAGES ( ERROR_NAME )
+};
 
 #define MAX_MESSAGE_LEN 1024
 
 #include <QScrollBar>
 
+#define MESSAGES_COLORS(name,color) "<font color=\"" color "\">%s </font>",
+const char * fontColors[] =
+{
+	MESSAGES(MESSAGES_COLORS)
+};
 void LogHandler::Report(MessageLevel level, const QString & str)
 {
-	insertPlainText(levels[level]);
-	insertPlainText(" : ");
-	insertPlainText(str);
+	QString sStr = QString::asprintf(fontColors[level], levels[level]);
+	insertHtml(sStr);
+	sStr = QString::asprintf(fontColors[MNormal], str.toStdString().c_str());
+	insertHtml(sStr);
 	insertPlainText("\n");
 	QScrollBar *sb = verticalScrollBar();
 	sb->setValue(sb->maximum());
