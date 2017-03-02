@@ -867,7 +867,7 @@ bool ImageProcessor::InputWait()
 			_lastIndexSecondary = 1;
 			return false;
 		}
-		_lastIndexSecondary = _lastIndex;
+		_lastIndexSecondary = _lastIndex+1;
 		_phase--;
 		return true;
 	}
@@ -901,15 +901,19 @@ void ImageProcessor::InputMatches(const PointsContext & context)
 
 	// check if there can be fundamental matrix created from the provided matches
 	std::vector<uchar> status;
-	cv::Mat fundamendal = cv::findFundamentalMat(points1, points2, status);
-	if (fundamendal.empty())
-		_reporter->Report(MWarning, "Fundamental matrix was not found! Too low number of matches?");
-	else
+	if ( points2.size())
 	{
-		double inside = std::count(status.begin(), status.end(), 1);
-		r.rel = inside / status.size();
-		_reliability.push_back(r);
-		_reporter->Report(MInfo, "Fundamental matrix was not found! Too low number of matches?");
+		cv::Mat fundamendal = cv::findFundamentalMat(points1, points2, status);
+		if (fundamendal.empty())
+			_reporter->Report(MWarning, "Fundamental matrix was not found! Too low number of matches?");
+		else
+		{
+			double inside = std::count(status.begin(), status.end(), 1);
+			r.rel = inside / status.size();
+			_reliability.push_back(r);
+			QString str = QString::asprintf("%d/%d matches used", (int)inside, status.size());
+			_reporter->Report(MInfo, str);
+		}
 	}
 	SaveMatches(context.description.toStdString(), pair);
 }
