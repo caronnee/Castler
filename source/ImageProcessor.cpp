@@ -1065,7 +1065,7 @@ bool ImageProcessor::FinishCreationStep()
 	cv::Mat b = cv::Mat::zeros(2 * n, 1, CV_64F);
 	cv::Mat X = cv::Mat::zeros(3, 1, CV_64F);
 
-	cv::Rect rct1(0, 0, 3, 3);
+	cv::Rect rct(0, 0, 3, 3);
 	cv::Rect transl(0, 0, 1, 3);
 	cv::Mat projMatrices[] = { p1, p2 };
 
