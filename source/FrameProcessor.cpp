@@ -87,7 +87,6 @@ void FrameProcessor::Pause()
 
 void FrameProcessor::Stop()
 {
-	_worker.Terminate();
 	_timer.stop();
 	std::stack<cv::Mat> empty;
 	std::swap(_images, empty);

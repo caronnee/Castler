@@ -88,7 +88,8 @@ bool ImagesProvider::Frame(cv::Mat & frame)
 	if (_images[_pos].loaded == false)
 	{
 		cv::Mat frame = cv::imread(_images[_pos].name.toStdString().c_str(), CV_LOAD_IMAGE_COLOR);
-		cv::cvtColor(frame, frame, CV_BGR2RGB);
+		if (frame.empty() == false)
+			cv::cvtColor(frame, frame, CV_BGR2RGB);
 		_images[_pos].image = frame;
 	}
 	frame = _images[_pos].image;

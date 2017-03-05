@@ -117,7 +117,6 @@ void VideoRenderer::SwitchKeys(QKeyEvent *e)
 			{
 				// phase complete signal
 				emit PhaseDoneSignal();
-				_pointsContext.Clear();
 			}
 			else
 			{

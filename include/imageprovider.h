@@ -25,12 +25,45 @@ enum ActionModes
 #include "typedefs.h"
 struct PointsContext
 {
+	// boll if the keypoints are provided and so
 	bool mode;
+
+	// ids of the images
+	int id[2];
+
+	// 2D coordinated in the pictures
 	CoordsArray coords;
+
+	// indexes to coords
 	std::vector<int> indexes;
+
+	// additional data
 	int data;
+
+	// used description - TODO remove. We have ids
 	QString description;
-	PointsContext() : mode(false) {}
+public:
+	void Set(const PointsContext & ctx)
+	{
+		id[0] = ctx.id[0];
+		id[1] = ctx.id[1];
+		coords = ctx.coords;
+		data = ctx.data;
+		description = ctx.description;
+		indexes = ctx.indexes;
+		mode = ctx.mode;
+	}
+
+	PointsContext() : mode(false) {
+	}
+	PointsContext(const PointsContext & ctx) : mode(false) {
+		Set(ctx);
+	}
+	PointsContext & operator=(PointsContext & ctx)
+	{
+		Set(ctx);
+		return *this;
+	}
 	void Clear();	
 };
 

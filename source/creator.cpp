@@ -35,8 +35,8 @@ Creator::Creator(QWidget *parent)
 	connect(_shortcuts[2], SIGNAL(activated()), this, SLOT(AddNewPoint()));
 
 	// worker connects
-	connect(this, SIGNAL(modeChangedVisualSignal(int)), _capturer.GetWorker(), SLOT(ChangeVisualMode(int)));
-	connect(this, SIGNAL(modeChangedActionSignal(int)), _capturer.GetWorker(), SLOT(ChangeActionMode(int)));
+	connect(this, SIGNAL(modeChangedVisualSignal(int)), _capturer.GetWorker(), SLOT(ChangeVisualMode(int)),Qt::QueuedConnection);
+	connect(this, SIGNAL(modeChangedActionSignal(int)), _capturer.GetWorker(), SLOT(ChangeActionMode(int)), Qt::QueuedConnection);
 	connect(ui.renderer, SIGNAL( DescChangedSignal(PositionDesc&)), this, SLOT(FillActive(PositionDesc&)));
 
 	// rendered connects
@@ -55,11 +55,11 @@ Creator::Creator(QWidget *parent)
 
 	// videorender connections
 	connect(ui.clearButton, SIGNAL(clicked()), ui.cloudPoints, SLOT(VideoClear()));
-	connect(ui.deleteEntry, SIGNAL(clicked()), _capturer.GetWorker(), SLOT(DeleteInputEntry()));
+	connect(ui.deleteEntry, SIGNAL(clicked()), _capturer.GetWorker(), SLOT(DeleteInputEntry()), Qt::QueuedConnection);
 	connect(ui.hideKeysCheckbox, SIGNAL(stateChanged(int)), ui.cloudPoints, SLOT(SetMatchesState(int)));
 	connect(ui.hideKeysCheckbox, SIGNAL(stateChanged(int)), this, SLOT(SwitchMatchesName(int)));
-	connect(ui.cloudPoints, SIGNAL(PartialActionDoneSignal(PointsContext)), _capturer.GetWorker(), SLOT(ProcessPartialAction(PointsContext)));
-	connect(ui.cloudPoints, SIGNAL(PhaseDoneSignal()), _capturer.GetWorker(), SLOT(ProcessActionDone()));
+	connect(ui.cloudPoints, SIGNAL(PartialActionDoneSignal(PointsContext)), _capturer.GetWorker(), SLOT(ProcessPartialAction(PointsContext)), Qt::QueuedConnection);
+	connect(ui.cloudPoints, SIGNAL(PhaseDoneSignal()), _capturer.GetWorker(), SLOT(ProcessActionDone()), Qt::QueuedConnection);
 	connect(ui.applyDescButton, SIGNAL(clicked()), this, SLOT(ChangeActiveDesc()));
 	connect(ui.saveSettingsButton, SIGNAL(clicked(void)), this, SLOT(SaveSettings()));
 	connect(ui.playButton, SIGNAL(clicked(void)), this, SLOT(PlayVideo()));
@@ -67,7 +67,7 @@ Creator::Creator(QWidget *parent)
 	connect(ui.cloudPoints, SIGNAL(Finished(void)), this, SLOT(EnablePlay()));
 	connect(ui.cloudPoints, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.infobox, SLOT(Report(MessageLevel, const QString&)));
 	connect(ui.createMeshButton, SIGNAL(clicked()),this, SLOT(StartCreating()));
-	connect(ui.nextFrameButton, SIGNAL(clicked(void)), _capturer.GetWorker(), SLOT(RequestNextFrame()));
+	connect(ui.nextFrameButton, SIGNAL(clicked(void)), _capturer.GetWorker(), SLOT(RequestNextFrame()), Qt::QueuedConnection);
 	//connect(ui.prevFrameButton, SIGNAL(clicked(void)), ui.cloudPoints, SLOT(RequestPrevFrame()));
 	//ui.nextFrameButton->setDisabled(true);
 	ui.prevFrameButton->setDisabled(true);
@@ -85,18 +85,18 @@ Creator::Creator(QWidget *parent)
 	connect(ui.playUndistortedButton, SIGNAL(clicked()), this, SLOT(ShowUndistorted()));
 	connect(ui.saveCalibrationButton, SIGNAL(clicked()), this, SLOT(SaveCalibration()));
 
-	connect(&_capturer, SIGNAL(imageDescription(QString)), ui.creatorLabel, SLOT(setText(QString)));
-	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat,PointsContext)), ui.cloudPoints, SLOT(setImage(cv::Mat,PointsContext)));
+	connect(&_capturer, SIGNAL(imageDescription(QString)), ui.creatorLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+	connect(&_capturer, SIGNAL(imageReadySignal(cv::Mat,PointsContext)), ui.cloudPoints, SLOT(setImage(cv::Mat,PointsContext)), Qt::QueuedConnection);
 
-	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.cloudPoints, SLOT(Report(MessageLevel, const QString &)));
+	connect(&_capturer, SIGNAL(reportSignal(MessageLevel, const QString &)), ui.cloudPoints, SLOT(Report(MessageLevel, const QString &)), Qt::QueuedConnection);
 	connect(_capturer.GetWorker(), SIGNAL(camParametersSignal(cv::Mat, cv::Mat)), ui.cloudPoints, SLOT(ShowParameters(cv::Mat, cv::Mat)));
 	connect(ui.cloudPoints, SIGNAL(setCalibrationSignal(CalibrationSet)), _capturer.GetWorker(), SLOT(ChangeCalibration(CalibrationSet)));
-	connect(ui.manualCreationButton, SIGNAL(clicked()), this, SLOT(StartManualCreation()));
+	connect(ui.manualCreationButton, SIGNAL(clicked()), this, SLOT(StartManualCreation()), Qt::QueuedConnection);
 
 	// comparer connects
 	connect(ui.compareNext, SIGNAL(clicked()), this, SLOT(GetNextImagePair()));
-	connect(this, SIGNAL(PreparePairSignal(int, int)), _capturer.GetWorker(), SLOT(PreparePair(int,int)));
-	connect(_capturer.GetWorker(), SIGNAL(imagePairSignal(cv::Mat, cv::Mat)), this, SLOT(SetCompare(cv::Mat, cv::Mat)));
+	connect(this, SIGNAL(PreparePairSignal(int, int)), _capturer.GetWorker(), SLOT(PreparePair(int,int)), Qt::QueuedConnection);
+	connect(_capturer.GetWorker(), SIGNAL(imagePairSignal(cv::Mat, cv::Mat)), this, SLOT(SetCompare(cv::Mat, cv::Mat)), Qt::QueuedConnection);
 	connect(ui.applyModifierButton, SIGNAL(clicked()), this, SLOT(SetModifier()));
 	//connect(ui.comparePrev, SIGNAL(clicked()), this, SLOT(GetPrevImagePair()));
 

@@ -46,13 +46,21 @@ bool ImageProcessor::AutoCalibrate()
 	return false;
 }
 
+void ImageProcessor::Set2DCoords(KeypointsArray& coords, cv::Mat descArray, const int & id)
+{
+	_foundCoords.resize(id + 1);
+	_foundDesc.resize(id + 1);
+	_foundCoords[id] = coords;
+	_foundDesc[id] = descArray;
+}
+
 void ImageProcessor::InputFeatures(const PointsContext & c)
 {
 	KeypointsArray k;
 	cv::KeyPoint::convert(c.coords, k);
-	_foundCoords.push_back(k);
-	// zero. Just to indicate that we do not have any foundcoords
-	_foundDesc.push_back(cv::Mat());
+	// TODO set coord and matches at correct place
+	Set2DCoords(k, cv::Mat(), c.id[0]);
+	
 	// save to the files
 	FILE* file = fopen((c.description + ".keys").toStdString().c_str(), "wb");
 	if (file)
@@ -158,7 +166,7 @@ bool ImageProcessor::PrepareImage()
 	_modified = true;
 	if (!_provider || _provider->Frame(_frame) == false)
 		return false;
-
+	_context.id[0] = _lastIndex;
 	_frameSize = _frame.size();
 	cv::cvtColor(_frame, _gr, CV_RGB2GRAY);
 	//cv::goodFeaturesToTrack(gr, corners, 100, 0.1, 10, cv::noArray(), 7);
@@ -252,8 +260,7 @@ void ImageProcessor::ApplyFeatureDetector()
 	cv::Mat desc;
 	_ffd->detect(_gr, arr);
 	_ffd->compute(_gr, arr, desc);
-	_foundCoords.push_back(arr);
-	_foundDesc.push_back(desc);
+	Set2DCoords(arr, desc,_lastIndex);
 }
 
 bool ImageProcessor::PerformDetection()
@@ -487,7 +494,7 @@ bool ImageProcessor::CleanModifiedFlag()
 
 void ImageProcessor::ProcessContext(const PointsContext& context)
 {
-	DoAssert(_signalAccepted);
+	//DoAssert(_signalAccepted);
 	if (!_signalAccepted)
 		return;
 	(this->*_signalAccepted)(context);
@@ -756,35 +763,19 @@ bool ImageProcessor::GlobalBundleAdjustment()
 	return false;
 }
 
-void ImageProcessor::LoadKeys(const QString& name, const int&fid )
+void ImageProcessor::LoadKeys(const QString& name, const int&fid)
 {
-	if (_foundCoords.size() <= fid)
-		_foundCoords.resize(fid+1);
+	if ((_foundCoords.size() > fid && _foundCoords[fid].size() != 0))
+		return;
 	std::string nm = GetFullPath( (name + ".keys").toStdString());
 	FILE* file = fopen(nm.c_str(), "rb");
 	if (file)
 	{
 		std::vector<cv::KeyPoint> points;
 		LoadArrayKeypoint(file, points);
-		cv::KeyPoint::convert(points, _context.coords);
-		int index = 0;
-		while (index < _context.coords.size())
-		{
-			if (_context.coords[index].x > _ret.size().width)
-			{
-				_context.coords.erase(_context.coords.begin() + index);
-				continue;
-			}
-			if (_context.coords[index].y > _ret.size().height)
-			{
-				_context.coords.erase(_context.coords.begin() + index);
-				continue;
-			}
-			index++;
-		}
 		// false because this can be changed
 		_context.mode = false;
-		_foundCoords[fid] = points;
+		Set2DCoords(points, cv::Mat(),fid);
 		fclose(file);
 	}
 }
@@ -792,6 +783,8 @@ void ImageProcessor::LoadKeys(const QString& name, const int&fid )
 void ImageProcessor::PrepareDouble(const int& first, const int & second)
 {
 	_context.Clear();
+	_context.id[0] = _lastIndex;
+	_context.id[1] = _lastIndexSecondary;
 	cv::Mat f, s;
 	_provider->Get(first,f);
 	_provider->Get(second,s);
@@ -812,7 +805,6 @@ void ImageProcessor::PrepareDouble(const int& first, const int & second)
 	_modified = true;
 	// set context
 	_context.mode = true;
-	_context.Clear();
 	KeypointsArray & arr = _foundCoords[first];
 	for (int i = 0; i < arr.size(); i++)
 	{
@@ -847,7 +839,8 @@ bool ImageProcessor::ManualFeaturesStep()
 	_lastIndexSecondary = _imagesInfo.size();
 	PrepareImage();
 	// fill context with everything that you have
-	LoadKeys(_provider->Name(),_foundCoords.size());
+	LoadKeys(_provider->Name(),_lastIndex);
+	cv::KeyPoint::convert( _foundCoords[_lastIndex], _context.coords);
 	_signalAccepted = &ImageProcessor::InputFeatures;
 	return false;
 }
@@ -888,13 +881,13 @@ void ImageProcessor::InputMatches(const PointsContext & context)
 		int sec2 = context.indexes[i];
 		MatchPair* p= AddPair(_lastIndex, sec, _lastIndexSecondary, sec2);
 		pair.push_back(p);
-		points1.push_back(_context.coords[sec]);
-		points2.push_back(_context.coords[sec2]);
+		points1.push_back(context.coords[sec]);
+		points2.push_back(context.coords[sec2]);
 	}
 
 	RelMap r;
-	r.image1 = _lastIndex;
-	r.image2 = _lastIndexSecondary;
+	r.image1 = context.id[0];
+	r.image2 = context.id[1];
 	// default when we did not check fundamental matrix
 	
 	r.rel = 0;
@@ -1065,7 +1058,7 @@ bool ImageProcessor::FinishCreationStep()
 	cv::Mat b = cv::Mat::zeros(2 * n, 1, CV_64F);
 	cv::Mat X = cv::Mat::zeros(3, 1, CV_64F);
 
-	cv::Rect rct(0, 0, 3, 3);
+	cv::Rect rct1(0, 0, 3, 3);
 	cv::Rect transl(0, 0, 1, 3);
 	cv::Mat projMatrices[] = { p1, p2 };
 

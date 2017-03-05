@@ -181,6 +181,9 @@ public:
 	// automatically guess calibration 
 	bool AutoCalibrate();
 
+	// 
+	void Set2DCoords(KeypointsArray& coords, cv::Mat descArray, const int & id);
+
 	// finishes calibration according to the known object
 	bool FinishCalibration(PointsArray & chesses, cv::Mat& cameraMatrix, cv::Mat& distCoeffs);
 
@@ -218,7 +221,7 @@ public:
 	void Clear();
 	bool CleanModifiedFlag();
 	void ProcessContext(const PointsContext& context);
-	PointsContext Context()const
+	const PointsContext& Context()const
 	{
 		return _context;
 	}

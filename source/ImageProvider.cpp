@@ -126,4 +126,5 @@ void PointsContext::Clear()
 {
 	indexes.clear();
 	coords.clear();
+	id[0] = id[1] = -1;
 }
